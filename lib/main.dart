@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/modules/on_boarding/on_boarding_view.dart';
+import 'package:social_media_app/shared/bloc/app_cubit/app_cubit.dart';
 
 void main() {
   runApp(const SocialMediaApp());
@@ -10,11 +12,15 @@ class SocialMediaApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      initialRoute: OnBoardingView.routeViewName,
-      routes: {
-        OnBoardingView.routeViewName: (context) => const OnBoardingView(),
-      },
+    return BlocProvider(
+      create: (context) => AppCubit(),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        initialRoute: OnBoardingView.routeViewName,
+        routes: {
+          OnBoardingView.routeViewName: (context) => const OnBoardingView(),
+        },
+      ),
     );
   }
 }
