@@ -6,7 +6,12 @@ class AppCubit extends Cubit<AppState> {
   AppCubit() : super(AppInitial());
 
   int currentIndex = 0;
-  List<OnBoardingModel> onBoardingModels = [
+  void onBoardingPageChanged(int value) {
+    currentIndex = value;
+    emit(OnBoardingChangedState());
+  }
+
+  List<OnBoardingModel> onBoardingModelsList = [
     OnBoardingModel(
       title: 'Welocme !',
       subTitle: 'Experience a wonderful',

@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/modules/on_boarding/on_boarding_view.dart';
 import 'package:social_media_app/shared/bloc/app_cubit/app_cubit.dart';
+import 'package:social_media_app/shared/bloc/bloc_observer.dart';
 
 void main() {
+  Bloc.observer = MyBlocObserver();
   runApp(const SocialMediaApp());
 }
 

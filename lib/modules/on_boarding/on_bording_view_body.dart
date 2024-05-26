@@ -12,7 +12,7 @@ class OnBoardingViewBody extends StatelessWidget {
         Stack(
           clipBehavior: Clip.none,
           children: [
-            // this for hide the rounded upper ege of image 
+            // this for hide the rounded upper ege of image
             Transform.translate(
               offset: const Offset(0, -12),
               child: Image.asset(
