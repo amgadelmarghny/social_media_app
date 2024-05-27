@@ -7,23 +7,25 @@ class OnBoardingViewBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Stack(
+      alignment: Alignment.bottomCenter,
+      clipBehavior: Clip.none,
       children: [
-        Stack(
-          clipBehavior: Clip.none,
-          children: [
-            // this for hide the rounded upper ege of image 
-            Transform.translate(
-              offset: const Offset(0, -12),
-              child: Image.asset(
+        // this for hide the rounded upper ege of image
+        // by move it up until the bar
+        Transform.translate(
+          offset: const Offset(0, -12),
+          child: Column(
+            children: [
+              Image.asset(
                 'lib/assets/images/on_boarding.png',
                 width: double.infinity,
                 fit: BoxFit.fill,
               ),
-            ),
-            const ContainerPageView(),
-          ],
+            ],
+          ),
         ),
+        const CustomContainerPageView(),
       ],
     );
   }

@@ -6,24 +6,23 @@ import 'package:social_media_app/shared/bloc/app_cubit/app_cubit.dart';
 import 'package:social_media_app/shared/components/custom_button.dart';
 import 'dart:ui' as ui;
 
-class ContainerPageView extends StatelessWidget {
-  const ContainerPageView({
+class CustomContainerPageView extends StatelessWidget {
+  const CustomContainerPageView({
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
     PageController pageController = PageController();
-    return Positioned(
-      bottom: -MediaQuery.sizeOf(context).height * 0.85 / 7,
-      left: 0,
-      right: 0,
+    AppCubit appCubit = BlocProvider.of<AppCubit>(context);
+    return Align(
+      alignment: Alignment.bottomCenter,
       child: Container(
-        height: MediaQuery.of(context).size.height * 0.34,
+        height: MediaQuery.of(context).size.height * 0.37,
         width: double.infinity,
         clipBehavior: Clip.hardEdge,
         decoration: BoxDecoration(
-          color: const Color(0xffCEA6E7).withOpacity(0.85),
+          color: const Color(0xffCEA6E7).withOpacity(0.78),
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(50),
             topRight: Radius.circular(50),
@@ -32,13 +31,15 @@ class ContainerPageView extends StatelessWidget {
         child: BackdropFilter(
           filter: ui.ImageFilter.blur(sigmaX: 9, sigmaY: 9),
           child: Padding(
-            padding: const EdgeInsets.only(top: 30, left: 40, right: 30),
+            padding: const EdgeInsets.only(top: 30, left: 40, right: 40),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SmoothPageIndicator(
                   controller: pageController,
-                  count: 3,
+                  count: BlocProvider.of<AppCubit>(context)
+                      .onBoardingModelsList
+                      .length,
                   effect: const WormEffect(
                       dotHeight: 10,
                       dotWidth: 10,
@@ -49,20 +50,35 @@ class ContainerPageView extends StatelessWidget {
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.18,
                   child: PageView.builder(
-                    onPageChanged: (value) {
-                      BlocProvider.of<AppCubit>(context).currentIndex = value;
-                    },
-                    itemCount: 3,
-                    itemBuilder: (context, index) => OnBoardingPages(
-                      onBoardingModel: BlocProvider.of<AppCubit>(context)
-                          .onBoardingModels[index],
-                    ),
                     controller: pageController,
+                    onPageChanged: (value) {
+                      appCubit.onBoardingPageChanged(value);
+                    },
+                    itemCount: appCubit.onBoardingModelsList.length,
+                    itemBuilder: (context, index) => OnBoardingPages(
+                      onBoardingModel: appCubit.onBoardingModelsList[index],
+                    ),
                   ),
                 ),
-                CustomButton(
-                  text: 'Get Started',
-                  onTap: () {},
+                BlocBuilder<AppCubit, AppState>(
+                  builder: (context, state) {
+                    return CustomButton(
+                      text: appCubit.currentIndex ==
+                              appCubit.onBoardingModelsList.length - 1
+                          ? 'Get Started'
+                          : 'Next',
+                      onTap: () {
+                        if (appCubit.currentIndex ==
+                            appCubit.onBoardingModelsList.length - 1) {
+                        } else {
+                          pageController.nextPage(
+                            duration: const Duration(milliseconds: 500),
+                            curve: Curves.linear,
+                          );
+                        }
+                      },
+                    );
+                  },
                 )
               ],
             ),
