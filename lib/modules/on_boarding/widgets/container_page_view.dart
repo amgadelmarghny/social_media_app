@@ -4,8 +4,9 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:social_media_app/modules/login/login_view.dart';
 import 'package:social_media_app/modules/on_boarding/widgets/on_boarding_pages.dart';
 import 'package:social_media_app/shared/bloc/app_cubit/app_cubit.dart';
-import 'package:social_media_app/shared/components/custom_button.dart';
 import 'dart:ui' as ui;
+
+import 'package:social_media_app/shared/components/custom_button.dart';
 
 class CustomContainerPageView extends StatelessWidget {
   const CustomContainerPageView({
@@ -14,12 +15,12 @@ class CustomContainerPageView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    PageController pageController = PageController();
     AppCubit appCubit = BlocProvider.of<AppCubit>(context);
+    PageController pageController = PageController();
     return Align(
       alignment: Alignment.bottomCenter,
       child: Container(
-        height: MediaQuery.of(context).size.height * 0.37,
+        height: MediaQuery.of(context).size.height * 0.34,
         width: double.infinity,
         clipBehavior: Clip.hardEdge,
         decoration: BoxDecoration(
@@ -38,9 +39,7 @@ class CustomContainerPageView extends StatelessWidget {
               children: [
                 SmoothPageIndicator(
                   controller: pageController,
-                  count: BlocProvider.of<AppCubit>(context)
-                      .onBoardingModelsList
-                      .length,
+                  count: appCubit.onBoardingModelsList.length,
                   effect: const WormEffect(
                       dotHeight: 10,
                       dotWidth: 10,
@@ -82,7 +81,7 @@ class CustomContainerPageView extends StatelessWidget {
                       },
                     );
                   },
-                )
+                ),
               ],
             ),
           ),
