@@ -18,17 +18,17 @@ class OnBoardingPages extends StatelessWidget {
         ),
         Text(
           onBoardingModel.title,
-          style: FontsStyle.font36Bold,
+          style: FontsStyle.font36BoldShadow,
         ),
         Text(
           onBoardingModel.subTitle,
-          style: FontsStyle.font20,
+          style: FontsStyle.font24Shadow,
         ),
         Row(
           children: [
             const Text(
               'moment with',
-              style: FontsStyle.font20,
+              style: FontsStyle.font24Shadow,
             ),
             const SizedBox(
               width: 8,

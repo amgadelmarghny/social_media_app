@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:social_media_app/shared/components/textformfield.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
 
 class LodinViewBody extends StatelessWidget {
@@ -30,11 +31,14 @@ class LodinViewBody extends StatelessWidget {
           ),
           const Text(
             'Sign in',
-            style: FontsStyle.font36Bold,
+            style: FontsStyle.font36BoldShadow,
           ),
           SizedBox(
             height: h * 0.03,
           ),
+          const CustomTextField(
+            hintText: 'Email/phone number',
+          )
         ],
       ),
     );
