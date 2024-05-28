@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:social_media_app/modules/login/login_view.dart';
 import 'package:social_media_app/modules/on_boarding/widgets/on_boarding_pages.dart';
 import 'package:social_media_app/shared/bloc/app_cubit/app_cubit.dart';
 import 'package:social_media_app/shared/components/custom_button.dart';
@@ -70,6 +71,8 @@ class CustomContainerPageView extends StatelessWidget {
                       onTap: () {
                         if (appCubit.currentIndex ==
                             appCubit.onBoardingModelsList.length - 1) {
+                          Navigator.pushReplacementNamed(
+                              context, LoginView.routeViewName);
                         } else {
                           pageController.nextPage(
                             duration: const Duration(milliseconds: 500),
