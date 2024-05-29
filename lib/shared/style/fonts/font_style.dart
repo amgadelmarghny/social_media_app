@@ -31,7 +31,7 @@ abstract class FontsStyle {
     return GoogleFonts.poppins(
       textStyle: TextStyle(
         color: color,
-        fontSize: 20,
+        fontSize: 19,
       ),
     );
   }

@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
 
 class CustomTextField extends StatelessWidget {
@@ -24,7 +22,7 @@ class CustomTextField extends StatelessWidget {
   final bool obscureText;
   final String? hintText;
   final void Function(String)? onChange;
-  final Function()? suffixOnPressed;
+  final void Function()? suffixOnPressed;
   final String? labelText;
   @override
   Widget build(BuildContext context) {
@@ -36,7 +34,7 @@ class CustomTextField extends StatelessWidget {
         maxLines: 1,
         keyboardType: textInputType,
         obscureText: obscureText,
-        style: const TextStyle(fontSize: 12, color: Colors.white),
+        style: FontsStyle.font20Popin(),
         validator: (data) {
           if (data?.isEmpty ?? true) {
             return 'FIELD IS EMPTY';
@@ -53,6 +51,8 @@ class CustomTextField extends StatelessWidget {
                   onPressed: suffixOnPressed,
                   icon: Icon(
                     suffixIcon,
+                    size: 32,
+                    color: Colors.white,
                   ),
                 )
               : null,
