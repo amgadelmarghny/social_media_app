@@ -13,10 +13,11 @@ class CustomTextField extends StatelessWidget {
     this.prefixIcon,
     this.labelText,
     this.controller,
+    this.onTap,
   });
 
   final TextEditingController? controller;
-  final IconData? suffixIcon;
+  final Widget? suffixIcon;
   final IconData? prefixIcon;
   final TextInputType? textInputType;
   final bool obscureText;
@@ -24,6 +25,7 @@ class CustomTextField extends StatelessWidget {
   final void Function(String)? onChange;
   final void Function()? suffixOnPressed;
   final String? labelText;
+  final void Function()? onTap;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -31,10 +33,11 @@ class CustomTextField extends StatelessWidget {
         borderRadius: BorderRadius.circular(30),
       ),
       child: TextFormField(
+        onTap: onTap,
         maxLines: 1,
         keyboardType: textInputType,
         obscureText: obscureText,
-        style: FontsStyle.font20Popin(),
+        style: FontsStyle.font18Popin(),
         validator: (data) {
           if (data?.isEmpty ?? true) {
             return 'FIELD IS EMPTY';
@@ -45,24 +48,15 @@ class CustomTextField extends StatelessWidget {
         onChanged: onChange,
         decoration: InputDecoration(
           contentPadding:
-              const EdgeInsets.symmetric(horizontal: 30, vertical: 18),
-          suffixIcon: suffixIcon != null
-              ? IconButton(
-                  onPressed: suffixOnPressed,
-                  icon: Icon(
-                    suffixIcon,
-                    size: 32,
-                    color: Colors.white,
-                  ),
-                )
-              : null,
+              const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          suffixIcon: suffixIcon,
           prefixIcon: prefixIcon != null
               ? Icon(
                   prefixIcon,
                 )
               : null,
           hintText: hintText,
-          hintStyle: FontsStyle.font20Popin(),
+          hintStyle: FontsStyle.font18Popin(),
           labelText: labelText,
           labelStyle: const TextStyle(
             fontSize: 16,
@@ -78,9 +72,9 @@ class CustomTextField extends StatelessWidget {
   OutlineInputBorder outlineBorder(BuildContext context) {
     return OutlineInputBorder(
       borderRadius: BorderRadius.circular(30),
-      borderSide: BorderSide(
+      borderSide: const BorderSide(
         width: 2.2,
-        color: Theme.of(context).scaffoldBackgroundColor,
+        color: Colors.white,
       ),
     );
   }

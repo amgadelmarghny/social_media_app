@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:social_media_app/modules/reqister/reqister_view.dart';
 import 'package:social_media_app/shared/components/custom_button.dart';
 import 'package:social_media_app/shared/components/textformfield.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
@@ -40,7 +41,7 @@ class _LodinViewBodyState extends State<LodinViewBody> {
             ),
             const Text(
               'Sign in',
-              style: FontsStyle.font36BoldShadow,
+              style: FontsStyle.font32Bold,
             ),
             SizedBox(
               height: h * 0.03,
@@ -49,18 +50,24 @@ class _LodinViewBodyState extends State<LodinViewBody> {
               hintText: 'Email/phone number',
             ),
             SizedBox(
-              height: h * 0.017,
+              height: h * 0.02,
             ),
             CustomTextField(
               hintText: 'Password',
               obscureText: isObscure,
-              suffixIcon: isObscure
-                  ? Icons.visibility_off_outlined
-                  : Icons.visibility_outlined,
-              suffixOnPressed: () {
-                isObscure = !isObscure;
-                setState(() {});
-              },
+              suffixIcon: IconButton(
+                onPressed: () {
+                  isObscure = !isObscure;
+                  setState(() {});
+                },
+                icon: Icon(
+                  isObscure
+                      ? Icons.visibility_off_outlined
+                      : Icons.visibility_outlined,
+                  size: 32,
+                  color: Colors.white,
+                ),
+              ),
             ),
             SizedBox(
               height: h * 0.08,
@@ -74,15 +81,20 @@ class _LodinViewBodyState extends State<LodinViewBody> {
               children: [
                 Text(
                   'Don\'t have an account?',
-                  style: FontsStyle.font20Popin(),
+                  style: FontsStyle.font18Popin(),
                 ),
                 const Spacer(),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pushNamed(
+                      context,
+                      RegisterView.routeNameView,
+                    );
+                  },
                   child: Text(
                     'Sign up',
                     style:
-                        FontsStyle.font20Popin(color: const Color(0xff3B21B2)),
+                        FontsStyle.font18Popin(color: const Color(0xff3B21B2)),
                   ),
                 )
               ],

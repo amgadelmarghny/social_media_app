@@ -7,8 +7,17 @@ abstract class FontsStyle {
     fontWeight: FontWeight.bold,
     color: Colors.white,
     shadows: [
-      Shadow(blurRadius: 10, offset: Offset(0, 2), color: Colors.black38)
+      Shadow(
+        blurRadius: 10,
+        offset: Offset(0, 2),
+        color: Colors.black38,
+      )
     ],
+  );
+  static const TextStyle font32Bold = TextStyle(
+    fontSize: 32,
+    fontWeight: FontWeight.bold,
+    color: Colors.white,
   );
   static const TextStyle font24Shadow = TextStyle(
     fontSize: 24,
@@ -27,11 +36,11 @@ abstract class FontsStyle {
     color: Colors.white,
     fontWeight: FontWeight.bold,
   );
-  static TextStyle font20Popin({Color color = Colors.white}) {
+  static TextStyle font18Popin({Color color = Colors.white}) {
     return GoogleFonts.poppins(
       textStyle: TextStyle(
         color: color,
-        fontSize: 19,
+        fontSize: 18,
       ),
     );
   }
