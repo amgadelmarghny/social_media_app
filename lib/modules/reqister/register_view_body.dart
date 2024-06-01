@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:social_media_app/shared/components/textformfield.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
@@ -127,6 +126,16 @@ class _RegisterViewBodyState extends State<RegisterViewBody> {
                   ),
                 ],
               ),
+              SizedBox(
+                height: h * 0.02,
+              ),
+              Text(
+                'Gender',
+                style: FontsStyle.font18Popin(),
+              ),
+              SizedBox(
+                height: h * 0.02,
+              ),
             ],
           ),
         ),
@@ -134,3 +143,4 @@ class _RegisterViewBodyState extends State<RegisterViewBody> {
     );
   }
 }
+
