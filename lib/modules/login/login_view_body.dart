@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:social_media_app/modules/reqister/reqister_view.dart';
 import 'package:social_media_app/shared/components/custom_button.dart';
 import 'package:social_media_app/shared/components/textformfield.dart';
@@ -70,11 +71,40 @@ class _LodinViewBodyState extends State<LodinViewBody> {
               ),
             ),
             SizedBox(
-              height: h * 0.08,
+              height: h * 0.02,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () {},
+                  child: Text(
+                    'Forgot password?',
+                    style: FontsStyle.font18Popin(
+                      color: const Color(0xff3B21B2),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: h * 0.02,
             ),
             CustomButton(text: 'Sign in', onTap: () {}),
             SizedBox(
-              height: h * 0.1,
+              height: h * 0.02,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Or sign in with',
+                  style: FontsStyle.font18Popin(),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: h * 0.025,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -86,17 +116,16 @@ class _LodinViewBodyState extends State<LodinViewBody> {
                 const Spacer(),
                 TextButton(
                   onPressed: () {
-                    Navigator.pushNamed(
-                      context,
-                      RegisterView.routeNameView,
-                    );
+                    Navigator.pushNamedAndRemoveUntil(
+                        context, RegisterView.routeNameView, (route) => false);
                   },
                   child: Text(
                     'Sign up',
-                    style:
-                        FontsStyle.font18Popin(color: const Color(0xff3B21B2)),
+                    style: FontsStyle.font18Popin(
+                      color: const Color(0xff3B21B2),
+                    ),
                   ),
-                )
+                ),
               ],
             )
           ],
