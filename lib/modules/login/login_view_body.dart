@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-
 import 'package:social_media_app/modules/reqister/reqister_view.dart';
+import 'package:social_media_app/shared/components/auth_icon_list.dart';
 import 'package:social_media_app/shared/components/custom_button.dart';
 import 'package:social_media_app/shared/components/textformfield.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
@@ -104,7 +104,11 @@ class _LodinViewBodyState extends State<LodinViewBody> {
               ],
             ),
             SizedBox(
-              height: h * 0.025,
+              height: h * 0.0125,
+            ),
+            const AuthIocnList(),
+            SizedBox(
+              height: h * 0.0125,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
