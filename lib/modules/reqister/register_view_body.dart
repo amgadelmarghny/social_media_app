@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:social_media_app/modules/login/login_view.dart';
+import 'package:social_media_app/shared/components/custom_button.dart';
+import 'package:social_media_app/shared/components/gender_icon_list.dart';
 import 'package:social_media_app/shared/components/textformfield.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
-
 import '../../shared/components/year_picker.dart';
 
 class RegisterViewBody extends StatefulWidget {
@@ -38,6 +40,7 @@ class _RegisterViewBodyState extends State<RegisterViewBody> {
                     flex: 6,
                     child: CustomTextField(
                       hintText: 'First Name',
+                      textInputType: TextInputType.name,
                     ),
                   ),
                   Spacer(
@@ -47,6 +50,7 @@ class _RegisterViewBodyState extends State<RegisterViewBody> {
                     flex: 6,
                     child: CustomTextField(
                       hintText: 'Last Name',
+                      textInputType: TextInputType.name,
                     ),
                   ),
                 ],
@@ -56,12 +60,14 @@ class _RegisterViewBodyState extends State<RegisterViewBody> {
               ),
               const CustomTextField(
                 hintText: 'Email/phone number',
+                textInputType: TextInputType.emailAddress,
               ),
               SizedBox(
                 height: h * 0.02,
               ),
               CustomTextField(
                 hintText: 'Password',
+                textInputType: TextInputType.visiblePassword,
                 obscureText: isObscure,
                 suffixIcon: IconButton(
                   onPressed: () {
@@ -78,30 +84,22 @@ class _RegisterViewBodyState extends State<RegisterViewBody> {
                 ),
               ),
               SizedBox(
-                height: h * 0.02,
+                height: h * 0.015,
               ),
               Text(
                 'Birth of date',
                 style: FontsStyle.font18Popin(),
               ),
               SizedBox(
-                height: h * 0.02,
+                height: h * 0.015,
               ),
               Row(
                 children: [
-                  Expanded(
+                  const Expanded(
                     flex: 4,
                     child: CustomTextField(
                       hintText: 'Date/month',
-                      suffixIcon: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SvgPicture.asset(
-                            'lib/assets/images/arrow_bottom.svg',
-                            height: 20,
-                          ),
-                        ],
-                      ),
+                      textInputType: TextInputType.datetime,
                     ),
                   ),
                   const Spacer(
@@ -112,8 +110,12 @@ class _RegisterViewBodyState extends State<RegisterViewBody> {
                     child: CustomTextField(
                       hintText: 'Year',
                       controller: yearController,
+                      textInputType: TextInputType.datetime,
                       onTap: () async {
-                        yearController.text = await pickYear(context: context);
+                        String? selectedYear = await pickYear(context: context);
+                        if (selectedYear != null) {
+                          yearController.text = selectedYear;
+                        }
                       },
                       suffixIcon:
                           Row(mainAxisSize: MainAxisSize.min, children: [
@@ -127,15 +129,45 @@ class _RegisterViewBodyState extends State<RegisterViewBody> {
                 ],
               ),
               SizedBox(
-                height: h * 0.02,
+                height: h * 0.015,
               ),
               Text(
                 'Gender',
                 style: FontsStyle.font18Popin(),
               ),
               SizedBox(
-                height: h * 0.02,
+                height: h * 0.015,
               ),
+              const GenderIconList(),
+              SizedBox(
+                height: h * 0.15,
+              ),
+              CustomButton(text: 'Sign up', onTap: () {}),
+              SizedBox(
+                height: h * 0.0125,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'I have an account',
+                    style: FontsStyle.font18Popin(),
+                  ),
+                  const Spacer(),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pushNamedAndRemoveUntil(
+                          context, LoginView.routeViewName, (route) => false);
+                    },
+                    child: Text(
+                      'Sign in',
+                      style: FontsStyle.font18Popin(
+                        color: const Color(0xff3B21B2),
+                      ),
+                    ),
+                  ),
+                ],
+              )
             ],
           ),
         ),
@@ -143,4 +175,3 @@ class _RegisterViewBodyState extends State<RegisterViewBody> {
     );
   }
 }
-

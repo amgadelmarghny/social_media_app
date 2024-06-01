@@ -121,7 +121,7 @@ class _LodinViewBodyState extends State<LodinViewBody> {
                 TextButton(
                   onPressed: () {
                     Navigator.pushNamedAndRemoveUntil(
-                        context, RegisterView.routeNameView, (route) => false);
+                        context, RegisterView.routeViewName, (route) => false);
                   },
                   child: Text(
                     'Sign up',

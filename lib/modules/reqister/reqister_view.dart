@@ -4,7 +4,7 @@ import 'package:social_media_app/shared/style/theme/theme.dart';
 
 class RegisterView extends StatelessWidget {
   const RegisterView({super.key});
-  static const routeNameView = 'Register View';
+  static const routeViewName = 'Register View';
 
   @override
   Widget build(BuildContext context) {

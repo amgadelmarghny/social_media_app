@@ -1,14 +1,20 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_media_app/firebase_options.dart';
 import 'package:social_media_app/modules/login/login_view.dart';
 import 'package:social_media_app/modules/on_boarding/on_boarding_view.dart';
 import 'package:social_media_app/modules/reqister/reqister_view.dart';
 import 'package:social_media_app/shared/bloc/app_cubit/app_cubit.dart';
 import 'package:social_media_app/shared/bloc/bloc_observer.dart';
 
-void main() {
+void main() async {
   Bloc.observer = MyBlocObserver();
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const SocialMediaApp());
 }
 
@@ -34,7 +40,7 @@ class SocialMediaApp extends StatelessWidget {
         routes: {
           OnBoardingView.routeViewName: (context) => const OnBoardingView(),
           LoginView.routeViewName: (context) => const LoginView(),
-          RegisterView.routeNameView: (context) => const RegisterView(),
+          RegisterView.routeViewName: (context) => const RegisterView(),
         },
       ),
     );

@@ -4,8 +4,11 @@ import 'package:social_media_app/shared/style/fonts/font_style.dart';
 class GenderIcon extends StatelessWidget {
   const GenderIcon({
     super.key,
+    required this.genderType,
+    required this.isActive,
   });
-
+  final String genderType;
+  final bool isActive;
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
@@ -15,15 +18,15 @@ class GenderIcon extends StatelessWidget {
       decoration: ShapeDecoration(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30),
-          side: const BorderSide(
-            color: Color(0xff8B64DA),
+          side: BorderSide(
+            color: isActive ? const Color(0xff8B64DA) : Colors.white,
             width: 2.4,
           ),
         ),
       ),
       child: Center(
         child: Text(
-          'Male',
+          genderType,
           style: FontsStyle.font18Popin(),
         ),
       ),

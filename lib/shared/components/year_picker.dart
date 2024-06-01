@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 // Call this in the select year button.
 
-Future pickYear({required BuildContext context}) async {
+Future<String?> pickYear({required BuildContext context}) async {
   String? selectedYear;
   await showDialog(
     context: context,
@@ -53,5 +53,5 @@ Future pickYear({required BuildContext context}) async {
       );
     },
   );
-  return selectedYear!;
+  return selectedYear;
 }
