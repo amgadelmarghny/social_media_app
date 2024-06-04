@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:social_media_app/modules/login/login_view.dart';
 import 'package:social_media_app/shared/bloc/register_cubit/register_cubit.dart';
 import 'package:social_media_app/shared/components/custom_button.dart';
 import 'package:social_media_app/shared/components/gender_icon_list.dart';
+import 'package:social_media_app/shared/components/show_toast.dart';
 import 'package:social_media_app/shared/components/textformfield.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
 import '../../shared/components/year_picker.dart';
@@ -28,11 +28,12 @@ class RegisterViewBody extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
         child: BlocBuilder<RegisterCubit, RegisterState>(
           builder: (context, state) {
+            RegisterCubit registerCubit =
+                BlocProvider.of<RegisterCubit>(context);
             return SingleChildScrollView(
               child: Form(
-                key: BlocProvider.of<RegisterCubit>(context).formKey,
-                autovalidateMode:
-                    BlocProvider.of<RegisterCubit>(context).autovalidateMode,
+                key: registerCubit.formKey,
+                autovalidateMode: registerCubit.autovalidateMode,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -80,16 +81,14 @@ class RegisterViewBody extends StatelessWidget {
                     CustomTextField(
                       hintText: 'Password',
                       textInputType: TextInputType.visiblePassword,
-                      obscureText:
-                          BlocProvider.of<RegisterCubit>(context).isObscure,
+                      obscureText: registerCubit.isObscure,
                       controller: passwordController,
                       suffixIcon: IconButton(
                         onPressed: () {
-                          BlocProvider.of<RegisterCubit>(context)
-                              .changeTextFieldObscure();
+                          registerCubit.changeTextFieldObscure();
                         },
                         icon: Icon(
-                          BlocProvider.of<RegisterCubit>(context).eyeIcon,
+                          registerCubit.eyeIcon,
                           size: 32,
                           color: Colors.white,
                         ),
@@ -161,18 +160,25 @@ class RegisterViewBody extends StatelessWidget {
                         CustomButton(
                           text: 'Sign up',
                           onTap: () {
-                            if (BlocProvider.of<RegisterCubit>(context)
-                                .formKey
-                                .currentState!
+                            if (registerCubit.formKey.currentState!
                                 .validate()) {
-                              BlocProvider.of<RegisterCubit>(context)
-                                  .userRegister(
-                                email: emailController.text,
-                                password: emailController.text,
-                              );
+                              if (registerCubit.gender != null) {
+                                registerCubit.userRegister(
+                                    email: emailController.text,
+                                    password: emailController.text,
+                                    firstName: firstNameController.text,
+                                    lastName: lastNameController.text,
+                                    dateAndMonth: dateAndMonthController.text,
+                                    year: yearController.text,
+                                    gender:
+                                        BlocProvider.of<RegisterCubit>(context)
+                                            .gender!);
+                              } else {
+                                customSnakbar(context,
+                                    msg: 'Please select your gender');
+                              }
                             } else {
-                              BlocProvider.of<RegisterCubit>(context)
-                                  .noticeTextFormFieldValidation();
+                              registerCubit.noticeTextFormFieldValidation();
                             }
                           },
                           isLoading: state is RegisterLoadingState,

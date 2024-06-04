@@ -1,6 +1,9 @@
 import 'package:bloc/bloc.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:social_media_app/models/onBoarding/user_model.dart';
+import 'package:social_media_app/shared/components/constants.dart';
 
 part 'register_state.dart';
 
@@ -18,7 +21,7 @@ class RegisterCubit extends Cubit<RegisterState> {
     emit(TextFieldObscureState());
   }
 
-  //
+  // text field validation
   AutovalidateMode autovalidateMode = AutovalidateMode.disabled;
   GlobalKey<FormState> formKey = GlobalKey();
   void noticeTextFormFieldValidation() {
@@ -27,19 +30,35 @@ class RegisterCubit extends Cubit<RegisterState> {
   }
 
   late UserCredential userCredential;
-
-  void userRegister({required String email, required String password}) async {
+  String? gender;
+  void userRegister({
+    required String firstName,
+    required String lastName,
+    required String dateAndMonth,
+    required String year,
+    required String email,
+    required String gender,
+    required String password,
+  }) async {
     emit(RegisterLoadingState());
-    print('loading');
     try {
       userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
+      UserModel userModel = UserModel(
+          uid: userCredential.user!.uid,
+          firstName: firstName,
+          lastName: lastName,
+          email: email,
+          dateAndMonth: dateAndMonth,
+          year: year,
+          gender: gender);
+      await FirebaseFirestore.instance
+          .collection(collectionName)
+          .doc(userCredential.user!.uid)
+          .set(userModel.tojson());
       emit(RegisterLoadingState());
-      print('Success');
     } on Exception catch (error) {
-      print(error.toString());
       emit(RegisterFailureState(errMessage: error.toString()));
-      print('Failure : ${error.toString()}');
     }
   }
 }

@@ -1,0 +1,1 @@
+const collectionName = 'user';

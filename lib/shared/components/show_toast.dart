@@ -28,3 +28,11 @@ Color toastColor(ToastState toastState) {
   }
   return color;
 }
+
+void customSnakbar(context, {required String msg}) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(msg),
+    ),
+  );
+}

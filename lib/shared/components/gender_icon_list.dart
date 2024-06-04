@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_media_app/shared/bloc/register_cubit/register_cubit.dart';
 import 'package:social_media_app/shared/components/gender_icon.dart';
 
 class GenderIconList extends StatefulWidget {
@@ -25,6 +27,10 @@ class _GenderIconListState extends State<GenderIconList> {
           onTap: () {
             isSelected = index;
             setState(() {});
+            if (isSelected == index) {
+              BlocProvider.of<RegisterCubit>(context).gender =
+                  genderTypeList[index];
+            }
           },
           child: GenderIcon(
             genderType: genderTypeList[index],
