@@ -1,1 +1,1 @@
-const collectionName = 'user';
+const userCollection = 'user';

@@ -15,7 +15,6 @@ class RegisterView extends StatelessWidget {
       child: Container(
         decoration: themeColor(),
         child: const Scaffold(
-          backgroundColor: Colors.transparent,
           body: RegisterViewBody(),
         ),
       ),
