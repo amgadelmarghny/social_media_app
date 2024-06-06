@@ -9,10 +9,12 @@ import 'package:social_media_app/modules/on_boarding/on_boarding_view.dart';
 import 'package:social_media_app/modules/reqister/reqister_view.dart';
 import 'package:social_media_app/shared/bloc/app_cubit/app_cubit.dart';
 import 'package:social_media_app/shared/bloc/bloc_observer.dart';
+import 'package:social_media_app/shared/bloc/network/local/cache_helper.dart';
 
 void main() async {
   Bloc.observer = MyBlocObserver();
   WidgetsFlutterBinding.ensureInitialized();
+  await CacheHelper.init();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
