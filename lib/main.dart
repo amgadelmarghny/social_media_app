@@ -10,6 +10,7 @@ import 'package:social_media_app/modules/reqister/reqister_view.dart';
 import 'package:social_media_app/shared/bloc/app_cubit/app_cubit.dart';
 import 'package:social_media_app/shared/bloc/bloc_observer.dart';
 import 'package:social_media_app/shared/bloc/network/local/cache_helper.dart';
+import 'package:social_media_app/shared/components/constants.dart';
 
 void main() async {
   Bloc.observer = MyBlocObserver();
@@ -26,6 +27,19 @@ class SocialMediaApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    
+    var tokenCache = CacheHelper.getData(key: uidToken);
+    var onBoardingCache = CacheHelper.getData(key: onBoardingConst);
+    late String initialRoute;
+    if (onBoardingCache != null) {
+      if (tokenCache != null) {
+        initialRoute = HomeView.routeViewName;
+      } else {
+        initialRoute = LoginView.routeViewName;
+      }
+    } else {
+      initialRoute = OnBoardingView.routeViewName;
+    }
     return BlocProvider(
       create: (context) => AppCubit(),
       child: MaterialApp(
@@ -39,7 +53,7 @@ class SocialMediaApp extends StatelessWidget {
           ),
         ),
         debugShowCheckedModeBanner: false,
-        initialRoute: OnBoardingView.routeViewName,
+        initialRoute: initialRoute,
         routes: {
           OnBoardingView.routeViewName: (context) => const OnBoardingView(),
           LoginView.routeViewName: (context) => const LoginView(),

@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:social_media_app/layout/home/home_view.dart';
 import 'package:social_media_app/modules/login/login_view.dart';
+import 'package:social_media_app/shared/bloc/network/local/cache_helper.dart';
 import 'package:social_media_app/shared/bloc/register_cubit/register_cubit.dart';
+import 'package:social_media_app/shared/components/constants.dart';
 import 'package:social_media_app/shared/components/custom_button.dart';
 import 'package:social_media_app/shared/components/gender_icon_list.dart';
 import 'package:social_media_app/shared/components/navigators.dart';
@@ -37,6 +39,8 @@ class RegisterViewBody extends StatelessWidget {
               showToast(msg: state.errMessage, toastState: ToastState.error);
             }
             if (state is SaveUserInfoSuccessState) {
+              CacheHelper.setData(key: enterToHone, value: true);
+              CacheHelper.setData(key: uidToken, value: state.uid);
               pushAndRemoveView(context, newRouteName: HomeView.routeViewName);
             }
           },
