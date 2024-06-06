@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:social_media_app/layout/home/home_view.dart';
 import 'package:social_media_app/modules/login/login_view.dart';
-import 'package:social_media_app/shared/bloc/network/local/cache_helper.dart';
+import 'package:social_media_app/shared/network/local/cache_helper.dart';
 import 'package:social_media_app/shared/bloc/register_cubit/register_cubit.dart';
 import 'package:social_media_app/shared/components/constants.dart';
 import 'package:social_media_app/shared/components/custom_button.dart';

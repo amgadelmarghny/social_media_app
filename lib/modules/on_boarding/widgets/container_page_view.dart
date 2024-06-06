@@ -4,7 +4,7 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:social_media_app/modules/login/login_view.dart';
 import 'package:social_media_app/modules/on_boarding/widgets/on_boarding_pages.dart';
 import 'package:social_media_app/shared/bloc/app_cubit/app_cubit.dart';
-import 'package:social_media_app/shared/bloc/network/local/cache_helper.dart';
+import 'package:social_media_app/shared/network/local/cache_helper.dart';
 import 'package:social_media_app/shared/components/constants.dart';
 import 'dart:ui' as ui;
 
