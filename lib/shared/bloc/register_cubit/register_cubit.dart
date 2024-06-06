@@ -44,21 +44,46 @@ class RegisterCubit extends Cubit<RegisterState> {
     try {
       userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
-      UserModel userModel = UserModel(
-          uid: userCredential.user!.uid,
-          firstName: firstName,
-          lastName: lastName,
-          email: email,
-          dateAndMonth: dateAndMonth,
-          year: year,
-          gender: gender);
-      await FirebaseFirestore.instance
-          .collection(collectionName)
-          .doc(userCredential.user!.uid)
-          .set(userModel.tojson());
-      emit(RegisterLoadingState());
+      await saveUserData(
+        firstName: firstName,
+        lastName: lastName,
+        dateAndMonth: dateAndMonth,
+        year: year,
+        email: email,
+        gender: gender,
+        uid: userCredential.user!.uid,
+      );
     } on Exception catch (error) {
       emit(RegisterFailureState(errMessage: error.toString()));
+    }
+  }
+
+  Future<void> saveUserData({
+    required String firstName,
+    required String lastName,
+    required String dateAndMonth,
+    required String year,
+    required String email,
+    required String gender,
+    required String uid,
+  }) async {
+    emit(SaveUserInfoLoadingState());
+    UserModel userModel = UserModel(
+        uid: uid,
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        dateAndMonth: dateAndMonth,
+        year: year,
+        gender: gender);
+    try {
+      await FirebaseFirestore.instance
+          .collection(userCollection)
+          .doc(uid)
+          .set(userModel.tojson());
+      emit(SaveUserInfoSuccessState(uid: uid));
+    } catch (err) {
+      emit(SaveUserInfoFailureState(errMessage: err.toString()));
     }
   }
 }

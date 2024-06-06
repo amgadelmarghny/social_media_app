@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:social_media_app/layout/home/home_view.dart';
 import 'package:social_media_app/modules/login/login_view.dart';
 import 'package:social_media_app/shared/bloc/register_cubit/register_cubit.dart';
 import 'package:social_media_app/shared/components/custom_button.dart';
 import 'package:social_media_app/shared/components/gender_icon_list.dart';
+import 'package:social_media_app/shared/components/navigators.dart';
 import 'package:social_media_app/shared/components/show_toast.dart';
 import 'package:social_media_app/shared/components/textformfield.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
@@ -26,7 +28,18 @@ class RegisterViewBody extends StatelessWidget {
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-        child: BlocBuilder<RegisterCubit, RegisterState>(
+        child: BlocConsumer<RegisterCubit, RegisterState>(
+          listener: (context, state) {
+            if (state is RegisterFailureState) {
+              showToast(msg: state.errMessage, toastState: ToastState.error);
+            }
+            if (state is SaveUserInfoFailureState) {
+              showToast(msg: state.errMessage, toastState: ToastState.error);
+            }
+            if (state is SaveUserInfoSuccessState) {
+              pushAndRemoveView(context, newRouteName: HomeView.routeViewName);
+            }
+          },
           builder: (context, state) {
             RegisterCubit registerCubit =
                 BlocProvider.of<RegisterCubit>(context);

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/firebase_options.dart';
+import 'package:social_media_app/layout/home/home_view.dart';
 import 'package:social_media_app/modules/login/login_view.dart';
 import 'package:social_media_app/modules/on_boarding/on_boarding_view.dart';
 import 'package:social_media_app/modules/reqister/reqister_view.dart';
@@ -41,6 +42,7 @@ class SocialMediaApp extends StatelessWidget {
           OnBoardingView.routeViewName: (context) => const OnBoardingView(),
           LoginView.routeViewName: (context) => const LoginView(),
           RegisterView.routeViewName: (context) => const RegisterView(),
+          HomeView.routeViewName: (context) => const HomeView(),
         },
       ),
     );

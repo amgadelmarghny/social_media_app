@@ -10,7 +10,6 @@ class LoginView extends StatelessWidget {
     return Container(
       decoration: themeColor(),
       child: const Scaffold(
-        backgroundColor: Colors.transparent,
         body: LodinViewBody(),
       ),
     );
