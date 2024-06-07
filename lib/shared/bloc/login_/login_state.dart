@@ -6,6 +6,10 @@ final class LoginInitial extends LoginState {}
 
 final class LoginloadingSatate extends LoginState {}
 
+final class TextFieldObscureState extends LoginState {}
+
+final class TextFieldValidationState extends LoginState {}
+
 final class LoginSuccessSatate extends LoginState {
   final String uid;
 
