@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/layout/home/home_view.dart';
 import 'package:social_media_app/modules/reqister/reqister_view.dart';
-import 'package:social_media_app/shared/bloc/login_/login_cubit.dart';
+import 'package:social_media_app/shared/bloc/login_cubit/login_cubit.dart';
 import 'package:social_media_app/shared/components/auth_icon_list.dart';
 import 'package:social_media_app/shared/components/constants.dart';
 import 'package:social_media_app/shared/components/custom_button.dart';
@@ -12,17 +12,11 @@ import 'package:social_media_app/shared/components/textformfield.dart';
 import 'package:social_media_app/shared/network/local/cache_helper.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
 
-class LodinViewBody extends StatefulWidget {
+class LodinViewBody extends StatelessWidget {
   const LodinViewBody({
     super.key,
   });
 
-  @override
-  State<LodinViewBody> createState() => _LodinViewBodyState();
-}
-
-class _LodinViewBodyState extends State<LodinViewBody> {
-  bool isObscure = true;
   @override
   Widget build(BuildContext context) {
     double h = MediaQuery.sizeOf(context).height;

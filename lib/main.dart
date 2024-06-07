@@ -9,6 +9,7 @@ import 'package:social_media_app/modules/on_boarding/on_boarding_view.dart';
 import 'package:social_media_app/modules/reqister/reqister_view.dart';
 import 'package:social_media_app/shared/bloc/app_cubit/app_cubit.dart';
 import 'package:social_media_app/shared/bloc/bloc_observer.dart';
+import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/network/local/cache_helper.dart';
 import 'package:social_media_app/shared/components/constants.dart';
 
@@ -39,8 +40,15 @@ class SocialMediaApp extends StatelessWidget {
     } else {
       initialRoute = OnBoardingView.routeViewName;
     }
-    return BlocProvider(
-      create: (context) => AppCubit(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => AppCubit(),
+        ),
+        BlocProvider(
+          create: (context) => SocialCubit(tokenCache),
+        ),
+      ],
       child: MaterialApp(
         theme: ThemeData(
           scaffoldBackgroundColor: Colors.transparent,

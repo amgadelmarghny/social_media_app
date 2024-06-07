@@ -78,7 +78,7 @@ class RegisterCubit extends Cubit<RegisterState> {
         gender: gender);
     try {
       await FirebaseFirestore.instance
-          .collection(userCollection)
+          .collection(usersCollection)
           .doc(uid)
           .set(userModel.tojson());
       emit(SaveUserInfoSuccessState(uid: uid));
