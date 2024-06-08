@@ -1,4 +1,51 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+abstract class CustomThemeMode {
+  static final lightTheme = ThemeData(
+    scaffoldBackgroundColor: Colors.transparent,
+    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      selectedItemColor: Color(0xff635A8F),
+      unselectedItemColor: Colors.grey,
+      selectedLabelStyle: TextStyle(fontSize: 0),
+      unselectedLabelStyle: TextStyle(fontSize: 0),
+      showSelectedLabels: false,
+      showUnselectedLabels: false,
+    ),
+    appBarTheme: const AppBarTheme(
+      toolbarHeight: 0,
+      systemOverlayStyle: SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+      ),
+    ),
+    floatingActionButtonTheme: const FloatingActionButtonThemeData(
+      shape: CircleBorder(),
+      backgroundColor: Color(0xff635A8F),
+    ),
+  );
+
+  static final darkTheme = ThemeData(
+    scaffoldBackgroundColor: Colors.transparent,
+    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      selectedItemColor: Color(0xff635A8F),
+      unselectedItemColor: Colors.grey,
+      selectedLabelStyle: TextStyle(fontSize: 0),
+      unselectedLabelStyle: TextStyle(fontSize: 0),
+      showSelectedLabels: false,
+      showUnselectedLabels: false,
+    ),
+    appBarTheme: const AppBarTheme(
+      toolbarHeight: 0,
+      systemOverlayStyle: SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+      ),
+    ),
+    floatingActionButtonTheme: const FloatingActionButtonThemeData(
+      shape: CircleBorder(),
+      backgroundColor: Color(0xff635A8F),
+    ),
+  );
+}
 
 BoxDecoration themeColor() {
   return const BoxDecoration(

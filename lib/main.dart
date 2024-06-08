@@ -1,6 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/firebase_options.dart';
 import 'package:social_media_app/layout/home/home_view.dart';
@@ -12,6 +11,7 @@ import 'package:social_media_app/shared/bloc/bloc_observer.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/network/local/cache_helper.dart';
 import 'package:social_media_app/shared/components/constants.dart';
+import 'package:social_media_app/shared/style/theme/theme.dart';
 
 void main() async {
   Bloc.observer = MyBlocObserver();
@@ -50,15 +50,8 @@ class SocialMediaApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
-        theme: ThemeData(
-          scaffoldBackgroundColor: Colors.transparent,
-          appBarTheme: const AppBarTheme(
-            toolbarHeight: 0,
-            systemOverlayStyle: SystemUiOverlayStyle(
-              statusBarColor: Colors.transparent,
-            ),
-          ),
-        ),
+        darkTheme: CustomThemeMode.lightTheme,
+        theme: CustomThemeMode.lightTheme,
         debugShowCheckedModeBanner: false,
         initialRoute: initialRoute,
         routes: {
