@@ -41,6 +41,7 @@ abstract class FontsStyle {
       textStyle: TextStyle(
         color: color,
         fontSize: 18,
+        overflow: TextOverflow.ellipsis,
         fontWeight: color != Colors.white ? FontWeight.w500 : null,
       ),
     );
