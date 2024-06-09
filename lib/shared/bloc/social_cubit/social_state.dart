@@ -8,6 +8,8 @@ final class SocialLoadingState extends SocialState {}
 
 final class SocialSuccessState extends SocialState {}
 
+final class BottomNavBarState extends SocialState {}
+
 final class SocialFailureState extends SocialState {
   final String errMessage;
 

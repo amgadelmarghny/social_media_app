@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/layout/home/home_view.dart';
-import 'package:social_media_app/modules/reqister/reqister_view.dart';
+import 'package:social_media_app/modules/register/register_view.dart';
 import 'package:social_media_app/shared/bloc/login_cubit/login_cubit.dart';
 import 'package:social_media_app/shared/components/auth_icon_list.dart';
 import 'package:social_media_app/shared/components/constants.dart';

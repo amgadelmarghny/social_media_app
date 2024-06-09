@@ -43,6 +43,7 @@ abstract class CustomThemeMode {
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
       shape: CircleBorder(),
       backgroundColor: Color(0xff635A8F),
+      iconSize: 35,
     ),
   );
 }
