@@ -31,7 +31,7 @@ abstract class FontsStyle {
       ),
     ],
   );
-  static const TextStyle font22Blod = TextStyle(
+  static const TextStyle font22Bold = TextStyle(
     fontSize: 22,
     color: Colors.white,
     fontWeight: FontWeight.bold,
@@ -43,6 +43,30 @@ abstract class FontsStyle {
         fontSize: 18,
         overflow: TextOverflow.ellipsis,
         fontWeight: color != Colors.white ? FontWeight.w500 : null,
+      ),
+    );
+  }
+
+  static TextStyle font18PopinBold() {
+    return GoogleFonts.poppins(
+      textStyle: const TextStyle(
+        color: Colors.white,
+        fontSize: 18,
+        overflow: TextOverflow.ellipsis,
+        fontWeight: FontWeight.w500,
+      ),
+    );
+  }
+
+  static TextStyle font15Popin(
+      {Color color = Colors.white, bool isOverFlow = false, double? height}) {
+    return GoogleFonts.poppins(
+      textStyle: TextStyle(
+        height: height,
+        color: color,
+        fontSize: 15,
+        overflow: isOverFlow ? TextOverflow.ellipsis : null,
+        fontWeight: FontWeight.w500,
       ),
     );
   }

@@ -1,9 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../fonts/font_style.dart';
 
 abstract class CustomThemeMode {
   static final lightTheme = ThemeData(
     scaffoldBackgroundColor: Colors.transparent,
+    iconTheme: const IconThemeData(color: Colors.white),
+    searchBarTheme: SearchBarThemeData(
+      textStyle: MaterialStateProperty.resolveWith(
+          (states) => FontsStyle.font18Popin()),
+      hintStyle: MaterialStateProperty.resolveWith(
+          (states) => FontsStyle.font18Popin()),
+      backgroundColor:
+          MaterialStateColor.resolveWith((states) => const Color(0xff635A8F)),
+    ),
+    iconButtonTheme: IconButtonThemeData(
+      style: ButtonStyle(
+        iconColor: MaterialStateProperty.resolveWith((states) => Colors.white),
+      ),
+    ),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       selectedItemColor: Color(0xff635A8F),
       unselectedItemColor: Colors.grey,
@@ -15,7 +30,10 @@ abstract class CustomThemeMode {
     appBarTheme: const AppBarTheme(
       toolbarHeight: 0,
       systemOverlayStyle: SystemUiOverlayStyle(
+        systemStatusBarContrastEnforced: true,
         statusBarColor: Colors.transparent,
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarDividerColor: Colors.transparent,
       ),
     ),
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
@@ -26,6 +44,18 @@ abstract class CustomThemeMode {
 
   static final darkTheme = ThemeData(
     scaffoldBackgroundColor: Colors.transparent,
+    iconTheme: const IconThemeData(color: Colors.white),
+    iconButtonTheme: IconButtonThemeData(
+      style: ButtonStyle(
+        iconColor: MaterialStateProperty.resolveWith((states) => Colors.white),
+      ),
+    ),
+    searchBarTheme: SearchBarThemeData(
+      hintStyle: MaterialStateProperty.resolveWith(
+          (states) => FontsStyle.font18Popin()),
+      backgroundColor:
+          MaterialStateColor.resolveWith((states) => const Color(0xff635A8F)),
+    ),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       selectedItemColor: Color(0xff635A8F),
       unselectedItemColor: Colors.grey,
@@ -38,6 +68,8 @@ abstract class CustomThemeMode {
       toolbarHeight: 0,
       systemOverlayStyle: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarDividerColor: Colors.transparent,
       ),
     ),
     floatingActionButtonTheme: const FloatingActionButtonThemeData(

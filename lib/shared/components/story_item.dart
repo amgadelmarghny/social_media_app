@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:social_media_app/shared/components/profile_picture_with_story.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
 
 class StoryItem extends StatelessWidget {
@@ -11,28 +12,13 @@ class StoryItem extends StatelessWidget {
       width: 80,
       child: Column(
         children: [
-          Container(
-            height: 80,
-            padding: const EdgeInsets.all(4),
-            width: 80,
-            decoration: const ShapeDecoration(
-              shape: CircleBorder(
-                side: BorderSide(
-                  color: Color(0xffC79BE7),
-                  width: 3,
-                ),
-              ),
-            ),
-            child: CircleAvatar(
-              backgroundImage: NetworkImage(image),
-            ),
-          ),
+          ProfilePictureWithStory(image: image),
           const SizedBox(
             height: 5,
           ),
           Text(
             firstName,
-            style: FontsStyle.font18Popin(),
+            style: FontsStyle.font15Popin(isOverFlow: true),
           )
         ],
       ),

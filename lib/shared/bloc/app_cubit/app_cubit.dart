@@ -13,15 +13,15 @@ class AppCubit extends Cubit<AppState> {
 
   List<OnBoardingModel> onBoardingModelsList = [
     OnBoardingModel(
-      title: 'Welocme !',
+      title: 'Welcome !',
       subTitle: 'Experience a wonderful',
     ),
     OnBoardingModel(
-      title: 'Welocme !',
+      title: 'Welcome !',
       subTitle: 'Experience a wonderful',
     ),
     OnBoardingModel(
-      title: 'Welocme !',
+      title: 'Welcome !',
       subTitle: 'Experience a wonderful',
     ),
   ];

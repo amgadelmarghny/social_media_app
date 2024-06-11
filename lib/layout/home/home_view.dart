@@ -23,7 +23,7 @@ class HomeView extends StatelessWidget {
           } else if (BlocProvider.of<SocialCubit>(context).userModel != null) {
             return Scaffold(
               bottomNavigationBar: const Padding(
-                padding: EdgeInsets.all(8.0),
+                padding: EdgeInsets.only(bottom: 10,left: 8,right: 8,top: 3),
                 child: CustomBottomNavBat(),
               ),
               body: BlocProvider.of<SocialCubit>(context).currentBody[
