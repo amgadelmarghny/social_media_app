@@ -36,13 +36,20 @@ abstract class FontsStyle {
     color: Colors.white,
     fontWeight: FontWeight.bold,
   );
-  static TextStyle font18Popin({Color color = Colors.white}) {
+  static TextStyle font18Popin({Color color = Colors.white , bool isShadow = false}) {
     return GoogleFonts.poppins(
       textStyle: TextStyle(
         color: color,
         fontSize: 18,
         overflow: TextOverflow.ellipsis,
         fontWeight: color != Colors.white ? FontWeight.w500 : null,
+        shadows:isShadow?  [
+         const Shadow(
+            blurRadius: 5,
+            offset: Offset(1, 1),
+            color: Colors.black38,
+          )
+        ]: null,
       ),
     );
   }

@@ -16,12 +16,15 @@ class _GenderIconListState extends State<GenderIconList> {
   int? isSelected;
   @override
   Widget build(BuildContext context) {
-    const List<String> genderTypeList = ['Male', 'Female', 'Athor'];
+    const List<String> genderTypeList = [
+      'Male',
+      'Female',
+      'Other',
+    ];
     return SizedBox(
       height: 60,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        physics: const NeverScrollableScrollPhysics(),
         itemCount: genderTypeList.length,
         itemBuilder: (context, index) => GestureDetector(
           onTap: () {

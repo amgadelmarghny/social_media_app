@@ -22,12 +22,19 @@ class RegisterCubit extends Cubit<RegisterState> {
   }
 
   // text field validation
-  AutovalidateMode autovalidateMode = AutovalidateMode.disabled;
+  AutovalidateMode autoValidateMode = AutovalidateMode.disabled;
   GlobalKey<FormState> formKey = GlobalKey();
   void noticeTextFormFieldValidation() {
-    autovalidateMode = AutovalidateMode.always;
+    autoValidateMode = AutovalidateMode.always;
     emit(TextFieldValidationState());
   }
+
+  TextEditingController yearController = TextEditingController();
+  TextEditingController firstNameController = TextEditingController();
+  TextEditingController lastNameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController dateAndMonthController = TextEditingController();
 
   late UserCredential userCredential;
   String? gender;
@@ -75,7 +82,9 @@ class RegisterCubit extends Cubit<RegisterState> {
         email: email,
         dateAndMonth: dateAndMonth,
         year: year,
-        gender: gender);
+        gender: gender,
+        //TODO: put unknownemus pic
+        photo: '');
     try {
       await FirebaseFirestore.instance
           .collection(usersCollection)

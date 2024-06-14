@@ -6,6 +6,9 @@ class UserModel {
   final String dateAndMonth;
   final String year;
   final String gender;
+  final String photo;
+  final String? cover;
+  final String? bio;
 
   UserModel({
     required this.uid,
@@ -15,6 +18,9 @@ class UserModel {
     required this.dateAndMonth,
     required this.year,
     required this.gender,
+    required this.photo,
+    this.cover,
+    this.bio,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -26,6 +32,9 @@ class UserModel {
       dateAndMonth: json['dateAndMonth'],
       year: json['year'],
       gender: json['gender'],
+      photo: json['photo'],
+      cover: json['cover'],
+      bio: json['bio'],
     );
   }
 
@@ -38,6 +47,9 @@ class UserModel {
       'dateAndMonth': dateAndMonth,
       'year': year,
       'gender': gender,
+      'photo': photo,
+      'cover': cover,
+      'bio': bio,
     };
   }
 }

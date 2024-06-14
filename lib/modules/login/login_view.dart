@@ -14,7 +14,7 @@ class LoginView extends StatelessWidget {
       child: BlocProvider(
         create: (context) => LoginCubit(),
         child: const Scaffold(
-          body: LodinViewBody(),
+          body: LoginViewBody(),
         ),
       ),
     );

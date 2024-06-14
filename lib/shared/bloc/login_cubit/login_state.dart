@@ -10,14 +10,14 @@ final class TextFieldObscureState extends LoginState {}
 
 final class TextFieldValidationState extends LoginState {}
 
-final class LoginSuccessSatate extends LoginState {
+final class LoginSuccessState extends LoginState {
   final String uid;
 
-  LoginSuccessSatate({required this.uid});
+  LoginSuccessState({required this.uid});
 }
 
-final class LoginFailureSatate extends LoginState {
+final class LoginFailureState extends LoginState {
   final String errMessage;
 
-  LoginFailureSatate({required this.errMessage});
+  LoginFailureState({required this.errMessage});
 }
