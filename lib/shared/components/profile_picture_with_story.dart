@@ -12,7 +12,7 @@ class ProfilePictureWithStory extends StatelessWidget {
       decoration: const ShapeDecoration(
         image: DecorationImage(
             image: AssetImage(
-          'lib/assets/images/story_circular.png',
+          'lib/assets/images/story_circular.png', 
         )),
         shape: CircleBorder(),
       ),

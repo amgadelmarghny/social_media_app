@@ -14,8 +14,8 @@ import 'package:social_media_app/shared/components/constants.dart';
 import 'package:social_media_app/shared/style/theme/theme.dart';
 
 void main() async {
-  Bloc.observer = MyBlocObserver();
   WidgetsFlutterBinding.ensureInitialized();
+  Bloc.observer = MyBlocObserver();
   await CacheHelper.init();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -46,7 +46,7 @@ class SocialMediaApp extends StatelessWidget {
           create: (context) => AppCubit(),
         ),
         BlocProvider(
-          create: (context) => SocialCubit(tokenCache)..getUserData(),
+          create: (context) => SocialCubit()..getUserData(),
         ),
       ],
       child: MaterialApp(

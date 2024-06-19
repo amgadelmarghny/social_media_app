@@ -9,11 +9,12 @@ import 'package:social_media_app/modules/new_post/new_post.dart';
 import 'package:social_media_app/modules/notifications/notifications_body.dart';
 import 'package:social_media_app/modules/users/users_body.dart';
 import 'package:social_media_app/shared/components/constants.dart';
+import 'package:social_media_app/shared/network/local/cache_helper.dart';
 
 part 'social_state.dart';
 
 class SocialCubit extends Cubit<SocialState> {
-  SocialCubit(this.uidToken) : super(SocialInitial());
+  SocialCubit() : super(SocialInitial());
 
   //? social bodies navigation
   int currentBottomNavBarIndex = 0;
@@ -47,7 +48,7 @@ class SocialCubit extends Cubit<SocialState> {
   ];
 
   //? get user info
-  String uidToken;
+  String uidTokenCache = CacheHelper.getData(key: uidToken);
   UserModel? userModel;
 
   void getUserData() async {
@@ -56,11 +57,10 @@ class SocialCubit extends Cubit<SocialState> {
       DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
           await FirebaseFirestore.instance
               .collection(usersCollection)
-              .doc(uidToken)
+              .doc(uidTokenCache)
               .get();
 
       userModel = UserModel.fromJson(documentSnapshot.data()!);
-      print(' ******* ${userModel!.firstName}');
       emit(SocialSuccessState());
     } catch (error) {
       emit(SocialFailureState(errMessage: error.toString()));

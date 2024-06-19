@@ -32,18 +32,19 @@ class LoginCubit extends Cubit<LoginState> {
   TextEditingController passwordController = TextEditingController();
 
   void loginUser({required String email, required String password}) async {
-    UserCredential? userCredential;
     try {
-      userCredential = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: email, password: password);
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
       emit(LoginSuccessState(uid: userCredential.user!.uid));
     } on FirebaseAuthException catch (e) {
       // Catching FirebaseAuthException specifically for more detailed error handling
-      if (e.code == 'wrong-password' || e.code == 'user-not-found') {
-        emit(LoginFailureState(errMessage: 'Invalid email or password.'));
-      } else if (e.code == 'invalid-credential') {
+      if (e.code == 'wrong-password') {
+        emit(LoginFailureState(errMessage: 'Wrong password provided for that user.'));
+      } else if (e.code == 'user-not-found') {
         emit(LoginFailureState(
-            errMessage: 'Credentials are malformed or expired.'));
+            errMessage: 'No user found for that email.'));
       } else {
         emit(LoginFailureState(
             errMessage: 'An unknown error occurred: ${e.message}'));

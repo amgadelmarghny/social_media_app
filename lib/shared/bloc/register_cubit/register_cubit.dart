@@ -76,15 +76,16 @@ class RegisterCubit extends Cubit<RegisterState> {
   }) async {
     emit(SaveUserInfoLoadingState());
     UserModel userModel = UserModel(
-        uid: uid,
-        firstName: firstName,
-        lastName: lastName,
-        email: email,
-        dateAndMonth: dateAndMonth,
-        year: year,
-        gender: gender,
-        //TODO: put unknownemus pic
-        photo: '');
+      uid: uid,
+      firstName: firstName,
+      lastName: lastName,
+      email: email,
+      dateAndMonth: dateAndMonth,
+      year: year,
+      gender: gender,
+      photo:
+          'https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?t=st=1718443395~exp=1718446995~hmac=0e6003476b13a111d940370d474ab77d892f114041691e56209fdeb2024a310d&w=740',
+    );
     try {
       await FirebaseFirestore.instance
           .collection(usersCollection)
