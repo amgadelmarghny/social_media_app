@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
 
+import '../style/theme/constant.dart';
+
 class CustomButton extends StatelessWidget {
   const CustomButton({
     super.key,
@@ -33,7 +35,7 @@ class CustomButton extends StatelessWidget {
         child: Center(
           child: isLoading
               ? const CircularProgressIndicator(
-                  color: Color(0xff3B21B2),
+                  color: defaultColor,
                 )
               : Text(
                   text,

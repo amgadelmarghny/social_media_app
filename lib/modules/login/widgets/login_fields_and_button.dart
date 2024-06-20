@@ -10,6 +10,8 @@ import 'package:social_media_app/shared/components/text_form_field.dart';
 import 'package:social_media_app/shared/network/local/cache_helper.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
 
+import '../../../shared/style/theme/constant.dart';
+
 class LoginFieldsAndButton extends StatelessWidget {
   const LoginFieldsAndButton({super.key});
 
@@ -67,7 +69,7 @@ class LoginFieldsAndButton extends StatelessWidget {
                   child: Text(
                     'Forgot password?',
                     style: FontsStyle.font18Popin(
-                      color: const Color(0xff3B21B2),
+                      color: defaultColor,
                     ),
                   ),
                 ),

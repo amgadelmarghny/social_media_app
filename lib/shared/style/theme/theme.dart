@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:social_media_app/shared/style/theme/constant.dart';
 import '../fonts/font_style.dart';
 
 abstract class CustomThemeMode {
@@ -86,7 +87,7 @@ BoxDecoration themeColor() {
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
       colors: [
-        Color(0xff3B21B2),
+        defaultColor,
         Color(0xff8862D9),
         Color(0xff986DDD),
         Color(0xffA878E2),

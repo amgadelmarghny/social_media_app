@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../style/theme/constant.dart';
+
 class AuthIcon extends StatelessWidget {
   const AuthIcon({
     super.key,
@@ -14,7 +16,7 @@ class AuthIcon extends StatelessWidget {
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Color(0xff3B21B2),
+            defaultColor,
             Colors.white,
           ],
         ),

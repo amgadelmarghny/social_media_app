@@ -10,6 +10,8 @@ import 'package:social_media_app/shared/components/navigators.dart';
 import 'package:social_media_app/shared/components/show_toast.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
 
+import '../../shared/style/theme/constant.dart';
+
 class RegisterViewBody extends StatelessWidget {
   const RegisterViewBody({super.key});
 
@@ -69,9 +71,7 @@ class RegisterViewBody extends StatelessWidget {
                           },
                           child: Text(
                             'Sign in',
-                            style: FontsStyle.font18Popin(
-                              color: const Color(0xff3B21B2),
-                            ),
+                            style: FontsStyle.font18Popin(color: defaultColor),
                           ),
                         ),
                       ],

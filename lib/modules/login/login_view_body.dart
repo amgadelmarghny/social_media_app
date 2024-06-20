@@ -5,6 +5,7 @@ import 'package:social_media_app/shared/bloc/login_cubit/login_cubit.dart';
 import 'package:social_media_app/shared/components/auth_icon_list.dart';
 import 'package:social_media_app/shared/components/navigators.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
+import '../../shared/style/theme/constant.dart';
 import 'widgets/login_fields_and_button.dart';
 
 class LoginViewBody extends StatelessWidget {
@@ -84,7 +85,7 @@ class LoginViewBody extends StatelessWidget {
                         child: Text(
                           'Sign up',
                           style: FontsStyle.font18Popin(
-                            color: const Color(0xff3B21B2),
+                            color: defaultColor,
                           ),
                         ),
                       ),
