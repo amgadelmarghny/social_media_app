@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
-
 import '../style/theme/constant.dart';
 
 class CustomButton extends StatelessWidget {
@@ -9,16 +8,22 @@ class CustomButton extends StatelessWidget {
     required this.text,
     required this.onTap,
     this.isLoading = false,
+    this.buttonColor = const Color(0xFF635A8F),
+    this.textColor = Colors.white,
+    this.height = 55,
   });
   final void Function()? onTap;
   final String text;
   final bool isLoading;
+  final Color buttonColor;
+  final Color textColor;
+  final double height;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 55,
+        height: height,
         decoration: ShapeDecoration(
           shadows: const [
             BoxShadow(
@@ -27,7 +32,7 @@ class CustomButton extends StatelessWidget {
               color: Colors.black38,
             )
           ],
-          color: const Color(0xFF635A8F),
+          color: buttonColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30),
           ),
@@ -39,7 +44,7 @@ class CustomButton extends StatelessWidget {
                 )
               : Text(
                   text,
-                  style: FontsStyle.font22Bold,
+                  style: FontsStyle.font22Bold(color: textColor),
                 ),
         ),
       ),

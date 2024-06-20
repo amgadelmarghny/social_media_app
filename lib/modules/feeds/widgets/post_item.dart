@@ -19,6 +19,7 @@ class PostItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(25),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const ProfilePostRow(
             image:
