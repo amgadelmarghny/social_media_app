@@ -7,7 +7,7 @@ import '../../shared/style/theme/constant.dart';
 import 'widgets/custom_follower_following_row.dart';
 
 class UsersBody extends StatelessWidget {
-  const UsersBody({super.key});
+  const UsersBody({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
