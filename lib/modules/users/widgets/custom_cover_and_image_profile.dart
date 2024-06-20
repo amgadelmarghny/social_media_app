@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:popover/popover.dart';
 import '../../../shared/components/profile_picture_with_story.dart';
+import 'profile_image_menu_items.dart';
 
 class CustomCoverAndImageProfile extends StatelessWidget {
   const CustomCoverAndImageProfile({
@@ -8,7 +10,7 @@ class CustomCoverAndImageProfile extends StatelessWidget {
     required this.profileCover,
   });
   final String profileImage;
-  final String profileCover;
+  final String? profileCover;
 
   @override
   Widget build(BuildContext context) {
@@ -32,17 +34,32 @@ class CustomCoverAndImageProfile extends StatelessWidget {
             ),
             height: height * 0.3,
             width: double.infinity,
-            child: Image.network(
-              fit: BoxFit.cover,
-              profileCover,
+            child: GestureDetector(
+              onTap: () {},
+              child: Image.network(
+                fit: BoxFit.cover,
+                profileCover ??
+                    'https://as1.ftcdn.net/v2/jpg/02/70/09/98/1000_F_270099822_9zbx236dHn1hyxYNl9HSOBvpUEpU0eOz.jpg',
+              ),
             ),
           ),
           Positioned(
             bottom: -50,
             right: width / 2 - 50,
-            child: ProfilePictureWithStory(
-              size: 100,
-              image: profileImage,
+            child: GestureDetector(
+              onTap: () {
+
+                showPopover(
+                  backgroundColor: const Color(0xff8862D9),
+                  height: 150,
+                    width: 250,
+                    context: context,
+                    bodyBuilder: (context) => const ProfileImageMenuItem());
+              },
+              child: ProfilePictureWithStory(
+                size: 100,
+                image: profileImage,
+              ),
             ),
           ),
         ],
