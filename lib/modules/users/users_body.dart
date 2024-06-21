@@ -4,6 +4,7 @@ import 'package:icon_broken/icon_broken.dart';
 import 'package:social_media_app/models/user_model.dart';
 import 'package:social_media_app/modules/users/widgets/custom_cover_and_image_profile.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
+import 'package:social_media_app/shared/components/show_toast.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
 import '../../shared/style/theme/constant.dart';
 import 'widgets/custom_follower_following_row.dart';
@@ -14,7 +15,15 @@ class UsersBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<SocialCubit, SocialState>(
+    return BlocConsumer<SocialCubit, SocialState>(
+      listener:  (context, state) {
+        if(state is ProfileImagePickedFailureState){
+          showToast(msg: state.errMessage, toastState: ToastState.worrning);
+        }
+        if(state is UploadProfileImageFailureState){
+          showToast(msg: state.errMessage, toastState: ToastState.worrning);
+        }
+      },
       builder: (context, state) {
         UserModel userModel = BlocProvider.of<SocialCubit>(context).userModel!;
         return SingleChildScrollView(

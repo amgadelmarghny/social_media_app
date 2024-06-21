@@ -14,9 +14,7 @@ import 'package:social_media_app/modules/notifications/notifications_body.dart';
 import 'package:social_media_app/modules/users/users_body.dart';
 import 'package:social_media_app/shared/components/constants.dart';
 import 'package:social_media_app/shared/network/local/cache_helper.dart';
-
 import '../../../models/updateUserImplModel.dart';
-
 part 'social_state.dart';
 
 class SocialCubit extends Cubit<SocialState> {

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
 
 class ProfileImageMenuItem extends StatelessWidget {
@@ -9,7 +11,10 @@ class ProfileImageMenuItem extends StatelessWidget {
     return Column(
       children: [
         GestureDetector(
-          onTap: (){},
+          onTap: (){
+            BlocProvider.of<SocialCubit>(context).pickAndUploadProfileImage();
+            Navigator.pop(context);
+          },
           child: Container(
             height: 50,
             color: const Color(0xff8862D9),
