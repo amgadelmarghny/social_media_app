@@ -39,7 +39,7 @@ class CustomCoverAndImageProfile extends StatelessWidget {
               onTap: () {
                 showPopover(
                     backgroundColor: const Color(0xff8862D9),
-                    height: 150,
+                    height: 100,
                     width: 250,
                     context: context,
                     bodyBuilder: (context) => const CoverImageMenuItem());

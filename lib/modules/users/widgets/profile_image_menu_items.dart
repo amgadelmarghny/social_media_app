@@ -11,7 +11,7 @@ class ProfileImageMenuItem extends StatelessWidget {
     return Column(
       children: [
         GestureDetector(
-          onTap: (){
+          onTap: () {
             BlocProvider.of<SocialCubit>(context).pickAndUploadProfileImage();
             Navigator.pop(context);
           },
@@ -27,7 +27,7 @@ class ProfileImageMenuItem extends StatelessWidget {
           ),
         ),
         GestureDetector(
-          onTap: (){},
+          onTap: () {},
           child: Container(
             height: 50,
             color: const Color(0xffA879E2),
@@ -40,7 +40,7 @@ class ProfileImageMenuItem extends StatelessWidget {
           ),
         ),
         GestureDetector(
-          onTap: (){},
+          onTap: () {},
           child: Container(
             height: 50,
             color: const Color(0xffD197ED),
