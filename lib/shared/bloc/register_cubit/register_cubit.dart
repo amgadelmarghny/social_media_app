@@ -2,7 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:social_media_app/models/onBoarding/user_model.dart';
+import 'package:social_media_app/models/user_model.dart';
 import 'package:social_media_app/shared/components/constants.dart';
 
 part 'register_state.dart';

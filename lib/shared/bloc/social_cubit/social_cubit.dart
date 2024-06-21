@@ -6,7 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:icon_broken/icon_broken.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:social_media_app/models/onBoarding/user_model.dart';
+import 'package:social_media_app/models/user_model.dart';
 import 'package:social_media_app/modules/chat/chat_body.dart';
 import 'package:social_media_app/modules/feeds/feeds_body.dart';
 import 'package:social_media_app/modules/new_post/new_post.dart';

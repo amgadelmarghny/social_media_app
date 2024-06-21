@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:icon_broken/icon_broken.dart';
-import 'package:social_media_app/models/onBoarding/user_model.dart';
+import 'package:social_media_app/models/user_model.dart';
 import 'package:social_media_app/modules/users/widgets/custom_cover_and_image_profile.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
