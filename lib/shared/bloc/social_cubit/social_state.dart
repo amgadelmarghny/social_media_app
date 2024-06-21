@@ -35,3 +35,23 @@ final class UploadProfileImageFailureState extends SocialState {
 
   UploadProfileImageFailureState({required this.errMessage});
 }
+
+final class CoverImagePickedLoadingState extends SocialState {}
+
+final class CoverImagePickedSuccessState extends SocialState {}
+
+final class CoverImagePickedFailureState extends SocialState {
+  final String errMessage;
+
+  CoverImagePickedFailureState({required this.errMessage});
+}
+
+final class UploadCoverImageLoadingState extends SocialState {}
+
+final class UploadCoverImageSuccessState extends SocialState {}
+
+final class UploadCoverImageFailureState extends SocialState {
+  final String errMessage;
+
+  UploadCoverImageFailureState({required this.errMessage});
+}

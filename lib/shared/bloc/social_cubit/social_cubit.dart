@@ -72,6 +72,7 @@ class SocialCubit extends Cubit<SocialState> {
     }
   }
 
+  // profile image
   Future<File?> profileImagePicked() async {
     emit(ProfileImagePickedLoadingState());
 
@@ -122,6 +123,55 @@ class SocialCubit extends Cubit<SocialState> {
           await uploadProfileImage(file: returnedProfileImage);
       UpdateUserImplModel updateUserImplModel =
           UpdateUserImplModel(photo: profileImageUrl);
+      await updateUserInfo(updateUserImplModel: updateUserImplModel);
+      await getUserData();
+    }
+    return null;
+  }
+
+  // cover image
+  Future<File?> coverImagePicked() async {
+    emit(CoverImagePickedLoadingState());
+
+    final ImagePicker picker = ImagePicker();
+    XFile? returnImage = await picker.pickImage(source: ImageSource.gallery);
+
+    if (returnImage == null) {
+      debugPrint('No image selected');
+      emit(CoverImagePickedFailureState(errMessage: 'No image selected'));
+      return null;
+    } else {
+      emit(CoverImagePickedSuccessState());
+      return File(returnImage.path);
+    }
+  }
+
+  Future<String?> uploadCoverImage({required File file}) async {
+    emit(UploadCoverImageLoadingState());
+    String? coverUrl;
+    try {
+      final task = await FirebaseStorage.instance
+          .ref()
+          .child(
+              '$usersCollection/cover/${Uri.file(file.path).pathSegments.last}')
+          .putFile(file);
+
+      coverUrl = await task.ref.getDownloadURL();
+      emit(UploadCoverImageSuccessState());
+      return coverUrl;
+    } on Exception catch (e) {
+      emit(UploadCoverImageFailureState(errMessage: e.toString()));
+    }
+    return coverUrl;
+  }
+
+  Future<String?> pickAndUploadCoverImage() async {
+    File? returnedCoverImage = await profileImagePicked();
+    if (returnedCoverImage != null) {
+      String? coverImageUrl =
+          await uploadProfileImage(file: returnedCoverImage);
+      UpdateUserImplModel updateUserImplModel =
+          UpdateUserImplModel(cover: coverImageUrl);
       await updateUserInfo(updateUserImplModel: updateUserImplModel);
       await getUserData();
     }
