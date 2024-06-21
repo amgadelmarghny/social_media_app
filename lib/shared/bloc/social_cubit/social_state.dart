@@ -16,12 +16,12 @@ final class SocialFailureState extends SocialState {
   SocialFailureState({required this.errMessage});
 }
 
-final class ChangeProfileImageLoadingState extends SocialState {}
+final class ProfileImagePickedLoadingState extends SocialState {}
 
-final class ChangeProfileImageSuccessState extends SocialState {}
+final class ProfileImagePickedSuccessState extends SocialState {}
 
-final class ChangeProfileImageFailureState extends SocialState {
+final class ProfileImagePickedFailureState extends SocialState {
   final String errMessage;
 
-  ChangeProfileImageFailureState({required this.errMessage});
+  ProfileImagePickedFailureState({required this.errMessage});
 }
