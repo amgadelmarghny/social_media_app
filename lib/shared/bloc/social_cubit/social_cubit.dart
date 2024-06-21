@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:icon_broken/icon_broken.dart';
 import 'package:image_picker/image_picker.dart';
@@ -18,6 +19,8 @@ part 'social_state.dart';
 
 class SocialCubit extends Cubit<SocialState> {
   SocialCubit() : super(SocialInitial());
+  
+  String uidTokenCache = CacheHelper.getData(key: uidToken);
 
   //? social bodies navigation
   int currentBottomNavBarIndex = 0;
@@ -51,7 +54,6 @@ class SocialCubit extends Cubit<SocialState> {
   ];
 
   //? get user info
-  String uidTokenCache = CacheHelper.getData(key: uidToken);
   UserModel? userModel;
 
   void getUserData() async {
@@ -84,5 +86,32 @@ class SocialCubit extends Cubit<SocialState> {
       emit(ProfileImagePickedSuccessState());
       return File(returnImage.path);
     }
+  }
+
+  Future<String?> uploadProfileImage({required File file}) async {
+    emit(UploadProfileImageLoadingState());
+    String? pictureUrl;
+    try {
+      final task = await FirebaseStorage.instance
+          .ref()
+          .child(
+              '$usersCollection/profile/${Uri.file(file.path).pathSegments.last}')
+          .putFile(file);
+
+      pictureUrl = await task.ref.getDownloadURL();
+      emit(UploadProfileImageSuccessState());
+      return pictureUrl;
+    } on Exception catch (e) {
+      emit(UploadProfileImageFailureState(errMessage: e.toString()));
+    }
+    return pictureUrl;
+  }
+
+  Future<String?> pickAndUploadProfileImage() async {
+    File? returnedProfileImage = await profileImagePicked();
+    if (returnedProfileImage != null) {
+      return await uploadProfileImage(file: returnedProfileImage);
+    }
+    return null;
   }
 }
