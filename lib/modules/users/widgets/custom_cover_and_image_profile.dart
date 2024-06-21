@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:popover/popover.dart';
 import '../../../shared/components/profile_picture_with_story.dart';
+import 'cover_image_menu_items.dart';
 import 'profile_image_menu_items.dart';
 
 class CustomCoverAndImageProfile extends StatelessWidget {
@@ -35,7 +36,14 @@ class CustomCoverAndImageProfile extends StatelessWidget {
             height: height * 0.3,
             width: double.infinity,
             child: GestureDetector(
-              onTap: () {},
+              onTap: () {
+                showPopover(
+                    backgroundColor: const Color(0xff8862D9),
+                    height: 150,
+                    width: 250,
+                    context: context,
+                    bodyBuilder: (context) => const CoverImageMenuItem());
+              },
               child: Image.network(
                 fit: BoxFit.cover,
                 profileCover ??
