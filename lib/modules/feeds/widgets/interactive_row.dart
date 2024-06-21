@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:social_media_app/shared/style/theme/constant.dart';
 import '../../../shared/style/fonts/font_style.dart';
 
 class InteractiveRow extends StatelessWidget {
@@ -19,6 +20,7 @@ class InteractiveRow extends StatelessWidget {
           icon: SvgPicture.asset(
             'lib/assets/images/like.svg',
           ),
+          color: defaultColor,
         ),
         Transform.translate(
           offset: const Offset(-7, 0),
@@ -50,6 +52,7 @@ class InteractiveRow extends StatelessWidget {
           icon: SvgPicture.asset(
             'lib/assets/images/share.svg',
           ),
+          color: defaultColor,
         ),
       ],
     );

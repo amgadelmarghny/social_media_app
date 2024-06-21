@@ -21,7 +21,7 @@ class ProfilePostRow extends StatelessWidget {
           image: image,
         ),
         const SizedBox(
-          width: 3,
+          width: 5,
         ),
         Expanded(
           child: Column(

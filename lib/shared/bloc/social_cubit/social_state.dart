@@ -4,14 +4,24 @@ sealed class SocialState {}
 
 final class SocialInitial extends SocialState {}
 
+final class BottomNavBarState extends SocialState {}
+
 final class SocialLoadingState extends SocialState {}
 
 final class SocialSuccessState extends SocialState {}
-
-final class BottomNavBarState extends SocialState {}
 
 final class SocialFailureState extends SocialState {
   final String errMessage;
 
   SocialFailureState({required this.errMessage});
+}
+
+final class ChangeProfileImageLoadingState extends SocialState {}
+
+final class ChangeProfileImageSuccessState extends SocialState {}
+
+final class ChangeProfileImageFailureState extends SocialState {
+  final String errMessage;
+
+  ChangeProfileImageFailureState({required this.errMessage});
 }

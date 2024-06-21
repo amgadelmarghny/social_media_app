@@ -48,10 +48,9 @@ class CustomCoverAndImageProfile extends StatelessWidget {
             right: width / 2 - 50,
             child: GestureDetector(
               onTap: () {
-
                 showPopover(
-                  backgroundColor: const Color(0xff8862D9),
-                  height: 150,
+                    backgroundColor: const Color(0xff8862D9),
+                    height: 150,
                     width: 250,
                     context: context,
                     bodyBuilder: (context) => const ProfileImageMenuItem());

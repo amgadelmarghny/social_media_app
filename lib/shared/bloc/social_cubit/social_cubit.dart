@@ -66,4 +66,13 @@ class SocialCubit extends Cubit<SocialState> {
       emit(SocialFailureState(errMessage: error.toString()));
     }
   }
+
+  void changeProfileImage() {
+    emit(ChangeProfileImageLoadingState());
+    try {
+
+    } catch (err) {
+      emit(ChangeProfileImageFailureState(errMessage: err.toString()));
+    }
+  }
 }

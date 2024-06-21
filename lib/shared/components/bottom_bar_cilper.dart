@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
 class BottomBarClipper extends CustomClipper<Path> {
-  BottomBarClipper(this.context, {required this.hight});
+  BottomBarClipper(this.context, {required this.height});
   final BuildContext context;
-  final double hight;
+  final double height;
   @override
   Path getClip(Size size) {
     Path path = Path();
     final double xScaling =
         size.width / (MediaQuery.sizeOf(context).width - 20);
-    final double yScaling = size.height / hight;
+    final double yScaling = size.height / height;
     path.lineTo(0 * xScaling, 27.5585 * yScaling);
     path.cubicTo(
       0 * xScaling,
