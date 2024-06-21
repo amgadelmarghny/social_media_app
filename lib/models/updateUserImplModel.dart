@@ -11,14 +11,14 @@ class UpdateUserImplModel {
   final String? bio;
 
   UpdateUserImplModel(
-    this.firstName,
+   { this.firstName,
     this.lastName,
     this.dateAndMonth,
     this.year,
     this.gender,
     this.photo,
     this.cover,
-    this.bio,
+    this.bio,}
   );
 
   Map<Object, Object?> toMap(UserModel userModel) {

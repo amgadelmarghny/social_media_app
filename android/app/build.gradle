@@ -68,4 +68,6 @@ flutter {
     source '../..'
 }
 
-dependencies {}
+dependencies {
+    implementation 'com.google.firebase:firebase-appcheck-safetoken:16.0.0-beta02'
+}

@@ -15,11 +15,13 @@ import 'package:social_media_app/modules/users/users_body.dart';
 import 'package:social_media_app/shared/components/constants.dart';
 import 'package:social_media_app/shared/network/local/cache_helper.dart';
 
+import '../../../models/updateUserImplModel.dart';
+
 part 'social_state.dart';
 
 class SocialCubit extends Cubit<SocialState> {
   SocialCubit() : super(SocialInitial());
-  
+
   String uidTokenCache = CacheHelper.getData(key: uidToken);
 
   //? social bodies navigation
@@ -56,7 +58,7 @@ class SocialCubit extends Cubit<SocialState> {
   //? get user info
   UserModel? userModel;
 
-  void getUserData() async {
+  Future<void> getUserData() async {
     emit(SocialLoadingState());
     try {
       DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
@@ -107,10 +109,23 @@ class SocialCubit extends Cubit<SocialState> {
     return pictureUrl;
   }
 
+  Future<void> updateUserInfo(
+      {required UpdateUserImplModel updateUserImplModel}) async {
+    await FirebaseFirestore.instance
+        .collection(usersCollection)
+        .doc(uidTokenCache)
+        .update(updateUserImplModel.toMap(userModel!));
+  }
+
   Future<String?> pickAndUploadProfileImage() async {
     File? returnedProfileImage = await profileImagePicked();
     if (returnedProfileImage != null) {
-      return await uploadProfileImage(file: returnedProfileImage);
+      String? profileImageUrl =
+          await uploadProfileImage(file: returnedProfileImage);
+      UpdateUserImplModel updateUserImplModel =
+          UpdateUserImplModel(photo: profileImageUrl);
+      await updateUserInfo(updateUserImplModel: updateUserImplModel);
+      await getUserData();
     }
     return null;
   }
