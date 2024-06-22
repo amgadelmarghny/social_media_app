@@ -18,11 +18,22 @@ class ProfileImageMenuItem extends StatelessWidget {
           child: Container(
             height: 50,
             color: const Color(0xff8862D9),
-            child: Center(
-              child: Text(
-                'Change picture',
-                style: FontsStyle.font18Popin(),
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircleAvatar(
+                  backgroundColor: Colors.white.withOpacity(0.3),
+                  radius: 15,
+                  child:const Icon(Icons.file_upload_sharp),
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                Text(
+                  'Upload photo',
+                  style: FontsStyle.font18Popin(),
+                )
+              ],
             ),
           ),
         ),
@@ -31,11 +42,22 @@ class ProfileImageMenuItem extends StatelessWidget {
           child: Container(
             height: 50,
             color: const Color(0xffA879E2),
-            child: Center(
-              child: Text(
-                'View picture',
-                style: FontsStyle.font18Popin(),
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircleAvatar(
+                  backgroundColor: Colors.white.withOpacity(0.3),
+                  radius: 15,
+                  child:const Icon(Icons.photo_outlined,size: 22.5,),
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                Text(
+                  'See profile photo',
+                  style: FontsStyle.font18Popin(),
+                )
+              ],
             ),
           ),
         ),

@@ -90,7 +90,7 @@ class RegisterCubit extends Cubit<RegisterState> {
       await FirebaseFirestore.instance
           .collection(usersCollection)
           .doc(uid)
-          .set(userModel.tojson());
+          .set(userModel.toJson());
       emit(SaveUserInfoSuccessState(uid: uid));
     } catch (err) {
       emit(SaveUserInfoFailureState(errMessage: err.toString()));
