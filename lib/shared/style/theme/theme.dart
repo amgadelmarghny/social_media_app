@@ -30,7 +30,7 @@ abstract class CustomThemeMode {
       showUnselectedLabels: false,
     ),
     appBarTheme: const AppBarTheme(
-      toolbarHeight: 0,
+      backgroundColor: Colors.transparent,
       systemOverlayStyle: SystemUiOverlayStyle(
         systemStatusBarContrastEnforced: true,
         statusBarColor: Colors.transparent,
@@ -68,7 +68,7 @@ abstract class CustomThemeMode {
       showUnselectedLabels: false,
     ),
     appBarTheme: const AppBarTheme(
-      toolbarHeight: 0,
+      backgroundColor: Colors.transparent,
       systemOverlayStyle: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
         systemNavigationBarColor: Colors.transparent,
