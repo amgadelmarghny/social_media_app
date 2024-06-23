@@ -85,7 +85,11 @@ abstract class FontsStyle {
       ),
     ],
   );
-
+  static const TextStyle font25Bold = TextStyle(
+    fontSize: 25,
+    fontWeight: FontWeight.bold,
+    color: Colors.white,
+  );
   static const TextStyle font32Bold = TextStyle(
     fontSize: 32,
     fontWeight: FontWeight.bold,

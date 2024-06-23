@@ -14,7 +14,7 @@ import 'package:social_media_app/modules/notifications/notifications_body.dart';
 import 'package:social_media_app/modules/users/users_body.dart';
 import 'package:social_media_app/shared/components/constants.dart';
 import 'package:social_media_app/shared/network/local/cache_helper.dart';
-import '../../../models/updateUserImplModel.dart';
+import '../../../models/update_user_impl_model.dart';
 part 'social_state.dart';
 
 class SocialCubit extends Cubit<SocialState> {
@@ -72,6 +72,15 @@ class SocialCubit extends Cubit<SocialState> {
     }
   }
 
+  // update user info
+  Future<void> updateUserInfo(
+      {required UpdateUserImplModel updateUserImplModel}) async {
+    await FirebaseFirestore.instance
+        .collection(usersCollection)
+        .doc(uidTokenCache)
+        .update(updateUserImplModel.toMap(userModel!));
+  }
+
   // profile image
   Future<File?> profileImagePicked() async {
     emit(ProfileImagePickedLoadingState());
@@ -106,14 +115,6 @@ class SocialCubit extends Cubit<SocialState> {
       emit(UploadProfileImageFailureState(errMessage: e.toString()));
     }
     return pictureUrl;
-  }
-
-  Future<void> updateUserInfo(
-      {required UpdateUserImplModel updateUserImplModel}) async {
-    await FirebaseFirestore.instance
-        .collection(usersCollection)
-        .doc(uidTokenCache)
-        .update(updateUserImplModel.toMap(userModel!));
   }
 
   Future<String?> pickAndUploadProfileImage() async {
@@ -169,7 +170,7 @@ class SocialCubit extends Cubit<SocialState> {
     File? returnedCoverImage = await profileImagePicked();
     if (returnedCoverImage != null) {
       String? coverImageUrl =
-          await uploadProfileImage(file: returnedCoverImage);
+          await uploadCoverImage(file: returnedCoverImage);
       UpdateUserImplModel updateUserImplModel =
           UpdateUserImplModel(cover: coverImageUrl);
       await updateUserInfo(updateUserImplModel: updateUserImplModel);

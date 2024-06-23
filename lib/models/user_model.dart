@@ -7,7 +7,7 @@ class UserModel {
   final String year;
   final String gender;
   final String photo;
-  final String? cover;
+  final String cover;
   final String? bio;
 
   UserModel({
@@ -19,7 +19,7 @@ class UserModel {
     required this.year,
     required this.gender,
     required this.photo,
-    this.cover,
+    required this.cover,
     this.bio,
   });
 

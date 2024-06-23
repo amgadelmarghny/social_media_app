@@ -11,7 +11,7 @@ class CustomCoverAndImageProfile extends StatelessWidget {
     required this.profileCover,
   });
   final String profileImage;
-  final String? profileCover;
+  final String profileCover;
 
   @override
   Widget build(BuildContext context) {
@@ -46,8 +46,7 @@ class CustomCoverAndImageProfile extends StatelessWidget {
               },
               child: Image.network(
                 fit: BoxFit.cover,
-                profileCover ??
-                    'https://as1.ftcdn.net/v2/jpg/02/70/09/98/1000_F_270099822_9zbx236dHn1hyxYNl9HSOBvpUEpU0eOz.jpg',
+                profileCover,
               ),
             ),
           ),
