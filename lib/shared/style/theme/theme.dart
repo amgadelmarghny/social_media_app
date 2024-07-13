@@ -9,16 +9,16 @@ abstract class CustomThemeMode {
     scaffoldBackgroundColor: Colors.transparent,
     iconTheme: const IconThemeData(color: Colors.white),
     searchBarTheme: SearchBarThemeData(
-      textStyle: MaterialStateProperty.resolveWith(
-          (states) => FontsStyle.font18Popin()),
-      hintStyle: MaterialStateProperty.resolveWith(
-          (states) => FontsStyle.font18Popin()),
+      textStyle:
+          WidgetStateProperty.resolveWith((states) => FontsStyle.font18Popin()),
+      hintStyle:
+          WidgetStateProperty.resolveWith((states) => FontsStyle.font18Popin()),
       backgroundColor:
-          MaterialStateColor.resolveWith((states) => const Color(0xff635A8F)),
+          WidgetStateProperty.resolveWith((states) => const Color(0xff635A8F)),
     ),
     iconButtonTheme: IconButtonThemeData(
       style: ButtonStyle(
-        iconColor: MaterialStateProperty.resolveWith((states) => Colors.white),
+        iconColor: WidgetStateProperty .resolveWith((states) => Colors.white),
       ),
     ),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
@@ -50,14 +50,14 @@ abstract class CustomThemeMode {
     iconTheme: const IconThemeData(color: Colors.white),
     iconButtonTheme: IconButtonThemeData(
       style: ButtonStyle(
-        iconColor: MaterialStateProperty.resolveWith((states) => Colors.white),
+        iconColor: WidgetStateProperty .resolveWith((states) => Colors.white),
       ),
     ),
     searchBarTheme: SearchBarThemeData(
-      hintStyle: MaterialStateProperty.resolveWith(
+      hintStyle: WidgetStateProperty .resolveWith(
           (states) => FontsStyle.font18Popin()),
       backgroundColor:
-          MaterialStateColor.resolveWith((states) => const Color(0xff635A8F)),
+          WidgetStateProperty .resolveWith((states) => const Color(0xff635A8F)),
     ),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       selectedItemColor: Color(0xff635A8F),

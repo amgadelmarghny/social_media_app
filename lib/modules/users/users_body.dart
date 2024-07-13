@@ -40,28 +40,34 @@ class UsersBody extends StatelessWidget {
                 profileImage: userModel.photo,
                 profileCover: userModel.cover,
               ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    '${userModel.firstName} ${userModel.lastName}',
-                    style: FontsStyle.font20BoldWithColor,
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, EditProfileView.routeViewName);
-                    },
-                    icon: const Icon(
-                      IconBroken.Edit_Square,
-                      size: 32,
-                      color: defaultColor,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        '${userModel.firstName} ${userModel.lastName}',
+                        style: FontsStyle.font20BoldWithColor,
+                      ),
                     ),
-                    color: defaultColor,
-                  )
-                ],
+                    IconButton(
+                      onPressed: () {
+                        Navigator.pushNamed(
+                            context, EditProfileView.routeViewName);
+                      },
+                      icon: const Icon(
+                        IconBroken.Edit_Square,
+                        size: 32,
+                        color: defaultColor,
+                      ),
+                      color: defaultColor,
+                    )
+                  ],
+                ),
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 20, right: 20),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
                   children: [
                     const CustomPostFollowersFollowingRow(
