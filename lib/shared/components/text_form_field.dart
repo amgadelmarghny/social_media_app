@@ -14,6 +14,8 @@ class CustomTextField extends StatelessWidget {
     this.labelText,
     this.controller,
     this.onTap,
+    this.outLineBorderColor = Colors.white,
+    this.contentVerticalPadding = 16,
   });
 
   final TextEditingController? controller;
@@ -26,6 +28,8 @@ class CustomTextField extends StatelessWidget {
   final void Function()? suffixOnPressed;
   final String? labelText;
   final void Function()? onTap;
+  final Color outLineBorderColor;
+  final double contentVerticalPadding;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -37,7 +41,10 @@ class CustomTextField extends StatelessWidget {
         maxLines: 1,
         keyboardType: textInputType,
         obscureText: obscureText,
-        style: FontsStyle.font18Popin(),
+        style: FontsStyle.font18Popin().copyWith(
+          color:
+              outLineBorderColor != Colors.white ? Colors.black : Colors.white,
+        ),
         validator: (data) {
           if (data?.isEmpty ?? true) {
             return 'FIELD IS EMPTY';
@@ -48,7 +55,7 @@ class CustomTextField extends StatelessWidget {
         onChanged: onChange,
         decoration: InputDecoration(
           contentPadding:
-              const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+               EdgeInsets.symmetric(horizontal: 20, vertical: contentVerticalPadding),
           suffixIcon: suffixIcon,
           prefixIcon: prefixIcon != null
               ? Icon(
@@ -56,7 +63,10 @@ class CustomTextField extends StatelessWidget {
                 )
               : null,
           hintText: hintText,
-          hintStyle: FontsStyle.font18Popin(),
+          hintStyle:  FontsStyle.font18Popin().copyWith(
+            color:
+            outLineBorderColor,
+          ),
           labelText: labelText,
           labelStyle: const TextStyle(
             fontSize: 16,
@@ -72,9 +82,9 @@ class CustomTextField extends StatelessWidget {
   OutlineInputBorder outlineBorder(BuildContext context) {
     return OutlineInputBorder(
       borderRadius: BorderRadius.circular(30),
-      borderSide: const BorderSide(
+      borderSide: BorderSide(
         width: 2.2,
-        color: Colors.white,
+        color: outLineBorderColor,
       ),
     );
   }
