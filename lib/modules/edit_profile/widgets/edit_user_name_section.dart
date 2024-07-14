@@ -30,28 +30,29 @@ class _EditUserNameSectionState extends State<EditUserNameSection> {
           },
         ),
         ExpandedSection(
-            expand: isStretchedDropDown,
-            height: 100,
-            child: const Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CustomTextField(
-                  outLineBorderColor: Colors.grey,
-                  contentVerticalPadding: 10,
-                  textInputType: TextInputType.name,
-                  hintText: 'First name',
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                CustomTextField(
-                  outLineBorderColor: Colors.grey,
-                  contentVerticalPadding: 10,
-                  textInputType: TextInputType.name,
-                  hintText: 'Last name',
-                ),
-              ],
-            )),
+          expand: isStretchedDropDown,
+          height: 100,
+          child: const Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CustomTextField(
+                outLineBorderColor: Colors.grey,
+                contentVerticalPadding: 10,
+                textInputType: TextInputType.name,
+                hintText: 'First name',
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              CustomTextField(
+                outLineBorderColor: Colors.grey,
+                contentVerticalPadding: 10,
+                textInputType: TextInputType.name,
+                hintText: 'Last name',
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
