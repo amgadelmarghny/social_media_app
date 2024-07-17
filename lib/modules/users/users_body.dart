@@ -32,7 +32,7 @@ class UsersBody extends StatelessWidget {
         }
         if (state is UploadCoverImageSuccessState ||
             state is UploadProfileImageSuccessState) {
-          showToast(msg: 'Added successfully', toastState: ToastState.worrning);
+          showToast(msg: 'Added successfully', toastState: ToastState.success);
         }
       },
       builder: (context, state) {
