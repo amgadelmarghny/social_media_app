@@ -30,6 +30,10 @@ class UsersBody extends StatelessWidget {
         if (state is UploadCoverImageFailureState) {
           showToast(msg: state.errMessage, toastState: ToastState.worrning);
         }
+        if (state is UploadCoverImageSuccessState ||
+            state is UploadProfileImageSuccessState) {
+          showToast(msg: 'Added successfully', toastState: ToastState.worrning);
+        }
       },
       builder: (context, state) {
         UserModel userModel = BlocProvider.of<SocialCubit>(context).userModel!;

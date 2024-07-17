@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:icon_broken/icon_broken.dart';
+import '../../../shared/bloc/social_cubit/social_cubit.dart';
 import '../../../shared/components/expanded_list_animation_widget.dart';
 import '../../../shared/components/text_form_field.dart';
 
@@ -32,19 +34,23 @@ class _EditUserNameSectionState extends State<EditUserNameSection> {
         ExpandedSection(
           expand: isStretchedDropDown,
           height: 100,
-          child: const Column(
+          child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               CustomTextField(
+                controller:
+                    BlocProvider.of<SocialCubit>(context).firstNameController,
                 outLineBorderColor: Colors.grey,
                 contentVerticalPadding: 10,
                 textInputType: TextInputType.name,
                 hintText: 'First name',
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               CustomTextField(
+                controller:
+                    BlocProvider.of<SocialCubit>(context).lastNameController,
                 outLineBorderColor: Colors.grey,
                 contentVerticalPadding: 10,
                 textInputType: TextInputType.name,

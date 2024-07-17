@@ -83,10 +83,6 @@ class RegisterCubit extends Cubit<RegisterState> {
       dateAndMonth: dateAndMonth,
       year: year,
       gender: gender,
-      photo:
-          'https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?t=st=1718443395~exp=1718446995~hmac=0e6003476b13a111d940370d474ab77d892f114041691e56209fdeb2024a310d&w=740',
-      cover:
-          'https://as1.ftcdn.net/v2/jpg/02/70/09/98/1000_F_270099822_9zbx236dHn1hyxYNl9HSOBvpUEpU0eOz.jpg',
     );
     try {
       await FirebaseFirestore.instance

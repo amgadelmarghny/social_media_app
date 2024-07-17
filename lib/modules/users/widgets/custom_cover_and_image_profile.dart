@@ -10,8 +10,8 @@ class CustomCoverAndImageProfile extends StatelessWidget {
     required this.profileImage,
     required this.profileCover,
   });
-  final String profileImage;
-  final String profileCover;
+  final String? profileImage;
+  final String? profileCover;
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +24,7 @@ class CustomCoverAndImageProfile extends StatelessWidget {
         children: [
           Container(
             decoration: BoxDecoration(
+              color: profileCover != null ? null : Colors.grey,
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.5),
@@ -44,10 +45,15 @@ class CustomCoverAndImageProfile extends StatelessWidget {
                     context: context,
                     bodyBuilder: (context) => const CoverImageMenuItem());
               },
-              child: Image.network(
-                fit: BoxFit.cover,
-                profileCover,
-              ),
+              child: profileCover != null
+                  ? Image.network(
+                      fit: BoxFit.cover,
+                      profileCover!,
+                    )
+                  : const Icon(
+                      Icons.camera_alt,
+                      size: 80,
+                    ),
             ),
           ),
           Positioned(

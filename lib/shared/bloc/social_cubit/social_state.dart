@@ -6,14 +6,14 @@ final class SocialInitial extends SocialState {}
 
 final class BottomNavBarState extends SocialState {}
 
-final class SocialLoadingState extends SocialState {}
+final class GetUserDataLoadingState extends SocialState {}
 
-final class SocialSuccessState extends SocialState {}
+final class GetUserDataSuccessState extends SocialState {}
 
-final class SocialFailureState extends SocialState {
+final class GetUserDataFailureState extends SocialState {
   final String errMessage;
 
-  SocialFailureState({required this.errMessage});
+  GetUserDataFailureState({required this.errMessage});
 }
 
 final class ProfileImagePickedLoadingState extends SocialState {}
@@ -54,4 +54,12 @@ final class UploadCoverImageFailureState extends SocialState {
   final String errMessage;
 
   UploadCoverImageFailureState({required this.errMessage});
+}
+
+final class UpdateUserInfoLoadingState extends SocialState {}
+
+final class UpdateUserInfoFailureState extends SocialState {
+  final String errMessage;
+
+  UpdateUserInfoFailureState({required this.errMessage});
 }

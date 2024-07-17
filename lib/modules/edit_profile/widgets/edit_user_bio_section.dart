@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:icon_broken/icon_broken.dart';
+import '../../../shared/bloc/social_cubit/social_cubit.dart';
 import '../../../shared/components/expanded_list_animation_widget.dart';
 import '../../../shared/components/text_form_field.dart';
 
@@ -32,11 +34,12 @@ class _EditUseBioSectionState extends State<EditUseBioSection> {
         ExpandedSection(
           expand: isStretchedDropDown,
           height: 100,
-          child: const Column(
+          child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               CustomTextField(
                 outLineBorderColor: Colors.grey,
+                controller: BlocProvider.of<SocialCubit>(context).bioController,
                 contentVerticalPadding: 10,
                 textInputType: TextInputType.text,
                 hintText: 'Write your bio',

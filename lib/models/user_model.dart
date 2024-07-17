@@ -6,8 +6,8 @@ class UserModel {
   final String dateAndMonth;
   final String year;
   final String gender;
-  final String photo;
-  final String cover;
+  final String? photo;
+  final String? cover;
   final String? bio;
 
   UserModel({
@@ -18,8 +18,8 @@ class UserModel {
     required this.dateAndMonth,
     required this.year,
     required this.gender,
-    required this.photo,
-    required this.cover,
+     this.photo,
+     this.cover,
     this.bio,
   });
 

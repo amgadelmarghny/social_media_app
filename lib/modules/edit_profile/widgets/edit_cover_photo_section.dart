@@ -34,12 +34,23 @@ class CoverPhotoSection extends StatelessWidget {
         ),
         Card(
           clipBehavior: Clip.antiAliasWithSaveLayer,
-          child: Image.network(
-            height: height * 0.3,
-            width: double.infinity,
-            fit: BoxFit.cover,
-            BlocProvider.of<SocialCubit>(context).userModel!.cover,
-          ),
+          child: BlocProvider.of<SocialCubit>(context).userModel!.cover != null
+              ? Image.network(
+                  height: height * 0.3,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  BlocProvider.of<SocialCubit>(context).userModel!.cover!,
+                )
+              : SizedBox(
+                  height: height * 0.3,
+                  child: const Center(
+                    child: Icon(
+                      Icons.camera_alt,
+                      size: 60,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
         ),
       ],
     );

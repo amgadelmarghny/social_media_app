@@ -56,7 +56,7 @@ class SocialCubit extends Cubit<SocialState> {
   UserModel? userModel;
 
   Future<void> getUserData() async {
-    emit(SocialLoadingState());
+    emit(GetUserDataLoadingState());
     try {
       DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
           await FirebaseFirestore.instance
@@ -65,19 +65,32 @@ class SocialCubit extends Cubit<SocialState> {
               .get();
 
       userModel = UserModel.fromJson(documentSnapshot.data()!);
-      emit(SocialSuccessState());
+      emit(GetUserDataSuccessState());
     } catch (error) {
-      emit(SocialFailureState(errMessage: error.toString()));
+      emit(GetUserDataFailureState(errMessage: error.toString()));
     }
   }
 
   // update user info
+  TextEditingController firstNameController = TextEditingController();
+  TextEditingController lastNameController = TextEditingController();
+  TextEditingController bioController = TextEditingController();
+  TextEditingController birthdayController = TextEditingController();
+  String? updatedYear;
+  String? updatedDayAndMonth;
+
   Future<void> updateUserInfo(
       {required UpdateUserImplModel updateUserImplModel}) async {
-    await FirebaseFirestore.instance
-        .collection(usersCollection)
-        .doc(uidTokenCache)
-        .update(updateUserImplModel.toMap(userModel!));
+    emit(UpdateUserInfoLoadingState());
+    try {
+      await FirebaseFirestore.instance
+          .collection(usersCollection)
+          .doc(uidTokenCache)
+          .update(updateUserImplModel.toMap(userModel!));
+      await getUserData();
+    } on Exception catch (err) {
+      emit(UpdateUserInfoFailureState(errMessage: err.toString()));
+    }
   }
 
   // profile image
@@ -124,7 +137,6 @@ class SocialCubit extends Cubit<SocialState> {
       UpdateUserImplModel updateUserImplModel =
           UpdateUserImplModel(photo: profileImageUrl);
       await updateUserInfo(updateUserImplModel: updateUserImplModel);
-      await getUserData();
     }
     return null;
   }
@@ -168,12 +180,10 @@ class SocialCubit extends Cubit<SocialState> {
   Future<String?> pickAndUploadCoverImage() async {
     File? returnedCoverImage = await profileImagePicked();
     if (returnedCoverImage != null) {
-      String? coverImageUrl =
-          await uploadCoverImage(file: returnedCoverImage);
+      String? coverImageUrl = await uploadCoverImage(file: returnedCoverImage);
       UpdateUserImplModel updateUserImplModel =
           UpdateUserImplModel(cover: coverImageUrl);
       await updateUserInfo(updateUserImplModel: updateUserImplModel);
-      await getUserData();
     }
     return null;
   }

@@ -34,9 +34,23 @@ class ProfilePictureSection extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 80,
-              backgroundImage: NetworkImage(
-                BlocProvider.of<SocialCubit>(context).userModel!.photo,
-              ),
+              backgroundImage:
+                  BlocProvider.of<SocialCubit>(context).userModel!.photo != null
+                      ? NetworkImage(
+                          BlocProvider.of<SocialCubit>(context)
+                              .userModel!
+                              .photo!,
+                        )
+                      : null,
+              child:
+                  BlocProvider.of<SocialCubit>(context).userModel!.photo == null
+                      ? Icon(
+                          Icons.person,
+                          color: Colors.grey.shade600,
+                          size: 120,
+                        )
+                      : null,
+
             ),
           ],
         ),

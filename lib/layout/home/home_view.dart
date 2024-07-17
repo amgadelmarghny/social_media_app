@@ -20,7 +20,7 @@ class HomeView extends StatelessWidget {
       child: Scaffold(
         body: BlocBuilder<SocialCubit, SocialState>(
           builder: (context, state) {
-            if (state is SocialFailureState) {
+            if (state is GetUserDataFailureState) {
               return const Center(
                 child: Text('Something went wrong'),
               );
