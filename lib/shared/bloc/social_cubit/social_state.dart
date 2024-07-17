@@ -6,6 +6,7 @@ final class SocialInitial extends SocialState {}
 
 final class BottomNavBarState extends SocialState {}
 
+///////////////! get user data /////////////////
 final class GetUserDataLoadingState extends SocialState {}
 
 final class GetUserDataSuccessState extends SocialState {}
@@ -16,16 +17,18 @@ final class GetUserDataFailureState extends SocialState {
   GetUserDataFailureState({required this.errMessage});
 }
 
-final class ProfileImagePickedLoadingState extends SocialState {}
+// pick image
+final class PickeImageLoadingState extends SocialState {}
 
-final class ProfileImagePickedSuccessState extends SocialState {}
+final class PickeImageSuccessState extends SocialState {}
 
-final class ProfileImagePickedFailureState extends SocialState {
+final class PickeImageFailureState extends SocialState {
   final String errMessage;
 
-  ProfileImagePickedFailureState({required this.errMessage});
+  PickeImageFailureState({required this.errMessage});
 }
 
+// upload profile image
 final class UploadProfileImageLoadingState extends SocialState {}
 
 final class UploadProfileImageSuccessState extends SocialState {}
@@ -36,16 +39,7 @@ final class UploadProfileImageFailureState extends SocialState {
   UploadProfileImageFailureState({required this.errMessage});
 }
 
-final class CoverImagePickedLoadingState extends SocialState {}
-
-final class CoverImagePickedSuccessState extends SocialState {}
-
-final class CoverImagePickedFailureState extends SocialState {
-  final String errMessage;
-
-  CoverImagePickedFailureState({required this.errMessage});
-}
-
+// upload cover image
 final class UploadCoverImageLoadingState extends SocialState {}
 
 final class UploadCoverImageSuccessState extends SocialState {}
@@ -56,6 +50,18 @@ final class UploadCoverImageFailureState extends SocialState {
   UploadCoverImageFailureState({required this.errMessage});
 }
 
+// upload post image
+final class UploadPostImageLoadingState extends SocialState {}
+
+final class UploadPostImageSuccessState extends SocialState {}
+
+final class UploadPostImageFailureState extends SocialState {
+  final String errMessage;
+
+  UploadPostImageFailureState({required this.errMessage});
+}
+
+///////////////////! update user info /////////////////
 final class UpdateUserInfoLoadingState extends SocialState {}
 
 final class UpdateUserInfoFailureState extends SocialState {

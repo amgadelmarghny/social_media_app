@@ -94,19 +94,19 @@ class SocialCubit extends Cubit<SocialState> {
   }
 
   // profile image
-  Future<File?> profileImagePicked() async {
-    emit(ProfileImagePickedLoadingState());
+  Future<File?> pickImage() async {
+    emit(PickeImageLoadingState());
 
     final ImagePicker picker = ImagePicker();
     XFile? returnImage = await picker.pickImage(source: ImageSource.gallery);
 
-    if (returnImage == null) {
-      debugPrint('No image selected');
-      emit(ProfileImagePickedFailureState(errMessage: 'No image selected'));
-      return null;
-    } else {
-      emit(ProfileImagePickedSuccessState());
+    if (returnImage != null) {
+      emit(PickeImageSuccessState());
       return File(returnImage.path);
+    } else {
+      debugPrint('No image selected');
+      emit(PickeImageFailureState(errMessage: 'No image selected'));
+      return null;
     }
   }
 
@@ -130,34 +130,20 @@ class SocialCubit extends Cubit<SocialState> {
   }
 
   Future<String?> pickAndUploadProfileImage() async {
-    File? returnedProfileImage = await profileImagePicked();
+    File? returnedProfileImage = await pickImage();
     if (returnedProfileImage != null) {
       String? profileImageUrl =
           await uploadProfileImage(file: returnedProfileImage);
-      UpdateUserImplModel updateUserImplModel =
-          UpdateUserImplModel(photo: profileImageUrl);
-      await updateUserInfo(updateUserImplModel: updateUserImplModel);
+      if (profileImageUrl != null) {
+        UpdateUserImplModel updateUserImplModel =
+            UpdateUserImplModel(photo: profileImageUrl);
+        await updateUserInfo(updateUserImplModel: updateUserImplModel);
+      }
     }
     return null;
   }
 
-  // cover image
-  Future<File?> coverImagePicked() async {
-    emit(CoverImagePickedLoadingState());
-
-    final ImagePicker picker = ImagePicker();
-    XFile? returnImage = await picker.pickImage(source: ImageSource.gallery);
-
-    if (returnImage == null) {
-      debugPrint('No image selected');
-      emit(CoverImagePickedFailureState(errMessage: 'No image selected'));
-      return null;
-    } else {
-      emit(CoverImagePickedSuccessState());
-      return File(returnImage.path);
-    }
-  }
-
+  //? cover image
   Future<String?> uploadCoverImage({required File file}) async {
     emit(UploadCoverImageLoadingState());
     String? coverUrl;
@@ -178,13 +164,37 @@ class SocialCubit extends Cubit<SocialState> {
   }
 
   Future<String?> pickAndUploadCoverImage() async {
-    File? returnedCoverImage = await profileImagePicked();
+    File? returnedCoverImage = await pickImage();
     if (returnedCoverImage != null) {
       String? coverImageUrl = await uploadCoverImage(file: returnedCoverImage);
-      UpdateUserImplModel updateUserImplModel =
-          UpdateUserImplModel(cover: coverImageUrl);
-      await updateUserInfo(updateUserImplModel: updateUserImplModel);
+      if (coverImageUrl != null) {
+        UpdateUserImplModel updateUserImplModel =
+            UpdateUserImplModel(cover: coverImageUrl);
+        await updateUserInfo(updateUserImplModel: updateUserImplModel);
+      }
     }
     return null;
   }
+
+  // posts
+  Future<String?> uploadPostImage({required File file}) async {
+    emit(UploadPostImageLoadingState());
+    String? postUrl;
+    try {
+      final task = await FirebaseStorage.instance
+          .ref()
+          .child(
+              '$usersCollection/post/${Uri.file(file.path).pathSegments.last}')
+          .putFile(file);
+
+      postUrl = await task.ref.getDownloadURL();
+      emit(UploadPostImageSuccessState());
+      return postUrl;
+    } on Exception catch (e) {
+      emit(UploadPostImageFailureState(errMessage: e.toString()));
+    }
+    return postUrl;
+  }
+
+
 }

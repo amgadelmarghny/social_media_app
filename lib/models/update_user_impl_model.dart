@@ -10,27 +10,28 @@ class UpdateUserImplModel {
   final String? cover;
   final String? bio;
 
-  UpdateUserImplModel(
-   { this.firstName,
+  UpdateUserImplModel({
+    this.firstName,
     this.lastName,
     this.dateAndMonth,
     this.year,
     this.gender,
     this.photo,
     this.cover,
-    this.bio,}
-  );
+    this.bio,
+  });
 
   Map<Object, Object?> toMap(UserModel userModel) {
     return {
-      'firstName': firstName ?? userModel.firstName,
-      'lastName': lastName ?? userModel.lastName,
-      'dateAndMonth': dateAndMonth ?? userModel.dateAndMonth,
+      'firstName': firstName!.isNotEmpty ? firstName : userModel.firstName,
+      'lastName': lastName!.isNotEmpty ? lastName : userModel.lastName,
+      'dateAndMonth':
+          dateAndMonth!.isNotEmpty ? dateAndMonth : userModel.dateAndMonth,
       'year': year ?? userModel.year,
       'gender': gender ?? userModel.gender,
       'photo': photo ?? userModel.photo,
       'cover': cover ?? userModel.cover,
-      'bio': bio ?? userModel.bio,
+      'bio': bio!.isNotEmpty ? bio : userModel.bio,
     };
   }
 }

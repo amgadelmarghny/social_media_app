@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:social_media_app/models/user_model.dart';
+import 'package:social_media_app/models/user_register_impl.dart';
 import 'package:social_media_app/shared/components/constants.dart';
 
 part 'register_state.dart';
@@ -17,7 +18,7 @@ class RegisterCubit extends Cubit<RegisterState> {
   void changeTextFieldObscure() {
     isObscure = !isObscure;
     eyeIcon =
-        isObscure ? Icons.visibility_off_outlined : Icons.visibility_outlined;
+    isObscure ? Icons.visibility_off_outlined : Icons.visibility_outlined;
     emit(TextFieldObscureState());
   }
 
@@ -38,58 +39,38 @@ class RegisterCubit extends Cubit<RegisterState> {
 
   late UserCredential userCredential;
   String? gender;
-  void userRegister({
-    required String firstName,
-    required String lastName,
-    required String dateAndMonth,
-    required String year,
-    required String email,
-    required String gender,
-    required String password,
-  }) async {
+  void userRegister(UserRegisterImpl userRegisterImpl) async {
     emit(RegisterLoadingState());
     try {
       userCredential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: email, password: password);
-      await saveUserData(
-        firstName: firstName,
-        lastName: lastName,
-        dateAndMonth: dateAndMonth,
-        year: year,
-        email: email,
-        gender: gender,
+          .createUserWithEmailAndPassword(
+          email: userRegisterImpl.email,
+          password: userRegisterImpl.password);
+      UserModel userModel = UserModel(
         uid: userCredential.user!.uid,
+        firstName: userRegisterImpl.firstName,
+        lastName: userRegisterImpl.lastName,
+        email: userRegisterImpl.email,
+        dateAndMonth: userRegisterImpl.dateAndMonth,
+        year: userRegisterImpl.year,
+        gender: userRegisterImpl.gender,
+      );
+      await saveUserData(
+        userModel: userModel,
       );
     } on Exception catch (error) {
       emit(RegisterFailureState(errMessage: error.toString()));
     }
   }
 
-  Future<void> saveUserData({
-    required String firstName,
-    required String lastName,
-    required String dateAndMonth,
-    required String year,
-    required String email,
-    required String gender,
-    required String uid,
-  }) async {
+  Future<void> saveUserData({required UserModel userModel}) async {
     emit(SaveUserInfoLoadingState());
-    UserModel userModel = UserModel(
-      uid: uid,
-      firstName: firstName,
-      lastName: lastName,
-      email: email,
-      dateAndMonth: dateAndMonth,
-      year: year,
-      gender: gender,
-    );
     try {
       await FirebaseFirestore.instance
           .collection(usersCollection)
-          .doc(uid)
-          .set(userModel.toJson());
-      emit(SaveUserInfoSuccessState(uid: uid));
+          .doc(userModel.uid)
+          .set(userModel.toMap());
+      emit(SaveUserInfoSuccessState(uid: userModel.uid));
     } catch (err) {
       emit(SaveUserInfoFailureState(errMessage: err.toString()));
     }

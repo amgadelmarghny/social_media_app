@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_media_app/models/user_register_impl.dart';
 import 'package:social_media_app/shared/bloc/register_cubit/register_cubit.dart';
 import 'package:social_media_app/shared/components/custom_button.dart';
 import 'package:social_media_app/shared/components/show_toast.dart';
@@ -30,7 +31,7 @@ class BlocConsumerButton extends StatelessWidget {
           onTap: () {
             if (registerCubit.formKey.currentState!.validate()) {
               if (registerCubit.gender != null) {
-                registerCubit.userRegister(
+                UserRegisterImpl userRegisterImpl = UserRegisterImpl(
                   email: emailController.text,
                   password: emailController.text,
                   firstName: firstNameController.text,
@@ -39,6 +40,7 @@ class BlocConsumerButton extends StatelessWidget {
                   year: yearController.text,
                   gender: registerCubit.gender!,
                 );
+                registerCubit.userRegister(userRegisterImpl);
               } else {
                 customSnakbar(context, msg: 'Please select your gender');
               }
