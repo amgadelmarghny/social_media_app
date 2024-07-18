@@ -9,31 +9,29 @@ class FeedsBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              SearchBar(
-                hintText: 'Explore',
-                leading: IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.search,
-                    size: 32,
-                  ),
+        padding: const EdgeInsets.only(top: 20,left: 20,right: 20,),
+        child: Column(
+          children: [
+            SearchBar(
+              hintText: 'Explore',
+              leading: IconButton(
+                onPressed: () {},
+                icon: const Icon(
+                  Icons.search,
+                  size: 32,
                 ),
               ),
-              const SizedBox(
-                height: 15,
-              ),
-              const StoryListView(),
-              const SizedBox(
-                height: 20,
-              ),
-              // post
-              const PostItem()
-            ],
-          ),
+            ),
+            const SizedBox(
+              height: 15,
+            ),
+            const StoryListView(),
+            const SizedBox(
+              height: 20,
+            ),
+            // post
+            const PostItem()
+          ],
         ),
       ),
     );

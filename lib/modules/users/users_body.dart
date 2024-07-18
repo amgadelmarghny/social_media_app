@@ -34,85 +34,83 @@ class UsersBody extends StatelessWidget {
       },
       builder: (context, state) {
         UserModel userModel = BlocProvider.of<SocialCubit>(context).userModel!;
-        return SingleChildScrollView(
-          child: Column(
-            children: [
-              CustomCoverAndImageProfile(
-                profileImage: userModel.photo,
-                profileCover: userModel.cover,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Flexible(
-                      child: Text(
-                        '${userModel.firstName} ${userModel.lastName}',
-                        style: FontsStyle.font20BoldWithColor,
-                      ),
+        return Column(
+          children: [
+            CustomCoverAndImageProfile(
+              profileImage: userModel.photo,
+              profileCover: userModel.cover,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Flexible(
+                    child: Text(
+                      '${userModel.firstName} ${userModel.lastName}',
+                      style: FontsStyle.font20BoldWithColor,
                     ),
-                    IconButton(
-                      onPressed: () {
-                        Navigator.pushNamed(
-                            context, EditProfileView.routeViewName);
-                      },
-                      icon: const Icon(
-                        IconBroken.Edit_Square,
-                        size: 32,
-                        color: defaultColor,
-                      ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pushNamed(
+                          context, EditProfileView.routeViewName);
+                    },
+                    icon: const Icon(
+                      IconBroken.Edit_Square,
+                      size: 32,
                       color: defaultColor,
-                    )
-                  ],
-                ),
+                    ),
+                    color: defaultColor,
+                  )
+                ],
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  children: [
-                    const CustomPostFollowersFollowingRow(
-                      numOfPosts: '148',
-                      numOfFollowers: '12K',
-                      numOfFollowing: '200',
-                    ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                children: [
+                  const CustomPostFollowersFollowingRow(
+                    numOfPosts: '148',
+                    numOfFollowers: '12K',
+                    numOfFollowing: '200',
+                  ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  const FollowAndMessageButtons(),
+                  if (userModel.bio != null)
                     const SizedBox(
-                      height: 15,
+                      height: 20,
                     ),
-                    const FollowAndMessageButtons(),
-                    if (userModel.bio != null)
-                      const SizedBox(
-                        height: 20,
-                      ),
-                    if (userModel.bio != null)
-                      Text(
-                        '"${userModel.bio}"',
-                        style: FontsStyle.font20Poppins,
-                      ),
-                    GridView.builder(
-                      clipBehavior: Clip.none,
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: 20,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        childAspectRatio: 0.95,
-                        crossAxisSpacing: 8,
-                        mainAxisSpacing: 8,
-                        crossAxisCount: 2,
-                      ),
-                      itemBuilder: (context, index) {
-                        return Image.network(
-                          fit: BoxFit.cover,
-                          'https://img.freepik.com/free-psd/travel-tourism-facebook-cover-template_106176-2350.jpg?t=st=1718837003~exp=1718840603~hmac=ee693122a4a6abe55342026a5443a20b35e53b8ec5c6c4a8cddcb53e87314dba&w=1380',
-                        );
-                      },
+                  if (userModel.bio != null)
+                    Text(
+                      '"${userModel.bio}"',
+                      style: FontsStyle.font20Poppins,
                     ),
-                  ],
-                ),
-              )
-            ],
-          ),
+                  GridView.builder(
+                    clipBehavior: Clip.none,
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: 20,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      childAspectRatio: 0.95,
+                      crossAxisSpacing: 8,
+                      mainAxisSpacing: 8,
+                      crossAxisCount: 2,
+                    ),
+                    itemBuilder: (context, index) {
+                      return Image.network(
+                        fit: BoxFit.cover,
+                        'https://img.freepik.com/free-psd/travel-tourism-facebook-cover-template_106176-2350.jpg?t=st=1718837003~exp=1718840603~hmac=ee693122a4a6abe55342026a5443a20b35e53b8ec5c6c4a8cddcb53e87314dba&w=1380',
+                      );
+                    },
+                  ),
+                ],
+              ),
+            )
+          ],
         );
       },
     );

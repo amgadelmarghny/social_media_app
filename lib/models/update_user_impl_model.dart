@@ -26,7 +26,7 @@ class UpdateUserImplModel {
       'firstName': firstName!.isNotEmpty ? firstName : userModel.firstName,
       'lastName': lastName!.isNotEmpty ? lastName : userModel.lastName,
       'dateAndMonth':
-          dateAndMonth!.isNotEmpty ? dateAndMonth : userModel.dateAndMonth,
+          dateAndMonth ?? userModel.dateAndMonth,
       'year': year ?? userModel.year,
       'gender': gender ?? userModel.gender,
       'photo': photo ?? userModel.photo,

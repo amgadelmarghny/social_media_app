@@ -53,6 +53,7 @@ class SocialMediaApp extends StatelessWidget {
       child: MaterialApp(
         darkTheme: CustomThemeMode.darkTheme,
         theme: CustomThemeMode.lightTheme,
+        themeMode: ThemeMode.light,
         debugShowCheckedModeBanner: false,
         initialRoute: initialRoute,
         routes: {
