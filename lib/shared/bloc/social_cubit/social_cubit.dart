@@ -5,6 +5,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:icon_broken/icon_broken.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:social_media_app/models/create_post_impl_model.dart';
+import 'package:social_media_app/models/post_model.dart';
 import 'package:social_media_app/models/user_model.dart';
 import 'package:social_media_app/modules/chat/chat_body.dart';
 import 'package:social_media_app/modules/feeds/feeds_body.dart';
@@ -196,5 +198,48 @@ class SocialCubit extends Cubit<SocialState> {
     return postUrl;
   }
 
+  Future<void> createPost(CreatePostImplModel createPostImplModel) async {
+    emit(CreatePostLoadingState());
+    PostModel postModel = PostModel(
+      userName: '${userModel!.firstName} ${userModel!.lastName}',
+      uid: userModel!.uid,
+      profilePhoto: userModel!.photo,
+      dateTime: createPostImplModel.dateTime,
+      content: createPostImplModel.content,
+      postImage: createPostImplModel.postImage,
+    );
+    try {
+      await FirebaseFirestore.instance
+          .collection(usersCollection)
+          .add(postModel.toJson());
+      emit(CreatePostSuccessState());
+    } catch (err) {
+      emit(CreatePostFailureState(errMessage: err.toString()));
+    }
+  }
 
+  File? postImagePicked;
+  Future<void> createPostWithPhoto(
+      {required String? postContent, required DateTime dateTime}) async {
+    if (postImagePicked != null) {
+      String? postUrl = await uploadPostImage(file: postImagePicked!);
+      if (postUrl != null) {
+        CreatePostImplModel createPostImplModel = CreatePostImplModel(
+          content: postContent,
+          postImage: postUrl,
+          dateTime: dateTime,
+        );
+        await createPost(createPostImplModel);
+      }
+    }
+  }
+
+ Future<void> createPostWithContentOnly({required String? postContent, required DateTime dateTime})async{
+   CreatePostImplModel createPostImplModel = CreatePostImplModel(
+     content: postContent,
+     postImage: null,
+     dateTime: dateTime,
+   );
+   await createPost(createPostImplModel);
+ }
 }

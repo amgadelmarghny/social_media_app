@@ -61,6 +61,17 @@ final class UploadPostImageFailureState extends SocialState {
   UploadPostImageFailureState({required this.errMessage});
 }
 
+// create post
+final class CreatePostLoadingState extends SocialState {}
+
+final class CreatePostSuccessState extends SocialState {}
+
+final class CreatePostFailureState extends SocialState {
+  final String errMessage;
+
+  CreatePostFailureState({required this.errMessage});
+}
+
 ///////////////////! update user info /////////////////
 final class UpdateUserInfoLoadingState extends SocialState {}
 

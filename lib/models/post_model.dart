@@ -1,7 +1,7 @@
 class PostModel {
   final String uid;
   final String userName;
-  final String profilePhoto;
+  final String? profilePhoto;
   final String? content;
   final String? postImage;
   final DateTime dateTime;
