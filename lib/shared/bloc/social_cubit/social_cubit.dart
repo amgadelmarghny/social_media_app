@@ -34,7 +34,7 @@ class SocialCubit extends Cubit<SocialState> {
   final List<Widget> currentBody = const [
     FeedsBody(),
     ChatBody(),
-    PostNewFeed(),
+    CreatePostSheet(),
     UsersBody(),
     NotificationsBody(),
   ];
@@ -234,12 +234,13 @@ class SocialCubit extends Cubit<SocialState> {
     }
   }
 
- Future<void> createPostWithContentOnly({required String? postContent, required DateTime dateTime})async{
-   CreatePostImplModel createPostImplModel = CreatePostImplModel(
-     content: postContent,
-     postImage: null,
-     dateTime: dateTime,
-   );
-   await createPost(createPostImplModel);
- }
+  Future<void> createPostWithContentOnly(
+      {required String? postContent, required DateTime dateTime}) async {
+    CreatePostImplModel createPostImplModel = CreatePostImplModel(
+      content: postContent,
+      postImage: null,
+      dateTime: dateTime,
+    );
+    await createPost(createPostImplModel);
+  }
 }

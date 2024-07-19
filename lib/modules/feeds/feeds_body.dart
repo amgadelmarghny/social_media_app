@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:social_media_app/modules/feeds/widgets/post_item.dart';
+import 'package:social_media_app/shared/components/post_item.dart';
 import 'package:social_media_app/modules/feeds/widgets/story_list_view.dart';
 
 class FeedsBody extends StatelessWidget {

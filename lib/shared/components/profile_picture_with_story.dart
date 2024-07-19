@@ -5,23 +5,25 @@ class ProfilePictureWithStory extends StatelessWidget {
     super.key,
     required this.image,
     this.size = 85,
+    this.isWithoutStory = false
   });
   final String? image;
   final double size;
+  final bool isWithoutStory;
   @override
   Widget build(BuildContext context) {
     return Container(
       height: size,
       padding: const EdgeInsets.all(4),
       width: size,
-      decoration: const BoxDecoration(
+      decoration: !isWithoutStory ? const BoxDecoration(
         image: DecorationImage(
           fit: BoxFit.fill,
           image: AssetImage(
             'lib/assets/images/story_circular.png',
           ),
         ),
-      ),
+      ): null,
       child: CircleAvatar(
         backgroundImage: image != null ? NetworkImage(image!) : null,
         child: image != null
@@ -30,6 +32,7 @@ class ProfilePictureWithStory extends StatelessWidget {
                 child: Icon(
                   Icons.person,
                   color: Colors.grey.shade600,
+                  // if size != 85 that's mean the widget is in edit profile
                   size: size == 85? 65:80,
                 ),
               ),

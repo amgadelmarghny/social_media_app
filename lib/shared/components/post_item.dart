@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
-import 'hashtag.dart';
-import 'interactive_row.dart';
-import 'profile_post_row.dart';
+import '../../modules/feeds/widgets/hashtag.dart';
+import '../../modules/feeds/widgets/interactive_row.dart';
+import '../../modules/feeds/widgets/profile_post_row.dart';
 
 class PostItem extends StatelessWidget {
   const PostItem({
