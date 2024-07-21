@@ -7,19 +7,19 @@ class ProfilePostRow extends StatelessWidget {
       {super.key,
       required this.image,
       required this.userName,
-      this.timePosted,
-      this.isAddPost = false});
+      this.timePosted,});
   final String image;
   final String userName;
   final dynamic timePosted;
-  final bool isAddPost;
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
+        // timePosted != null that mean remove more_vert & timePosted
+        // when this widget used in add post
         ProfilePictureWithStory(
-          isWithoutStory: isAddPost,
+          isWithoutStory: timePosted == null,
           image: image,
         ),
         const SizedBox(
@@ -44,7 +44,7 @@ class ProfilePostRow extends StatelessWidget {
             ],
           ),
         ),
-        if (!isAddPost)
+        if (timePosted != null)
           IconButton(
             onPressed: () {},
             icon: const Icon(Icons.more_vert),

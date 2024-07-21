@@ -97,22 +97,22 @@ class SocialCubit extends Cubit<SocialState> {
 
   // profile image
   Future<File?> pickImage() async {
-    emit(PickeImageLoadingState());
+    emit(PickImageLoadingState());
 
     final ImagePicker picker = ImagePicker();
     XFile? returnImage = await picker.pickImage(source: ImageSource.gallery);
 
     if (returnImage != null) {
-      emit(PickeImageSuccessState());
+      emit(PickImageSuccessState());
       return File(returnImage.path);
     } else {
       debugPrint('No image selected');
-      emit(PickeImageFailureState(errMessage: 'No image selected'));
+      emit(PickImageFailureState(errMessage: 'No image selected'));
       return null;
     }
   }
 
-  Future<String?> uploadProfileImage({required File file}) async {
+  Future<String?> _uploadProfileImage({required File file}) async {
     emit(UploadProfileImageLoadingState());
     String? pictureUrl;
     try {
@@ -135,7 +135,7 @@ class SocialCubit extends Cubit<SocialState> {
     File? returnedProfileImage = await pickImage();
     if (returnedProfileImage != null) {
       String? profileImageUrl =
-          await uploadProfileImage(file: returnedProfileImage);
+          await _uploadProfileImage(file: returnedProfileImage);
       if (profileImageUrl != null) {
         UpdateUserImplModel updateUserImplModel =
             UpdateUserImplModel(photo: profileImageUrl);
@@ -179,8 +179,8 @@ class SocialCubit extends Cubit<SocialState> {
   }
 
   // posts
-  Future<String?> uploadPostImage({required File file}) async {
-    emit(UploadPostImageLoadingState());
+  Future<String?> _uploadPostImage({required File file}) async {
+    emit(CreatePostLoadingState());
     String? postUrl;
     try {
       final task = await FirebaseStorage.instance
@@ -192,13 +192,13 @@ class SocialCubit extends Cubit<SocialState> {
       postUrl = await task.ref.getDownloadURL();
       emit(UploadPostImageSuccessState());
       return postUrl;
-    } on Exception catch (e) {
+    } catch (e) {
       emit(UploadPostImageFailureState(errMessage: e.toString()));
     }
     return postUrl;
   }
 
-  Future<void> createPost(CreatePostImplModel createPostImplModel) async {
+  Future<void> _createPost(CreatePostImplModel createPostImplModel) async {
     emit(CreatePostLoadingState());
     PostModel postModel = PostModel(
       userName: '${userModel!.firstName} ${userModel!.lastName}',
@@ -210,7 +210,7 @@ class SocialCubit extends Cubit<SocialState> {
     );
     try {
       await FirebaseFirestore.instance
-          .collection(usersCollection)
+          .collection(postsCollection)
           .add(postModel.toJson());
       emit(CreatePostSuccessState());
     } catch (err) {
@@ -219,19 +219,26 @@ class SocialCubit extends Cubit<SocialState> {
   }
 
   File? postImagePicked;
+  TextEditingController postContentController = TextEditingController();
+
   Future<void> createPostWithPhoto(
       {required String? postContent, required DateTime dateTime}) async {
     if (postImagePicked != null) {
-      String? postUrl = await uploadPostImage(file: postImagePicked!);
+      String? postUrl = await _uploadPostImage(file: postImagePicked!);
       if (postUrl != null) {
         CreatePostImplModel createPostImplModel = CreatePostImplModel(
           content: postContent,
           postImage: postUrl,
           dateTime: dateTime,
         );
-        await createPost(createPostImplModel);
+        await _createPost(createPostImplModel);
       }
     }
+  }
+
+  void removePickedFile() {
+    postImagePicked = null;
+    emit(RemovePickedFile());
   }
 
   Future<void> createPostWithContentOnly(
@@ -241,6 +248,12 @@ class SocialCubit extends Cubit<SocialState> {
       postImage: null,
       dateTime: dateTime,
     );
-    await createPost(createPostImplModel);
+    await _createPost(createPostImplModel);
+  }
+
+  void cancelUploadPost() {
+    postImagePicked = null;
+    postContentController.text = '';
+    emit(CancelUploadPostState());
   }
 }

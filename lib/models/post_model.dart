@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class PostModel {
   final String uid;
   final String userName;
@@ -22,7 +24,7 @@ class PostModel {
       profilePhoto: json['profilePhoto'],
       content: json['content'],
       postImage: json['postImage'],
-      dateTime: json['dateTime'],
+      dateTime: json['dateTime'].toDate(),
     );
   }
 
@@ -33,7 +35,7 @@ class PostModel {
       'profilePhoto': profilePhoto,
       'content': content,
       'postImage': postImage,
-      'dateTime': dateTime.toString(),
+      'dateTime': Timestamp.fromDate(dateTime),
     };
   }
 }

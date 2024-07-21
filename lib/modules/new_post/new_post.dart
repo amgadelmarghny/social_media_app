@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_media_app/modules/new_post/widgets/new_post_body.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/style/theme/theme.dart';
 import '../../shared/style/fonts/font_style.dart';
-import '../feeds/widgets/profile_post_row.dart';
 
 class CreatePostSheet extends StatelessWidget {
   const CreatePostSheet({
@@ -12,106 +12,65 @@ class CreatePostSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController postContentController = TextEditingController();
+    SocialCubit socialCubit = BlocProvider.of<SocialCubit>(context);
     return Container(
       decoration: themeColor(),
       child: Padding(
         padding: const EdgeInsets.only(top: 40),
-        child: Scaffold(
-          appBar: AppBar(
-            actions: [
-              MaterialButton(
-                color: Colors.grey.shade400,
-                onPressed: () {},
-                child: Text(
-                  'Post',
-                  style:
-                      FontsStyle.font18PopinBold().copyWith(color: Colors.grey),
-                ),
-              ),
-              const SizedBox(
-                width: 20,
-              )
-            ],
-          ),
-          body: Padding(
-            padding: const EdgeInsets.only(right: 20, left: 20, bottom: 10),
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                ProfilePostRow(
-                  isAddPost: true,
-                  image:
-                      BlocProvider.of<SocialCubit>(context).userModel!.photo!,
-                  userName:
-                      '${BlocProvider.of<SocialCubit>(context).userModel!.firstName} ${BlocProvider.of<SocialCubit>(context).userModel!.lastName}',
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Flexible(
-                  child: TextField(
-                    controller: postContentController,
-                    maxLines: null, // Allows the TextField to expand vertically
-                    expands:
-                        true, // Allows the TextField to expand to fill available space
-                    style: FontsStyle.font18Popin(),
-                    decoration: InputDecoration(
-                        hintText: 'What is on your mind?',
-                        hintStyle: FontsStyle.font18Popin(),
-                        border: InputBorder.none),
+        child: BlocBuilder<SocialCubit, SocialState>(
+          builder: (BuildContext context, SocialState state) {
+            return Scaffold(
+              appBar: AppBar(
+                actions: [
+                  // to notice the text filed input changes
+                  ValueListenableBuilder<TextEditingValue>(
+                    valueListenable: socialCubit.postContentController,
+                    builder: (context, value, child) {
+                      return MaterialButton(
+                        color: socialCubit.postImagePicked == null &&
+                                value.text.isEmpty
+                            ? Colors.grey.shade400
+                            : Colors.blue,
+                        onPressed: () {
+                          final DateTime now = DateTime.now();
+                          final currentTime = DateTime(now.year, now.month,
+                              now.day, now.hour, now.minute);
+                          if (socialCubit.postImagePicked != null) {
+                            socialCubit.createPostWithPhoto(
+                              postContent: value.text,
+                              dateTime: currentTime,
+                            );
+                            Navigator.pop(context);
+                          } else if (value.text.isNotEmpty) {
+                            socialCubit.createPostWithContentOnly(
+                              postContent: value.text,
+                              dateTime: currentTime,
+                            );
+                            Navigator.pop(context);
+                          }
+                        },
+                        child: Text(
+                          'Post',
+                          style: FontsStyle.font18PopinBold().copyWith(
+                            color: socialCubit.postImagePicked == null &&
+                                    value.text.isEmpty
+                                ? Colors.grey
+                                : null,
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: InkWell(
-                        onTap: () {},
-                        child: SizedBox(
-                          height: 50,
-                          child: Center(
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(
-                                  Icons.insert_photo,
-                                  color: Colors.blue,
-                                  size: 30,
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                Text(
-                                  'Add photo',
-                                  style: FontsStyle.font18Popin(
-                                      color: Colors.blue),
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: InkWell(
-                        onTap: () {},
-                        child: SizedBox(
-                          height: 50,
-                          child: Center(
-                            child: Text(
-                              '#tags',
-                              style: FontsStyle.font18Popin(
-                                  color: Colors.blue),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                )
-              ],
-            ),
-          ),
+                  const SizedBox(
+                    width: 20,
+                  )
+                ],
+              ),
+              body: CreatePostSheetBody(
+                postContentController: socialCubit.postContentController,
+              ),
+            );
+          },
         ),
       ),
     );

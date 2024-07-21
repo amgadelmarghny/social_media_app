@@ -18,14 +18,14 @@ final class GetUserDataFailureState extends SocialState {
 }
 
 // pick image
-final class PickeImageLoadingState extends SocialState {}
+final class PickImageLoadingState extends SocialState {}
 
-final class PickeImageSuccessState extends SocialState {}
+final class PickImageSuccessState extends SocialState {}
 
-final class PickeImageFailureState extends SocialState {
+final class PickImageFailureState extends SocialState {
   final String errMessage;
 
-  PickeImageFailureState({required this.errMessage});
+  PickImageFailureState({required this.errMessage});
 }
 
 // upload profile image
@@ -51,8 +51,6 @@ final class UploadCoverImageFailureState extends SocialState {
 }
 
 // upload post image
-final class UploadPostImageLoadingState extends SocialState {}
-
 final class UploadPostImageSuccessState extends SocialState {}
 
 final class UploadPostImageFailureState extends SocialState {
@@ -71,6 +69,11 @@ final class CreatePostFailureState extends SocialState {
 
   CreatePostFailureState({required this.errMessage});
 }
+//remove image
+final class RemovePickedFile extends SocialState {}
+
+// cancel upload post
+final class CancelUploadPostState extends SocialState {}
 
 ///////////////////! update user info /////////////////
 final class UpdateUserInfoLoadingState extends SocialState {}

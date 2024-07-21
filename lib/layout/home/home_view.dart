@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -26,10 +25,10 @@ class _HomeViewState extends State<HomeView> {
     _scrollController.addListener(() {
       if (_scrollController.position.atEdge) {
         bool isTop = _scrollController.position.pixels == 0;
-
         if (!isTop) {
           // Reached the bottom
-          print("^^^^^^^ Reached the end of the SingleChildScrollView ^^^");
+          debugPrint(
+              "^^^^^^^ Reached the end of the SingleChildScrollView ^^^");
           // Perform your actions here
           setState(() {
             _bodiesBottomPadding = 90;
@@ -41,7 +40,7 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    log('Token ::::: ${CacheHelper.getData(key: uidToken)}');
+    debugPrint('Token ::::: ${CacheHelper.getData(key: uidToken)}');
     return Container(
       decoration: themeColor(),
       child: Stack(

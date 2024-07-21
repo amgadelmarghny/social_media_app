@@ -12,7 +12,7 @@ class PostItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.only(top: 10, bottom: 10, right: 10 ,left: 10),
+      padding: const EdgeInsets.only(top: 10, bottom: 10, right: 10, left: 10),
       width: double.infinity,
       decoration: BoxDecoration(
         color: const Color(0xff6D4ACD).withOpacity(0.40),
@@ -27,6 +27,9 @@ class PostItem extends StatelessWidget {
             userName: 'Amgad Marghny',
             timePosted: '5 minutes',
           ),
+          const SizedBox(
+            height: 8,
+          ),
           Text(
             'This is a beautiful sky that i took last week. it\'s great, right ? :) scewvevjjjjjjjjjjjjjjjjjj jjhiuuuuuuuuuuuuu sssuhun un',
             style: FontsStyle.font15Popin(),
@@ -39,24 +42,24 @@ class PostItem extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(
-            height: 20,
-          ),
-          Container(
-            padding: const EdgeInsets.all(1.3),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(25),
-            ),
+          Padding(
+            padding: const EdgeInsets.only(top: 15),
             child: Container(
-              clipBehavior: Clip.antiAliasWithSaveLayer,
+              padding: const EdgeInsets.all(1.3),
               decoration: BoxDecoration(
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(25),
               ),
-              child: const Image(
-                fit: BoxFit.fitHeight,
-                image: NetworkImage(
-                  'https://storage.googleapis.com/fc-freepik-pro-rev1-eu-static/ai-styles-landings/dark/people.jpg?h=1280',
+              child: Container(
+                clipBehavior: Clip.antiAliasWithSaveLayer,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                child: const Image(
+                  fit: BoxFit.fitHeight,
+                  image: NetworkImage(
+                    'https://storage.googleapis.com/fc-freepik-pro-rev1-eu-static/ai-styles-landings/dark/people.jpg?h=1280',
+                  ),
                 ),
               ),
             ),

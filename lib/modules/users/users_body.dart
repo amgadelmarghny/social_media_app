@@ -18,7 +18,7 @@ class UsersBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocConsumer<SocialCubit, SocialState>(
       listener: (context, state) {
-        if (state is PickeImageFailureState) {
+        if (state is PickImageFailureState) {
           showToast(msg: state.errMessage, toastState: ToastState.worrning);
         }
         if (state is UploadProfileImageFailureState) {
