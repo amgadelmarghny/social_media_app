@@ -75,6 +75,17 @@ final class RemovePickedFile extends SocialState {}
 // cancel upload post
 final class CancelUploadPostState extends SocialState {}
 
+///////////////! get posts /////////////////
+final class GetPostsLoadingState extends SocialState {}
+
+final class GetPostsSuccessState extends SocialState {}
+
+final class GetPostsFailureState extends SocialState {
+  final String errMessage;
+
+  GetPostsFailureState({required this.errMessage});
+}
+
 ///////////////////! update user info /////////////////
 final class UpdateUserInfoLoadingState extends SocialState {}
 

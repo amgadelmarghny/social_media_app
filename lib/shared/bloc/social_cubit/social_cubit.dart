@@ -256,4 +256,20 @@ class SocialCubit extends Cubit<SocialState> {
     postContentController.text = '';
     emit(CancelUploadPostState());
   }
+ // get posts
+  List<PostModel> postsList = [];
+  Future<void> getPosts() async {
+    emit(GetPostsLoadingState());
+    try {
+      var documentSnapshot =
+          await FirebaseFirestore.instance.collection(postsCollection).get();
+      for (var element in documentSnapshot.docs) {
+        postsList.add(PostModel.fromJson(element.data()));
+      }
+      // userModel = UserModel.fromJson(documentSnapshot.data()!);
+      emit(GetPostsSuccessState());
+    } catch (error) {
+      emit(GetPostsFailureState(errMessage: error.toString()));
+    }
+  }
 }
