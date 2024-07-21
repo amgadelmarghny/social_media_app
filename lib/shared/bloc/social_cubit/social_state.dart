@@ -73,7 +73,7 @@ final class CreatePostFailureState extends SocialState {
 final class RemovePickedFile extends SocialState {}
 
 // cancel upload post
-final class CancelUploadPostState extends SocialState {}
+final class RemovePostState extends SocialState {}
 
 ///////////////! get posts /////////////////
 final class GetPostsLoadingState extends SocialState {}

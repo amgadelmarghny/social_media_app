@@ -28,7 +28,7 @@ class FloatingErrorWidget extends StatelessWidget {
               Expanded(
                 child: InkWell(
                   onTap: () {
-                    socialCubit.cancelUploadPost();
+                    socialCubit.removePost();
                   },
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,

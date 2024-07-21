@@ -119,7 +119,7 @@ class SocialCubit extends Cubit<SocialState> {
       final task = await FirebaseStorage.instance
           .ref()
           .child(
-              '$usersCollection/profile/${Uri.file(file.path).pathSegments.last}')
+              '$usersCollection/$kProfileFolder/${Uri.file(file.path).pathSegments.last}')
           .putFile(file);
 
       pictureUrl = await task.ref.getDownloadURL();
@@ -153,7 +153,7 @@ class SocialCubit extends Cubit<SocialState> {
       final task = await FirebaseStorage.instance
           .ref()
           .child(
-              '$usersCollection/cover/${Uri.file(file.path).pathSegments.last}')
+              '$usersCollection/$kCoverFolder/${Uri.file(file.path).pathSegments.last}')
           .putFile(file);
 
       coverUrl = await task.ref.getDownloadURL();
@@ -186,7 +186,7 @@ class SocialCubit extends Cubit<SocialState> {
       final task = await FirebaseStorage.instance
           .ref()
           .child(
-              '$usersCollection/post/${Uri.file(file.path).pathSegments.last}')
+              '$usersCollection/$kPostFolder/${Uri.file(file.path).pathSegments.last}')
           .putFile(file);
 
       postUrl = await task.ref.getDownloadURL();
@@ -213,6 +213,8 @@ class SocialCubit extends Cubit<SocialState> {
           .collection(postsCollection)
           .add(postModel.toJson());
       emit(CreatePostSuccessState());
+      // to get posts after add post to firebase successfully
+      await getPosts();
     } catch (err) {
       emit(CreatePostFailureState(errMessage: err.toString()));
     }
@@ -251,22 +253,25 @@ class SocialCubit extends Cubit<SocialState> {
     await _createPost(createPostImplModel);
   }
 
-  void cancelUploadPost() {
+  void removePost() {
     postImagePicked = null;
     postContentController.text = '';
-    emit(CancelUploadPostState());
+    emit(RemovePostState());
   }
- // get posts
+
+  // get posts
   List<PostModel> postsList = [];
   Future<void> getPosts() async {
     emit(GetPostsLoadingState());
     try {
-      var documentSnapshot =
-          await FirebaseFirestore.instance.collection(postsCollection).get();
+      var documentSnapshot = await FirebaseFirestore.instance
+          .collection(postsCollection)
+          .orderBy(kDateTime, descending: true)
+          .get();
+      postsList.clear();
       for (var element in documentSnapshot.docs) {
         postsList.add(PostModel.fromJson(element.data()));
       }
-      // userModel = UserModel.fromJson(documentSnapshot.data()!);
       emit(GetPostsSuccessState());
     } catch (error) {
       emit(GetPostsFailureState(errMessage: error.toString()));

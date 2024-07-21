@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../shared/bloc/social_cubit/social_cubit.dart';
@@ -35,11 +36,20 @@ class CoverPhotoSection extends StatelessWidget {
         Card(
           clipBehavior: Clip.antiAliasWithSaveLayer,
           child: BlocProvider.of<SocialCubit>(context).userModel!.cover != null
-              ? Image.network(
+              ? CachedNetworkImage(
                   height: height * 0.3,
-                  width: double.infinity,
                   fit: BoxFit.cover,
-                  BlocProvider.of<SocialCubit>(context).userModel!.cover!,
+                  imageUrl:
+                      BlocProvider.of<SocialCubit>(context).userModel!.cover!,
+                  placeholder: (context, url) => const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                  errorWidget: (context, url, error) => const Center(
+                    child: Icon(
+                      Icons.error,
+                      color: Colors.red,
+                    ),
+                  ),
                 )
               : SizedBox(
                   height: height * 0.3,

@@ -4,7 +4,7 @@ sealed class LoginState {}
 
 final class LoginInitial extends LoginState {}
 
-final class LoginloadingSatate extends LoginState {}
+final class LoginLoadingState extends LoginState {}
 
 final class TextFieldObscureState extends LoginState {}
 

@@ -37,7 +37,7 @@ class UploadPostDemo extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     ProfilePostRow(
-                      image: socialCubit.userModel!.photo!,
+                      image: socialCubit.userModel!.photo,
                       userName:
                           '${socialCubit.userModel!.firstName} ${socialCubit.userModel!.lastName}',
                     ),

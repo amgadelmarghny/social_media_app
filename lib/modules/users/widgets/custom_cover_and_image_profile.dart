@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:popover/popover.dart';
 import '../../../shared/components/profile_picture_with_story.dart';
@@ -46,9 +47,19 @@ class CustomCoverAndImageProfile extends StatelessWidget {
                     bodyBuilder: (context) => const CoverImageMenuItem());
               },
               child: profileCover != null
-                  ? Image.network(
+                  ? CachedNetworkImage(
                       fit: BoxFit.cover,
-                      profileCover!,
+                      width: double.infinity,
+                      imageUrl: profileCover!,
+                      placeholder: (context, url) => const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                      errorWidget: (context, url, error) => const Center(
+                        child: Icon(
+                          Icons.error,
+                          color: Colors.red,
+                        ),
+                      ),
                     )
                   : const Icon(
                       Icons.camera_alt,

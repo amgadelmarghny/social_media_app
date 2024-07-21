@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../shared/bloc/social_cubit/social_cubit.dart';
@@ -32,16 +33,13 @@ class ProfilePictureSection extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircleAvatar(
-              radius: 80,
-              backgroundImage:
-                  BlocProvider.of<SocialCubit>(context).userModel!.photo != null
-                      ? NetworkImage(
-                          BlocProvider.of<SocialCubit>(context)
-                              .userModel!
-                              .photo!,
-                        )
-                      : null,
+            Container(
+              width: 160,
+              height: 160,
+              clipBehavior: Clip.hardEdge,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+              ),
               child:
                   BlocProvider.of<SocialCubit>(context).userModel!.photo == null
                       ? Icon(
@@ -49,8 +47,21 @@ class ProfilePictureSection extends StatelessWidget {
                           color: Colors.grey.shade600,
                           size: 120,
                         )
-                      : null,
-
+                      : CachedNetworkImage(
+                          fit: BoxFit.cover,
+                          imageUrl: BlocProvider.of<SocialCubit>(context)
+                              .userModel!
+                              .photo!,
+                          placeholder: (context, url) => const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                          errorWidget: (context, url, error) => const Center(
+                            child: Icon(
+                              Icons.error,
+                              color: Colors.red,
+                            ),
+                          ),
+                        ),
             ),
           ],
         ),

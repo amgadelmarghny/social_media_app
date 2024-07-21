@@ -47,7 +47,9 @@ class SocialMediaApp extends StatelessWidget {
           create: (context) => AppCubit(),
         ),
         BlocProvider(
-          create: (context) => SocialCubit()..getUserData(),
+          create: (context) => SocialCubit()
+            ..getUserData()
+            ..getPosts(),
         ),
       ],
       child: MaterialApp(

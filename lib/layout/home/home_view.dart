@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/layout/home/components/custom_bottom_nav_bar.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/components/constants.dart';
+import 'package:social_media_app/shared/components/show_toast.dart';
 import 'package:social_media_app/shared/network/local/cache_helper.dart';
 import 'package:social_media_app/shared/style/theme/theme.dart';
 
@@ -60,31 +61,39 @@ class _HomeViewState extends State<HomeView> {
                   }
                   return true;
                 },
-                child: SingleChildScrollView(
-                  controller: _scrollController,
-                  child: BlocBuilder<SocialCubit, SocialState>(
-                    builder: (context, state) {
-                      if (state is GetUserDataFailureState) {
-                        return const Center(
-                          child: Text('Something went wrong'),
-                        );
-                      }
-                      return ConditionalBuilder(
-                        condition:
-                            BlocProvider.of<SocialCubit>(context).userModel !=
-                                null,
-                        builder: (context) =>
+                child: BlocConsumer<SocialCubit, SocialState>(
+                  listener: (context,state){
+                    if(state is GetUserDataFailureState){
+                      showToast(msg: state.errMessage, toastState: ToastState.error);
+                    }
+                    if(state is GetPostsFailureState){
+                      showToast(msg: state.errMessage, toastState: ToastState.error);
+                    }
+                  },
+                  builder: (context, state) {
+                    if (state is GetUserDataFailureState) {
+                      return const Center(
+                        child: Text('Something went wrong'),
+                      );
+                    }
+                    return ConditionalBuilder(
+                      condition:
+                          BlocProvider.of<SocialCubit>(context).userModel !=
+                              null,
+                      builder: (context) => SingleChildScrollView(
+                        controller: _scrollController,
+                        child:
                             BlocProvider.of<SocialCubit>(context).currentBody[
                                 BlocProvider.of<SocialCubit>(context)
                                     .currentBottomNavBarIndex],
-                        fallback: (context) => const Center(
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                          ),
+                      ),
+                      fallback: (context) => const Center(
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
                         ),
-                      );
-                    },
-                  ),
+                      ),
+                    );
+                  },
                 ),
               ),
             ),

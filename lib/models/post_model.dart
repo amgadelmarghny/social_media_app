@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../shared/components/constants.dart';
 
 class PostModel {
   final String uid;
@@ -35,7 +36,7 @@ class PostModel {
       'profilePhoto': profilePhoto,
       'content': content,
       'postImage': postImage,
-      'dateTime': Timestamp.fromDate(dateTime),
+      kDateTime : Timestamp.fromDate(dateTime),
     };
   }
 }

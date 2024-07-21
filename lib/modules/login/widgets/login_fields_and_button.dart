@@ -80,7 +80,7 @@ class LoginFieldsAndButton extends StatelessWidget {
             ),
             CustomButton(
               text: 'Sign in',
-              isLoading: state is LoginloadingSatate,
+              isLoading: state is LoginLoadingState,
               onTap: () {
                 if (loginCubit.formKey.currentState!.validate()) {
                   loginCubit.loginUser(

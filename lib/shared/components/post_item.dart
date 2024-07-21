@@ -1,4 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:social_media_app/models/post_model.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
 import '../../modules/feeds/widgets/hashtag.dart';
 import '../../modules/feeds/widgets/interactive_row.dart';
@@ -7,11 +10,13 @@ import '../../modules/feeds/widgets/profile_post_row.dart';
 class PostItem extends StatelessWidget {
   const PostItem({
     super.key,
+    required this.postModel,
   });
-
+  final PostModel postModel;
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: const EdgeInsets.symmetric(vertical: 5),
       padding: const EdgeInsets.only(top: 10, bottom: 10, right: 10, left: 10),
       width: double.infinity,
       decoration: BoxDecoration(
@@ -21,19 +26,19 @@ class PostItem extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const ProfilePostRow(
-            image:
-                'https://avatars.githubusercontent.com/u/126693786?s=400&u=b1aebebdd8c0990c5bdb1c6b62cca90aebf2e247&v=4',
-            userName: 'Amgad Marghny',
-            timePosted: '5 minutes',
+          ProfilePostRow(
+            image: postModel.profilePhoto,
+            userName: postModel.userName,
+            timePosted: DateFormat.yMMMd().add_jm().format(postModel.dateTime),
           ),
-          const SizedBox(
-            height: 8,
-          ),
-          Text(
-            'This is a beautiful sky that i took last week. it\'s great, right ? :) scewvevjjjjjjjjjjjjjjjjjj jjhiuuuuuuuuuuuuu sssuhun un',
-            style: FontsStyle.font15Popin(),
-          ),
+          if (postModel.content != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Text(
+                postModel.content!,
+                style: FontsStyle.font15Popin(),
+              ),
+            ),
           // hashtags
           const Wrap(
             children: [
@@ -42,34 +47,42 @@ class PostItem extends StatelessWidget {
               ),
             ],
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 15),
-            child: Container(
-              padding: const EdgeInsets.all(1.3),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(25),
-              ),
+          if (postModel.postImage != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 15),
               child: Container(
-                clipBehavior: Clip.antiAliasWithSaveLayer,
+                padding: const EdgeInsets.all(1.3),
                 decoration: BoxDecoration(
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(25),
                 ),
-                child: const Image(
-                  fit: BoxFit.fitHeight,
-                  image: NetworkImage(
-                    'https://storage.googleapis.com/fc-freepik-pro-rev1-eu-static/ai-styles-landings/dark/people.jpg?h=1280',
+                child: Container(
+                  clipBehavior: Clip.antiAliasWithSaveLayer,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                  child: CachedNetworkImage(
+                    fit: BoxFit.fitHeight,
+                    width: double.infinity,
+                    imageUrl: postModel.postImage!,
+                    placeholder: (context, url) =>
+                        const Center(child: CircularProgressIndicator()),
+                    errorWidget: (context, url, error) => const Center(
+                      child: Icon(
+                        Icons.error,
+                        color: Colors.red,
+                      ),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(
-            height: 5,
-          ),
+          // const SizedBox(
+          //   height: 5,
+          // ),
           const InteractiveRow(
-            numOfLikes: '2000',
-            numOfComments: '231',
+            numOfLikes: '0',
+            numOfComments: '0',
           ),
         ],
       ),

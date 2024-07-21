@@ -3,14 +3,15 @@ import '../../../shared/components/profile_picture_with_story.dart';
 import '../../../shared/style/fonts/font_style.dart';
 
 class ProfilePostRow extends StatelessWidget {
-  const ProfilePostRow(
-      {super.key,
-      required this.image,
-      required this.userName,
-      this.timePosted,});
-  final String image;
+  const ProfilePostRow({
+    super.key,
+    required this.image,
+    required this.userName,
+    this.timePosted,
+  });
+  final String? image;
   final String userName;
-  final dynamic timePosted;
+  final String? timePosted;
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -34,11 +35,14 @@ class ProfilePostRow extends StatelessWidget {
                 style: FontsStyle.font18PopinBold(),
               ),
               if (timePosted != null)
-                Text(
-                  timePosted,
-                  style: FontsStyle.font15Popin(
-                    height: 1,
-                    color: Colors.white60,
+                Padding(
+                  padding: const EdgeInsets.only(top: 2.5),
+                  child: Text(
+                    timePosted!,
+                    style: FontsStyle.font15Popin(
+                      height: 1,
+                      color: Colors.white60,
+                    ),
                   ),
                 ),
             ],

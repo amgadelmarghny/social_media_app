@@ -1,9 +1,11 @@
+import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/modules/feeds/widgets/upload_post_demo_widget.dart';
 import 'package:social_media_app/shared/components/post_item.dart';
 import 'package:social_media_app/modules/feeds/widgets/story_list_view.dart';
 import 'package:social_media_app/shared/components/show_toast.dart';
+import 'package:social_media_app/shared/style/fonts/font_style.dart';
 
 import '../../shared/bloc/social_cubit/social_cubit.dart';
 
@@ -15,14 +17,14 @@ class FeedsBody extends StatelessWidget {
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.only(
-          top: 20,
+          top: 10,
           left: 20,
           right: 20,
         ),
         child: BlocConsumer<SocialCubit, SocialState>(
           listener: (BuildContext context, SocialState state) {
             if (state is CreatePostSuccessState) {
-              BlocProvider.of<SocialCubit>(context).cancelUploadPost();
+              BlocProvider.of<SocialCubit>(context).removePost();
               showToast(
                   msg: 'Post added successfully',
                   toastState: ToastState.success);
@@ -35,7 +37,9 @@ class FeedsBody extends StatelessWidget {
             }
           },
           builder: (BuildContext context, SocialState state) {
+            SocialCubit socialCubit = BlocProvider.of<SocialCubit>(context);
             return Column(
+              mainAxisSize: MainAxisSize.max,
               children: [
                 SearchBar(
                   hintText: 'Explore',
@@ -55,18 +59,36 @@ class FeedsBody extends StatelessWidget {
                   height: 20,
                 ),
                 // upload post demo
-                if (BlocProvider.of<SocialCubit>(context)
-                        .postContentController
-                        .text
-                        .isNotEmpty ||
-                    BlocProvider.of<SocialCubit>(context).postImagePicked !=
-                        null)
+                if (socialCubit.postContentController.text.isNotEmpty ||
+                    socialCubit.postImagePicked != null)
                   if (state is CreatePostLoadingState ||
                       state is UploadPostImageFailureState ||
                       state is CreatePostFailureState)
                     const UploadPostDemo(),
                 // post
-                const PostItem()
+                ConditionalBuilder(
+                  condition: socialCubit.postsList.isNotEmpty,
+                  builder: (context) {
+                    return ListView.builder(
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: socialCubit.postsList.length,
+                      itemBuilder: (context, index) {
+                        return PostItem(
+                          postModel: socialCubit.postsList[index],
+                        );
+                      },
+                    );
+                  },
+                  fallback: (context) => Padding(
+                    padding: EdgeInsets.only(
+                        top: MediaQuery.sizeOf(context).height / 5),
+                    child: Text(
+                      'There is no posts yet',
+                      style: FontsStyle.font20Poppins,
+                    ),
+                  ),
+                ),
               ],
             );
           },
