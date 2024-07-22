@@ -66,14 +66,13 @@ class SocialCubit extends Cubit<SocialState> {
               .doc(uidTokenCache)
               .get();
       userModel = UserModel.fromJson(documentSnapshot.data()!);
-      print('eeeeeeeeee ${documentSnapshot.id}');
       emit(GetUserDataSuccessState());
     } catch (error) {
       emit(GetUserDataFailureState(errMessage: error.toString()));
     }
   }
 
-  // update user info
+  //? update user info
   TextEditingController firstNameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
   TextEditingController bioController = TextEditingController();
@@ -95,7 +94,7 @@ class SocialCubit extends Cubit<SocialState> {
     }
   }
 
-  // profile image
+  //? profile image
   Future<File?> pickImage() async {
     emit(PickImageLoadingState());
 
@@ -178,7 +177,7 @@ class SocialCubit extends Cubit<SocialState> {
     return null;
   }
 
-  // posts
+  //? posts
   Future<String?> _uploadPostImage({required File file}) async {
     emit(CreatePostLoadingState());
     String? postUrl;
@@ -259,8 +258,10 @@ class SocialCubit extends Cubit<SocialState> {
     emit(RemovePostState());
   }
 
-  // get posts
+  //? get posts
   List<PostModel> postsList = [];
+  List<String> postsLikesList = [];
+
   Future<void> getPosts() async {
     emit(GetPostsLoadingState());
     try {
@@ -269,12 +270,29 @@ class SocialCubit extends Cubit<SocialState> {
           .orderBy(kDateTime, descending: true)
           .get();
       postsList.clear();
+      postsLikesList.clear();
       for (var element in documentSnapshot.docs) {
+        postsLikesList.add(element.id);
         postsList.add(PostModel.fromJson(element.data()));
       }
       emit(GetPostsSuccessState());
     } catch (error) {
       emit(GetPostsFailureState(errMessage: error.toString()));
+    }
+  } 
+
+  //? like post
+  Future<void> likePost({required String postID}) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection(postsCollection)
+          .doc(postID)
+          .collection('like')
+          .doc(userModel!.uid)
+          .set({'like': true});
+      emit(LikePostSuccessState());
+    } on Exception catch (errMessage) {
+      emit(LikePostFailureState(errMessage: errMessage.toString()));
     }
   }
 }

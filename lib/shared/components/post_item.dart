@@ -66,7 +66,10 @@ class PostItem extends StatelessWidget {
                     width: double.infinity,
                     imageUrl: postModel.postImage!,
                     placeholder: (context, url) =>
-                        const Center(child: CircularProgressIndicator()),
+                        const Center(child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          child: CircularProgressIndicator(),
+                        )),
                     errorWidget: (context, url, error) => const Center(
                       child: Icon(
                         Icons.error,

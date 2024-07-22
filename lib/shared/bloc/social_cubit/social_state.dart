@@ -6,7 +6,7 @@ final class SocialInitial extends SocialState {}
 
 final class BottomNavBarState extends SocialState {}
 
-///////////////! get user data /////////////////
+////////////////! get user data /////////////////
 final class GetUserDataLoadingState extends SocialState {}
 
 final class GetUserDataSuccessState extends SocialState {}
@@ -69,13 +69,23 @@ final class CreatePostFailureState extends SocialState {
 
   CreatePostFailureState({required this.errMessage});
 }
+
 //remove image
 final class RemovePickedFile extends SocialState {}
 
 // cancel upload post
 final class RemovePostState extends SocialState {}
 
-///////////////! get posts /////////////////
+//////////////////! like post ///////////////
+final class LikePostSuccessState extends SocialState {}
+
+final class LikePostFailureState extends SocialState {
+  final String errMessage;
+
+  LikePostFailureState({required this.errMessage});
+}
+
+////////////////! get posts /////////////////
 final class GetPostsLoadingState extends SocialState {}
 
 final class GetPostsSuccessState extends SocialState {}
@@ -86,7 +96,7 @@ final class GetPostsFailureState extends SocialState {
   GetPostsFailureState({required this.errMessage});
 }
 
-///////////////////! update user info /////////////////
+////////////////////! update user info /////////////////
 final class UpdateUserInfoLoadingState extends SocialState {}
 
 final class UpdateUserInfoFailureState extends SocialState {
