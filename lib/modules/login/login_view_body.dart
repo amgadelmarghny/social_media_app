@@ -5,6 +5,10 @@ import 'package:social_media_app/shared/bloc/login_cubit/login_cubit.dart';
 import 'package:social_media_app/shared/components/auth_icon_list.dart';
 import 'package:social_media_app/shared/components/navigators.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
+import '../../layout/home/home_view.dart';
+import '../../shared/components/constants.dart';
+import '../../shared/components/show_toast.dart';
+import '../../shared/network/local/cache_helper.dart';
 import '../../shared/style/theme/constant.dart';
 import 'widgets/login_fields_and_button.dart';
 
@@ -18,7 +22,16 @@ class LoginViewBody extends StatelessWidget {
     double height = MediaQuery.sizeOf(context).height;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: BlocBuilder<LoginCubit, LoginState>(
+      child: BlocConsumer<LoginCubit, LoginState>(
+        listener: (BuildContext context, LoginState state) {
+          if (state is LoginSuccessState) {
+            CacheHelper.setData(key: uidToken, value: state.uid);
+            pushAndRemoveView(context, newRouteName: HomeView.routeViewName);
+          }
+          if (state is LoginFailureState) {
+            showToast(msg: state.errMessage, toastState: ToastState.error);
+          }
+        },
         builder: (context, state) {
           LoginCubit loginCubit = BlocProvider.of<LoginCubit>(context);
           return SingleChildScrollView(

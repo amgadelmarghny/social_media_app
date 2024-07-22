@@ -65,8 +65,8 @@ class SocialCubit extends Cubit<SocialState> {
               .collection(usersCollection)
               .doc(uidTokenCache)
               .get();
-
       userModel = UserModel.fromJson(documentSnapshot.data()!);
+      print('eeeeeeeeee ${documentSnapshot.id}');
       emit(GetUserDataSuccessState());
     } catch (error) {
       emit(GetUserDataFailureState(errMessage: error.toString()));
