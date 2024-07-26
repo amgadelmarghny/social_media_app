@@ -73,7 +73,7 @@ class CustomContainerPageView extends StatelessWidget {
                         if (appCubit.currentIndex ==
                             appCubit.onBoardingModelsList.length - 1) {
                           CacheHelper.setData(
-                              key: onBoardingConst, value: true);
+                              key: kOnBoardingConst, value: true);
                           Navigator.pushReplacementNamed(
                               context, LoginView.routeViewName);
                         } else {

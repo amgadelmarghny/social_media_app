@@ -29,8 +29,8 @@ class SocialMediaApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var tokenCache = CacheHelper.getData(key: uidToken);
-    var onBoardingCache = CacheHelper.getData(key: onBoardingConst);
+    var tokenCache = CacheHelper.getData(key: kUidToken);
+    var onBoardingCache = CacheHelper.getData(key: kOnBoardingConst);
     late String initialRoute;
     if (onBoardingCache != null) {
       if (tokenCache != null) {
@@ -48,8 +48,8 @@ class SocialMediaApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => SocialCubit()
-            ..getUserData()
-            ..getPosts(),
+            ..getPosts()
+            ..getUserData(),
         ),
       ],
       child: MaterialApp(

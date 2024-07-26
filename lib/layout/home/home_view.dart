@@ -48,7 +48,7 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('Token ::::: ${CacheHelper.getData(key: uidToken)}');
+    debugPrint('Token ::::: ${CacheHelper.getData(key: kUidToken)}');
     return Container(
       decoration: themeColor(),
       child: Stack(
@@ -88,16 +88,19 @@ class _HomeViewState extends State<HomeView> {
                     return ConditionalBuilder(
                       condition:
                           BlocProvider.of<SocialCubit>(context).userModel !=
-                              null,
+                                  null ||
+                              BlocProvider.of<SocialCubit>(context)
+                                  .postsModelList
+                                  .isNotEmpty,
                       builder: (context) => LiquidPullToRefresh(
                         showChildOpacityTransition: false,
                         backgroundColor: const Color(0xff8862D9),
-                       springAnimationDurationInMilliseconds: 500,
+                        springAnimationDurationInMilliseconds: 500,
                         animSpeedFactor: 1.8,
-                        color: const  Color(0xffC58DEB),
+                        color: const Color(0xffC58DEB),
                         onRefresh: _handleRefresh,
                         borderWidth: 3,
-                        height: 200,
+                        height: 150,
                         child: SingleChildScrollView(
                           controller: _scrollController,
                           child:

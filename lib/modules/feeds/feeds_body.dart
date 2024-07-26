@@ -68,15 +68,17 @@ class FeedsBody extends StatelessWidget {
                     const UploadPostDemo(),
                 // post
                 ConditionalBuilder(
-                  condition: socialCubit.postsList.isNotEmpty,
+                  condition: socialCubit.postsModelList.isNotEmpty,
                   builder: (context) {
                     return ListView.builder(
                       physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
-                      itemCount: socialCubit.postsList.length,
+                      itemCount: socialCubit.postsModelList.length,
                       itemBuilder: (context, index) {
                         return PostItem(
-                          postModel: socialCubit.postsList[index],
+                          postModel: socialCubit.postsModelList[index],
+                          postId: socialCubit.postsIdList[index],
+                          likes:List<String>.from(socialCubit.postsModelList[index].likes ?? []) ,
                         );
                       },
                     );

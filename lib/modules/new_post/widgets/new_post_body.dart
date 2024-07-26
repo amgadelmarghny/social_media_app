@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_media_app/shared/style/theme/constant.dart';
 import '../../../shared/bloc/social_cubit/social_cubit.dart';
 import '../../../shared/style/fonts/font_style.dart';
 import '../../feeds/widgets/profile_post_row.dart';
@@ -86,8 +87,8 @@ class CreatePostSheetBody extends StatelessWidget {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   const Icon(
-                                    Icons.insert_photo,
-                                    color: Colors.blue,
+                                    Icons.insert_photo_outlined,
+                                    color: defaultColorButton,
                                     size: 30,
                                   ),
                                   const SizedBox(
@@ -96,7 +97,7 @@ class CreatePostSheetBody extends StatelessWidget {
                                   Text(
                                     'Add photo',
                                     style: FontsStyle.font18Popin(
-                                        color: Colors.blue),
+                                        color: defaultColorButton),
                                   )
                                 ],
                               ),
@@ -113,7 +114,7 @@ class CreatePostSheetBody extends StatelessWidget {
                               child: Text(
                                 '#tags',
                                 style:
-                                    FontsStyle.font18Popin(color: Colors.blue),
+                                    FontsStyle.font18Popin(color: defaultColorButton),
                               ),
                             ),
                           ),

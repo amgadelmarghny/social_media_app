@@ -8,26 +8,38 @@ class InteractiveRow extends StatelessWidget {
     super.key,
     required this.numOfLikes,
     required this.numOfComments,
+    required this.isLike,
+    this.onTap,
   });
-  final String numOfLikes;
+  final int numOfLikes;
   final String numOfComments;
+
+  final bool isLike;
+  final void Function()? onTap;
+
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
         IconButton(
-          onPressed: () {},
-          icon: SvgPicture.asset(
-            'lib/assets/images/like.svg',
-          ),
+          onPressed: onTap,
+          icon: isLike
+              ? SvgPicture.asset(
+                  'lib/assets/images/like.svg',
+                )
+              : const Icon(Icons.favorite_border),
           color: defaultColor,
         ),
-        Transform.translate(
-          offset: const Offset(-7, 0),
-          child: Text(
-            numOfLikes,
-            style: FontsStyle.font18Popin(),
+        if (numOfLikes > 0)
+          Transform.translate(
+            offset: const Offset(-7, 0),
+            child: Text(
+              numOfLikes.toString(),
+              style: FontsStyle.font18Popin(),
+            ),
           ),
+        const SizedBox(
+          width: 5,
         ),
         GestureDetector(
           onTap: () {},
@@ -48,7 +60,7 @@ class InteractiveRow extends StatelessWidget {
         ),
         const Spacer(),
         IconButton(
-          onPressed: () {},
+          onPressed: (){},
           icon: SvgPicture.asset(
             'lib/assets/images/share.svg',
           ),

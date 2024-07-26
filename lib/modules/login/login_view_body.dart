@@ -25,7 +25,7 @@ class LoginViewBody extends StatelessWidget {
       child: BlocConsumer<LoginCubit, LoginState>(
         listener: (BuildContext context, LoginState state) {
           if (state is LoginSuccessState) {
-            CacheHelper.setData(key: uidToken, value: state.uid);
+            CacheHelper.setData(key: kUidToken, value: state.uid);
             pushAndRemoveView(context, newRouteName: HomeView.routeViewName);
           }
           if (state is LoginFailureState) {

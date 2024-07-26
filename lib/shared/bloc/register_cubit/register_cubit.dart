@@ -67,7 +67,7 @@ class RegisterCubit extends Cubit<RegisterState> {
     emit(SaveUserInfoLoadingState());
     try {
       await FirebaseFirestore.instance
-          .collection(usersCollection)
+          .collection(kUsersCollection)
           .doc(userModel.uid)
           .set(userModel.toMap());
       emit(SaveUserInfoSuccessState(uid: userModel.uid));

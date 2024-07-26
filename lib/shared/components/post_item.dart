@@ -1,20 +1,64 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:social_media_app/models/post_model.dart';
+import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
 import '../../modules/feeds/widgets/hashtag.dart';
 import '../../modules/feeds/widgets/interactive_row.dart';
 import '../../modules/feeds/widgets/profile_post_row.dart';
+import 'constants.dart';
 
-class PostItem extends StatelessWidget {
+class PostItem extends StatefulWidget {
   const PostItem({
     super.key,
     required this.postModel,
+    required this.likes,
+    required this.postId,
   });
   final PostModel postModel;
+  final List<String> likes;
+  final String postId;
+
+  @override
+  State<PostItem> createState() => _PostItemState();
+}
+
+class _PostItemState extends State<PostItem> {
+  bool isLike = false;
+  final currentUser = FirebaseAuth.instance.currentUser!;
+  @override
+  void initState() {
+    isLike = widget.likes.contains(currentUser.email);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
+    void toggleLike() {
+      BlocProvider.of<SocialCubit>(context).getPosts();
+      setState(() {
+        isLike = !isLike;
+      });
+      //Access the document from firebase
+      DocumentReference docRef = FirebaseFirestore.instance
+          .collection(kPostsCollection)
+          .doc(widget.postId);
+      if (isLike) {
+        // if the user liked the post , add the use's email to the 'likes' filed
+        docRef.update({
+          'likes': FieldValue.arrayUnion([currentUser.email]),
+        });
+      } else {
+        // if the post is now unliked , remove the user from the list
+        docRef.update({
+          'likes': FieldValue.arrayRemove([currentUser.email]),
+        });
+      }
+    }
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 5),
       padding: const EdgeInsets.only(top: 10, bottom: 10, right: 10, left: 10),
@@ -27,15 +71,16 @@ class PostItem extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ProfilePostRow(
-            image: postModel.profilePhoto,
-            userName: postModel.userName,
-            timePosted: DateFormat.yMMMd().add_jm().format(postModel.dateTime),
+            image: widget.postModel.profilePhoto,
+            userName: widget.postModel.userName,
+            timePosted:
+                DateFormat.yMMMd().add_jm().format(widget.postModel.dateTime),
           ),
-          if (postModel.content != null)
+          if (widget.postModel.content != null)
             Padding(
               padding: const EdgeInsets.only(top: 10),
               child: Text(
-                postModel.content!,
+                widget.postModel.content!,
                 style: FontsStyle.font15Popin(),
               ),
             ),
@@ -47,7 +92,7 @@ class PostItem extends StatelessWidget {
               ),
             ],
           ),
-          if (postModel.postImage != null)
+          if (widget.postModel.postImage != null)
             Padding(
               padding: const EdgeInsets.only(top: 15),
               child: Container(
@@ -64,12 +109,12 @@ class PostItem extends StatelessWidget {
                   child: CachedNetworkImage(
                     fit: BoxFit.fitHeight,
                     width: double.infinity,
-                    imageUrl: postModel.postImage!,
-                    placeholder: (context, url) =>
-                        const Center(child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 20),
-                          child: CircularProgressIndicator(),
-                        )),
+                    imageUrl: widget.postModel.postImage!,
+                    placeholder: (context, url) => const Center(
+                        child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 20),
+                      child: CircularProgressIndicator(),
+                    )),
                     errorWidget: (context, url, error) => const Center(
                       child: Icon(
                         Icons.error,
@@ -83,9 +128,11 @@ class PostItem extends StatelessWidget {
           // const SizedBox(
           //   height: 5,
           // ),
-          const InteractiveRow(
-            numOfLikes: '0',
+          InteractiveRow(
+            numOfLikes: widget.likes.length,
             numOfComments: '0',
+            isLike: isLike,
+            onTap: toggleLike,
           ),
         ],
       ),

@@ -31,7 +31,7 @@ class RegisterViewBody extends StatelessWidget {
               showToast(msg: state.errMessage, toastState: ToastState.error);
             }
             if (state is SaveUserInfoSuccessState) {
-              CacheHelper.setData(key: uidToken, value: state.uid);
+              CacheHelper.setData(key: kUidToken, value: state.uid);
               pushAndRemoveView(context, newRouteName: HomeView.routeViewName);
             }
           },
