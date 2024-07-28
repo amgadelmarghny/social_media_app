@@ -16,71 +16,69 @@ class CreatePostSheet extends StatelessWidget {
     SocialCubit socialCubit = BlocProvider.of<SocialCubit>(context);
     return Container(
       decoration: themeColor(),
-      child: Padding(
-        padding: const EdgeInsets.only(top: 40),
-        child: BlocBuilder<SocialCubit, SocialState>(
-          builder: (BuildContext context, SocialState state) {
-            return Scaffold(
-              appBar: AppBar(
-                actions: [
-                  // to notice the text filed input changes
-                  ValueListenableBuilder<TextEditingValue>(
-                    valueListenable: socialCubit.postContentController,
-                    builder: (context, value, child) {
-                      return Container(
-                        height: 40,
-                        width: 90,
-                        clipBehavior: Clip.hardEdge,
-                        decoration: const BoxDecoration(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(15))),
-                        child: MaterialButton(
-                          color: socialCubit.postImagePicked == null &&
-                                  value.text.isEmpty
-                              ? Colors.white70
-                              : defaultColorButton,
-                          onPressed: () {
-                            final DateTime now = DateTime.now();
-                            final currentTime = DateTime(now.year, now.month,
-                                now.day, now.hour, now.minute);
-                            if (socialCubit.postImagePicked != null) {
-                              socialCubit.createPostWithPhoto(
-                                postContent: value.text,
-                                dateTime: currentTime,
-                              );
-                              Navigator.pop(context);
-                            } else if (value.text.isNotEmpty) {
-                              socialCubit.createPostWithContentOnly(
-                                postContent: value.text,
-                                dateTime: currentTime,
-                              );
-                              Navigator.pop(context);
-                            }
-                          },
-                          child: Text(
-                            'Post',
-                            style: FontsStyle.font18PopinBold().copyWith(
-                              color: socialCubit.postImagePicked == null &&
-                                      value.text.isEmpty
-                                  ? Colors.black54
-                                  : null,
-                            ),
+      padding: const EdgeInsets.only(top: 40),
+      child: BlocBuilder<SocialCubit, SocialState>(
+        builder: (BuildContext context, SocialState state) {
+          return Scaffold(
+            appBar: AppBar(
+              actions: [
+                // to notice the text filed input changes
+                ValueListenableBuilder<TextEditingValue>(
+                  valueListenable: socialCubit.postContentController,
+                  builder: (context, value, child) {
+                    return Container(
+                      height: 40,
+                      width: 90,
+                      clipBehavior: Clip.hardEdge,
+                      decoration: const BoxDecoration(
+                          borderRadius:
+                              BorderRadius.all(Radius.circular(15))),
+                      child: MaterialButton(
+                        color: socialCubit.postImagePicked == null &&
+                                value.text.isEmpty
+                            ? Colors.white70
+                            : defaultColorButton,
+                        onPressed: () {
+                          final DateTime now = DateTime.now();
+                          final currentTime = DateTime(now.year, now.month,
+                              now.day, now.hour, now.minute);
+                          if (socialCubit.postImagePicked != null) {
+                            socialCubit.createPostWithPhoto(
+                              postContent: value.text,
+                              dateTime: currentTime,
+                            );
+                            Navigator.pop(context);
+                          } else if (value.text.isNotEmpty) {
+                            socialCubit.createPostWithContentOnly(
+                              postContent: value.text,
+                              dateTime: currentTime,
+                            );
+                            Navigator.pop(context);
+                          }
+                        },
+                        child: Text(
+                          'Post',
+                          style: FontsStyle.font18PopinBold().copyWith(
+                            color: socialCubit.postImagePicked == null &&
+                                    value.text.isEmpty
+                                ? Colors.black54
+                                : null,
                           ),
                         ),
-                      );
-                    },
-                  ),
-                  const SizedBox(
-                    width: 20,
-                  )
-                ],
-              ),
-              body: CreatePostSheetBody(
-                postContentController: socialCubit.postContentController,
-              ),
-            );
-          },
-        ),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(
+                  width: 20,
+                )
+              ],
+            ),
+            body: CreatePostSheetBody(
+              postContentController: socialCubit.postContentController,
+            ),
+          );
+        },
       ),
     );
   }

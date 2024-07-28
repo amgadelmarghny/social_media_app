@@ -49,13 +49,13 @@ class _PostItemState extends State<PostItem> {
 
   @override
   Widget build(BuildContext context) {
-
     void toggleLike() async {
       setState(() {
-        isLike = ! isLike;
+        isLike = !isLike;
       });
-        likesCollection = await BlocProvider.of<SocialCubit>(context)
-            .toggleLike(postId: widget.postId, isLike: isLike);
+      // get likesCollection to access docs length for number of likes
+      likesCollection = await BlocProvider.of<SocialCubit>(context)
+          .toggleLike(postId: widget.postId, isLike: isLike);
     }
 
     return Container(
@@ -131,7 +131,7 @@ class _PostItemState extends State<PostItem> {
             numOfLikes: likesCollection?.docs.length ?? 0,
             numOfComments: '0',
             isLike: isLike,
-            onTap: toggleLike,
+            onLikeButtonTap: toggleLike,
           ),
         ],
       ),
