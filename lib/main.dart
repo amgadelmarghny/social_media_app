@@ -29,8 +29,8 @@ class SocialMediaApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var tokenCache = CacheHelper.getData(key: kUidToken);
-    var onBoardingCache = CacheHelper.getData(key: kOnBoardingConst);
+    String? tokenCache = CacheHelper.getData(key: kUidToken);
+    bool? onBoardingCache = CacheHelper.getData(key: kOnBoardingConst);
     late String initialRoute;
     if (onBoardingCache != null) {
       if (tokenCache != null) {

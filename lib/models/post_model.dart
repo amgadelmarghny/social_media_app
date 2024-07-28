@@ -8,10 +8,8 @@ class PostModel {
   final String? content;
   final String? postImage;
   final DateTime dateTime;
-  final List? likes;
 
   PostModel({
-    required this.likes,
     required this.userName,
     required this.uid,
     required this.profilePhoto,
@@ -28,7 +26,6 @@ class PostModel {
       content: json['content'],
       postImage: json['postImage'],
       dateTime: json['dateTime'].toDate(),
-      likes: json['likes'],
     );
   }
 
@@ -39,8 +36,9 @@ class PostModel {
       'profilePhoto': profilePhoto,
       'content': content,
       'postImage': postImage,
-      'likes' : likes,
       kDateTime: Timestamp.fromDate(dateTime),
     };
   }
 }
+
+

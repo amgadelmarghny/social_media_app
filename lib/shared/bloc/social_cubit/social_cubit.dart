@@ -15,6 +15,7 @@ import 'package:social_media_app/modules/notifications/notifications_body.dart';
 import 'package:social_media_app/modules/users/users_body.dart';
 import 'package:social_media_app/shared/components/constants.dart';
 import 'package:social_media_app/shared/network/local/cache_helper.dart';
+import '../../../models/like_model.dart';
 import '../../../models/update_user_impl_model.dart';
 part 'social_state.dart';
 
@@ -208,7 +209,6 @@ class SocialCubit extends Cubit<SocialState> {
       dateTime: createPostImplModel.dateTime,
       content: createPostImplModel.content,
       postImage: createPostImplModel.postImage,
-      likes: [],
     );
     try {
       await _postCollectionRef.add(postModel.toJson());
@@ -262,27 +262,28 @@ class SocialCubit extends Cubit<SocialState> {
   //? get posts
   List<PostModel> postsModelList = [];
   List<String> postsIdList = [];
-
+  // List<int> numbersOfLikesInPostsList = [];
   Future<void> getPosts() async {
     emit(GetPostsLoadingState());
     try {
-    var postsDocumentSnapshot =
-        await _postCollectionRef.orderBy(kDateTime, descending: true).get();
+      var postsDocumentSnapshot =
+          await _postCollectionRef.orderBy(kDateTime, descending: true).get();
 
-    postsModelList.clear();
-    postsIdList.clear();
-
-    for (var postDocInCollection in postsDocumentSnapshot.docs) {
-      // int numberOfLikeInPost =
-      //     await _getLikesInPostDocument(postDocInCollection);
-      // // to get post's like number
-      // numbersOfPostsLikesList.add(numberOfLikeInPost);
-      // to get list of post IDs
-      postsIdList.add(postDocInCollection.id);
-      // to get the post item data
-      postsModelList.add(PostModel.fromJson(postDocInCollection.data()));
-    }
-    emit(GetPostsSuccessState());
+      postsIdList.clear();
+      // numbersOfLikesInPostsList.clear();
+      postsModelList.clear();
+      for (var postDocInCollection in postsDocumentSnapshot.docs) {
+        // int numberOfLikeInPost =
+        //     // to get post's like number
+        //     await _getLikesInPostDocument(postDocInCollection);
+        // // put likes of every post in the list
+        // numbersOfLikesInPostsList.add(numberOfLikeInPost);
+        // to get list of post IDs
+        postsIdList.add(postDocInCollection.id);
+        // to get the post item data
+        postsModelList.add(PostModel.fromJson(postDocInCollection.data()));
+      }
+      emit(GetPostsSuccessState());
     } catch (error) {
       emit(GetPostsFailureState(errMessage: error.toString()));
     }
@@ -293,27 +294,51 @@ class SocialCubit extends Cubit<SocialState> {
   //         postDocumentInCollection) async {
   //   var likeCollectionInThePostCollection = await postDocumentInCollection
   //       .reference
-  //       .collection(kLikeCollection)
+  //       .collection(kLikesCollection)
   //       .get();
   //   int numbersOfLikes = likeCollectionInThePostCollection.docs.length;
   //   return numbersOfLikes;
   // }
 
   //? like post
-
-  // bool isLike = false;
-  // Future<void> likePost({required String postID}) async {
-  //   isLike = !isLike;
-  //   //! TODO : complete like !!!!!
-  //   try {
-  //     await _postCollectionRef
-  //         .doc(postID)
-  //         .collection(kLikeCollection)
-  //         .doc(userModel!.uid)
-  //         .set({'like': isLike});
-  //     await getPosts();
-  //   } on Exception catch (errMessage) {
-  //     emit(LikePostFailureState(errMessage: errMessage.toString()));
-  //   }
-  // }
+  Future<QuerySnapshot<Map<String, dynamic>>> toggleLike(
+      {required String postId, required bool isLike}) async {
+    //Access the document(post) from firebase
+    DocumentReference postDocRef = _postCollectionRef.doc(postId);
+    // if the user like the post , add the use's like model
+    // to likes collection in user uid doc
+    if (isLike) {
+      LikeUserModel likeUserModel = LikeUserModel(
+          profilePhoto: userModel!.photo,
+          userName: '${userModel!.firstName} ${userModel!.lastName}',
+          like: isLike);
+      try {
+        await postDocRef
+            .collection(kLikesCollection)
+            .doc(userModel!.uid)
+            .set(likeUserModel.toJson());
+      } catch (errMessage) {
+        emit(LikePostFailureState(
+            errMessage: 'Like error: ${errMessage.toString()}'));
+      }
+    } // if the user unlike the post , delete user uid likes collection
+    else {
+      try {
+        await postDocRef
+            .collection(kLikesCollection)
+            .doc(userModel!.uid)
+            .delete();
+      } catch (errMessage) {
+        emit(LikePostFailureState(
+            errMessage: 'Like error: ${errMessage.toString()}'));
+      }
+    }
+    final likesCollection = await FirebaseFirestore.instance
+        .collection(kPostsCollection)
+        .doc(postId)
+        .collection(kLikesCollection)
+        .get();
+    emit(ToggleLikeSuccessState());
+    return likesCollection;
+  }
 }

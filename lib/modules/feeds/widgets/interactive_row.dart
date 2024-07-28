@@ -60,7 +60,7 @@ class InteractiveRow extends StatelessWidget {
         ),
         const Spacer(),
         IconButton(
-          onPressed: (){},
+          onPressed: () {},
           icon: SvgPicture.asset(
             'lib/assets/images/share.svg',
           ),

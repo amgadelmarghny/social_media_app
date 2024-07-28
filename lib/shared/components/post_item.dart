@@ -16,11 +16,9 @@ class PostItem extends StatefulWidget {
   const PostItem({
     super.key,
     required this.postModel,
-    required this.likes,
     required this.postId,
   });
   final PostModel postModel;
-  final List<String> likes;
   final String postId;
 
   @override
@@ -30,35 +28,36 @@ class PostItem extends StatefulWidget {
 class _PostItemState extends State<PostItem> {
   bool isLike = false;
   final currentUser = FirebaseAuth.instance.currentUser!;
+  QuerySnapshot<Map<String, dynamic>>? likesCollection;
   @override
   void initState() {
-    isLike = widget.likes.contains(currentUser.email);
+    fetchLikes();
     super.initState();
+  }
+
+  Future<void> fetchLikes() async {
+    likesCollection = await FirebaseFirestore.instance
+        .collection(kPostsCollection)
+        .doc(widget.postId)
+        .collection(kLikesCollection)
+        .get();
+    final likesDocs = likesCollection!.docs;
+    setState(() {
+      isLike = likesDocs.any((doc) => doc.id == currentUser.uid);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    void toggleLike() {
-      BlocProvider.of<SocialCubit>(context).getPosts();
+
+    void toggleLike() async {
       setState(() {
-        isLike = !isLike;
+        isLike = ! isLike;
       });
-      //Access the document from firebase
-      DocumentReference docRef = FirebaseFirestore.instance
-          .collection(kPostsCollection)
-          .doc(widget.postId);
-      if (isLike) {
-        // if the user liked the post , add the use's email to the 'likes' filed
-        docRef.update({
-          'likes': FieldValue.arrayUnion([currentUser.email]),
-        });
-      } else {
-        // if the post is now unliked , remove the user from the list
-        docRef.update({
-          'likes': FieldValue.arrayRemove([currentUser.email]),
-        });
-      }
+        likesCollection = await BlocProvider.of<SocialCubit>(context)
+            .toggleLike(postId: widget.postId, isLike: isLike);
     }
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 5),
       padding: const EdgeInsets.only(top: 10, bottom: 10, right: 10, left: 10),
@@ -129,7 +128,7 @@ class _PostItemState extends State<PostItem> {
           //   height: 5,
           // ),
           InteractiveRow(
-            numOfLikes: widget.likes.length,
+            numOfLikes: likesCollection?.docs.length ?? 0,
             numOfComments: '0',
             isLike: isLike,
             onTap: toggleLike,

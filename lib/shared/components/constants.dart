@@ -1,6 +1,6 @@
 const kUsersCollection = 'users';
 const kPostsCollection = 'posts';
-const kLikeCollection = 'like';
+const kLikesCollection = 'likes';
 const kOnBoardingConst = 'onboarding';
 const kUidToken = 'token';
 const kDateTime = 'dateTime';

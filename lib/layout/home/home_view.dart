@@ -88,7 +88,7 @@ class _HomeViewState extends State<HomeView> {
                     return ConditionalBuilder(
                       condition:
                           BlocProvider.of<SocialCubit>(context).userModel !=
-                                  null ||
+                                  null &&
                               BlocProvider.of<SocialCubit>(context)
                                   .postsModelList
                                   .isNotEmpty,

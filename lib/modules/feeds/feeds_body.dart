@@ -31,6 +31,9 @@ class FeedsBody extends StatelessWidget {
             if (state is UploadPostImageFailureState) {
               showToast(msg: state.errMessage, toastState: ToastState.error);
             }
+            if (state is LikePostFailureState) {
+              showToast(msg: state.errMessage, toastState: ToastState.error);
+            }
             if (state is CreatePostFailureState) {
               showToast(msg: state.errMessage, toastState: ToastState.error);
             }
@@ -78,7 +81,6 @@ class FeedsBody extends StatelessWidget {
                         return PostItem(
                           postModel: socialCubit.postsModelList[index],
                           postId: socialCubit.postsIdList[index],
-                          likes:List<String>.from(socialCubit.postsModelList[index].likes ?? []) ,
                         );
                       },
                     );

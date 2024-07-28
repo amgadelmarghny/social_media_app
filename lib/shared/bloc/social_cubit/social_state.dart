@@ -77,13 +77,13 @@ final class RemovePickedFile extends SocialState {}
 final class RemovePostState extends SocialState {}
 
 // //////////////////! like post ///////////////
-// final class LikePostSuccessState extends SocialState {}
+final class ToggleLikeSuccessState extends SocialState {}
 
-// final class LikePostFailureState extends SocialState {
-//   final String errMessage;
+final class LikePostFailureState extends SocialState {
+  final String errMessage;
 
-//   LikePostFailureState({required this.errMessage});
-// }
+  LikePostFailureState({required this.errMessage});
+}
 
 ////////////////! get posts /////////////////
 final class GetPostsLoadingState extends SocialState {}
