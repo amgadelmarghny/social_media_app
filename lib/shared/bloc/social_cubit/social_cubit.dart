@@ -333,12 +333,16 @@ class SocialCubit extends Cubit<SocialState> {
             errMessage: 'Like error: ${errMessage.toString()}'));
       }
     }
-    final likesCollection = await FirebaseFirestore.instance
+    final likesCollection = await getLikes(postId);
+    emit(ToggleLikeSuccessState());
+    return likesCollection;
+  }
+
+  Future getLikes(String postId) async {
+    return await FirebaseFirestore.instance
         .collection(kPostsCollection)
         .doc(postId)
         .collection(kLikesCollection)
         .get();
-    emit(ToggleLikeSuccessState());
-    return likesCollection;
   }
 }

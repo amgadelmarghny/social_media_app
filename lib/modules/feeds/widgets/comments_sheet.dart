@@ -29,7 +29,7 @@ class CommentsSheet extends StatelessWidget {
                 style: FontsStyle.font18Popin(isShadow: true),
                 controller: commentController,
                 decoration: InputDecoration(
-                  hintStyle: FontsStyle.font18Popin(isShadow: true),
+                  hintStyle: FontsStyle.font18Popin(isShadow: true,),
                   suffixIconColor: defaultColor,
                   suffixIcon: IconButton(
                     onPressed: () {
@@ -37,7 +37,7 @@ class CommentsSheet extends StatelessWidget {
                     },
                     icon: const Icon(Icons.send_outlined),
                   ),
-                  hintText: 'Write comment...',
+                  hintText: 'Write a comment...',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
