@@ -17,12 +17,14 @@ abstract class FontsStyle {
   }
 
   static TextStyle font18Popin(
-      {Color color = Colors.white, bool isShadow = false}) {
+      {Color color = Colors.white,
+      bool isShadow = false,
+      bool isOverflow = true}) {
     return GoogleFonts.poppins(
       textStyle: TextStyle(
         color: color,
         fontSize: 18,
-        overflow: TextOverflow.ellipsis,
+        overflow: isOverflow ? TextOverflow.ellipsis : null,
         fontWeight: color != Colors.white ? FontWeight.w500 : null,
         shadows: isShadow
             ? [
@@ -72,6 +74,13 @@ abstract class FontsStyle {
       fontWeight: FontWeight.bold,
     );
   }
+
+  static const TextStyle font21ColorBold = TextStyle(
+    fontSize: 21,
+    color: Color(0xff6D4ACD),
+    fontWeight: FontWeight.w800,
+    overflow: TextOverflow.ellipsis,
+  );
 
   static const TextStyle font24Shadow = TextStyle(
     fontSize: 24,

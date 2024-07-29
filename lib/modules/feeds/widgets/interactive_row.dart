@@ -3,7 +3,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:social_media_app/modules/feeds/widgets/comments_sheet.dart';
 import 'package:social_media_app/shared/style/theme/constant.dart';
 import '../../../shared/style/fonts/font_style.dart';
-import '../../new_post/new_post.dart';
 
 class InteractiveRow extends StatelessWidget {
   const InteractiveRow({
