@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:social_media_app/models/user_model.dart';
 import 'package:social_media_app/modules/feeds/widgets/comments_sheet.dart';
+import 'package:social_media_app/shared/bloc/comments_cubit/comments_cubit.dart';
 import 'package:social_media_app/shared/style/theme/constant.dart';
 import '../../../shared/style/fonts/font_style.dart';
 
@@ -11,12 +14,16 @@ class InteractiveRow extends StatelessWidget {
     required this.numOfComments,
     required this.isLike,
     this.onLikeButtonTap,
+    required this.postId,
+    required this.userModel,
   });
+
   final int numOfLikes;
   final String numOfComments;
-
+  final String postId;
   final bool isLike;
   final void Function()? onLikeButtonTap;
+  final UserModel userModel;
 
   @override
   Widget build(BuildContext context) {
@@ -49,10 +56,17 @@ class InteractiveRow extends StatelessWidget {
               context: context,
               isScrollControlled: true,
               builder: (context) {
-                return const FractionallySizedBox(
+                return FractionallySizedBox(
                   heightFactor:
-                  1.0, // This makes the bottom sheet take the full height
-                  child: CommentsSheet(),
+                      1.0, // This makes the bottom sheet take the full height
+                  child: BlocProvider(
+                    create: (context) =>
+                        CommentsCubit()..getComments(postId: postId),
+                    child: CommentsSheet(
+                      postId: postId,
+                      userModel: userModel,
+                    ),
+                  ),
                 );
               },
             );
@@ -74,9 +88,7 @@ class InteractiveRow extends StatelessWidget {
         ),
         const Spacer(),
         IconButton(
-          onPressed: () {
-
-          },
+          onPressed: () {},
           icon: SvgPicture.asset(
             'lib/assets/images/share.svg',
           ),

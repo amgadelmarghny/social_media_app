@@ -108,7 +108,6 @@ class SocialCubit extends Cubit<SocialState> {
       emit(PickImageSuccessState());
       return File(returnImage.path);
     } else {
-      debugPrint('No image selected');
       emit(PickImageFailureState(errMessage: 'No image selected'));
       return null;
     }

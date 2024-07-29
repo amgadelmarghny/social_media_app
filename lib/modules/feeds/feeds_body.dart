@@ -81,6 +81,7 @@ class FeedsBody extends StatelessWidget {
                         return PostItem(
                           postModel: socialCubit.postsModelList[index],
                           postId: socialCubit.postsIdList[index],
+                          userModel: socialCubit.userModel!,
                         );
                       },
                     );

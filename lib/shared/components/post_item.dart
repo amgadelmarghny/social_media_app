@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:social_media_app/models/post_model.dart';
+import 'package:social_media_app/models/user_model.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
 import '../../modules/feeds/widgets/hashtag.dart';
@@ -17,9 +18,11 @@ class PostItem extends StatefulWidget {
     super.key,
     required this.postModel,
     required this.postId,
+    required this.userModel,
   });
   final PostModel postModel;
   final String postId;
+  final UserModel userModel;
 
   @override
   State<PostItem> createState() => _PostItemState();
@@ -132,6 +135,8 @@ class _PostItemState extends State<PostItem> {
             numOfComments: '0',
             isLike: isLike,
             onLikeButtonTap: toggleLike,
+            postId: widget.postId,
+            userModel: widget.userModel,
           ),
         ],
       ),

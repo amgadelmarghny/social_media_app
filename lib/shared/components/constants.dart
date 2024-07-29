@@ -8,3 +8,4 @@ const kDateTime = 'dateTime';
 const kProfileFolder = 'profile';
 const kCoverFolder = 'cover';
 const kPostFolder = 'post';
+const kCommentFolder = 'comment';

@@ -6,6 +6,7 @@ class CommentModel {
   final String? profilePhoto;
   final String? commentPhoto;
   final DateTime dateTime;
+  final String userUid;
 
   CommentModel({
     required this.userName,
@@ -13,10 +14,12 @@ class CommentModel {
     required this.profilePhoto,
     required this.commentPhoto,
     required this.dateTime,
+    required this.userUid,
   });
 
   factory CommentModel.fromJson(Map<String, dynamic> json) {
     return CommentModel(
+      userUid: json['userUid'],
       userName: json['userName'],
       comment: json['comment'],
       profilePhoto: json['profilePhoto'],
@@ -27,6 +30,7 @@ class CommentModel {
 
   Map<String, dynamic> toMap() {
     return {
+      'userUid': userUid,
       'userName': userName,
       'comment': comment,
       'profilePhoto': profilePhoto,
