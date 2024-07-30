@@ -24,12 +24,10 @@ class CommentsSheet extends StatelessWidget {
           body: BlocListener<CommentsCubit, CommentsState>(
             listener: (BuildContext context, CommentsState state) {
               if (state is PickImageFailureState) {
-                showToast(
-                    msg: state.errMessage, toastState: ToastState.error);
+                showToast(msg: state.errMessage, toastState: ToastState.error);
               }
               if (state is UploadCommentImageFailureState) {
-                showToast(
-                    msg: state.errMessage, toastState: ToastState.error);
+                showToast(msg: state.errMessage, toastState: ToastState.error);
               }
               if (state is GetCommentsFailure) {
                 showToast(msg: state.error, toastState: ToastState.error);
