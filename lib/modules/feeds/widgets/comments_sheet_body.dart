@@ -43,14 +43,7 @@ class CommentsSheetBody extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: ListView.builder(
                       itemBuilder: (context, index) => CommentItem(
-                        userName:
-                            commentsCubit.commentsModelList[index].userName,
-                        commentContent:
-                            commentsCubit.commentsModelList[index].comment!,
-                        dateTime: timeAgo(
-                            commentsCubit.commentsModelList[index].dateTime),
-                        profilePhoto:
-                            commentsCubit.commentsModelList[index].profilePhoto,
+                    commentModel: commentsCubit.commentsModelList[index],
                       ),
                       itemCount: commentsCubit.commentsModelList.length,
                     ),
