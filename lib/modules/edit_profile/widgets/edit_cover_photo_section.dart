@@ -46,7 +46,8 @@ class CoverPhotoSection extends StatelessWidget {
                   ),
                   errorWidget: (context, url, error) => const Center(
                     child: Icon(
-                      Icons.error,
+                      Icons.error_outline,
+                      size: 30,
                       color: Colors.red,
                     ),
                   ),

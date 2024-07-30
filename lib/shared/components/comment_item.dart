@@ -1,8 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:readmore/readmore.dart';
 import 'package:social_media_app/models/comment_model.dart';
 import 'package:social_media_app/shared/components/profile_picture_with_story.dart';
-import 'package:social_media_app/shared/style/theme/constant.dart';
 import '../style/fonts/font_style.dart';
 import 'custom_time_ago.dart';
 
@@ -11,7 +11,6 @@ class CommentItem extends StatelessWidget {
     super.key,
     required this.commentModel,
   });
-
   final CommentModel commentModel;
 
   @override
@@ -72,8 +71,25 @@ class CommentItem extends StatelessWidget {
                           clipBehavior: Clip.hardEdge,
                           margin: const EdgeInsets.symmetric(vertical: 5),
                           decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10)),
-                          child: Image.network(commentModel.commentPhoto!),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: CachedNetworkImage(
+                            fit: BoxFit.cover,
+                            imageUrl: commentModel.commentPhoto!,
+                            placeholder: (context, url) => const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                            errorWidget: (context, url, error) => const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Center(
+                                child: Icon(
+                                  Icons.error_outline,
+                                  size: 30,
+                                  color: Colors.red,
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
                     ],
                   ),
