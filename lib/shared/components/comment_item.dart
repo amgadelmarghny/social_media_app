@@ -59,7 +59,11 @@ class CommentItem extends StatelessWidget {
                       if (commentModel.commentPhoto != null)
                         Container(
                           clipBehavior: Clip.hardEdge,
+<<<<<<< HEAD
                           margin: const EdgeInsets.symmetric(vertical: 5),
+=======
+                          margin: const EdgeInsets.only(bottom: 5),
+>>>>>>> 40b4934daf823d8037bfb41c569c7d7ae1eefecb
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10)),
                           child: Image.network(commentModel.commentPhoto!),
