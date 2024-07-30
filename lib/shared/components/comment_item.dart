@@ -1,96 +1,104 @@
 import 'package:flutter/material.dart';
+import 'package:social_media_app/models/comment_model.dart';
 import 'package:social_media_app/shared/components/profile_picture_with_story.dart';
 import '../style/fonts/font_style.dart';
+import 'custom_time_ago.dart';
 
 class CommentItem extends StatelessWidget {
   const CommentItem({
     super.key,
-    required this.userName,
-    required this.commentContent,
-    required this.dateTime,
-    required this.profilePhoto,
+    required this.commentModel,
   });
-  final String? profilePhoto;
-  final String userName;
-  final String commentContent;
-  final String dateTime;
-  
+
+  final CommentModel commentModel;
+
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ProfilePictureWithStory(
-          image: profilePhoto,
-          size: 70,
-        ),
-        const SizedBox(
-          width: 10,
-        ),
-        Flexible(
-          child: Column(
-            children: [
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(18),
-                  color: const Color(0xffCCC4D0),
+    return Padding(
+      padding: const EdgeInsets.only(top: 5),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ProfilePictureWithStory(
+            image: commentModel.profilePhoto,
+            size: 70,
+          ),
+          const SizedBox(
+            width: 10,
+          ),
+          Flexible(
+            child: Column(
+              children: [
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(18),
+                    color: const Color(0xffCCC4D0),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        commentModel.userName,
+                        style: FontsStyle.font21ColorBold,
+                      ),
+                      const SizedBox(
+                        height: 1,
+                      ),
+                      if (commentModel.comment!.isNotEmpty)
+                        Text(
+                          commentModel.comment!,
+                          style: FontsStyle.font18Popin(
+                            isOverflow: false,
+                            color: const Color(0xff6D4ACD),
+                          ),
+                        ),
+                      if (commentModel.commentPhoto != null)
+                        Container(
+                          clipBehavior: Clip.hardEdge,
+                          margin: const EdgeInsets.symmetric(vertical: 5),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10)),
+                          child: Image.network(commentModel.commentPhoto!),
+                        ),
+                    ],
+                  ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                Row(
                   children: [
                     Text(
-                      userName,
-                      style: FontsStyle.font21ColorBold,
+                      timeAgo(commentModel.dateTime),
+                      style: FontsStyle.font18Popin(isShadow: true),
                     ),
-                    const SizedBox(
-                      height: 1,
-                    ),
-                    if (commentContent.isNotEmpty)
-                      Text(
-                        commentContent,
-                        style: FontsStyle.font18Popin(
-                          isOverflow: false,
-                          color: const Color(0xff6D4ACD),
-                        ),
+                    const Spacer(),
+                    TextButton(
+                      onPressed: () {},
+                      child: Text(
+                        'Like',
+                        style: FontsStyle.font18Popin(isShadow: true),
                       ),
+                    ),
+                    const Spacer(),
+                    TextButton(
+                      onPressed: () {},
+                      child: Text(
+                        'Reply',
+                        style: FontsStyle.font18Popin(isShadow: true),
+                      ),
+                    ),
+                    const Spacer(
+                      flex: 5,
+                    ),
                   ],
-                ),
-              ),
-              Row(
-                children: [
-                  Text(
-                    dateTime,
-                    style: FontsStyle.font18Popin(isShadow: true),
-                  ),
-                  const Spacer(),
-                  TextButton(
-                    onPressed: () {},
-                    child: Text(
-                      'Like',
-                      style: FontsStyle.font18Popin(isShadow: true),
-                    ),
-                  ),
-                  const Spacer(),
-                  TextButton(
-                    onPressed: () {},
-                    child: Text(
-                      'Reply',
-                      style: FontsStyle.font18Popin(isShadow: true),
-                    ),
-                  ),
-                  const Spacer(
-                    flex: 5,
-                  ),
-                ],
-              )
-            ],
-          ),
-        )
-      ],
+                )
+              ],
+            ),
+          )
+        ],
+      ),
     );
   }
 }
