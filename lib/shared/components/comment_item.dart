@@ -5,16 +5,24 @@ import '../style/fonts/font_style.dart';
 class CommentItem extends StatelessWidget {
   const CommentItem({
     super.key,
+    required this.userName,
+    required this.commentContent,
+    required this.dateTime,
+    required this.profilePhoto,
   });
-
+  final String? profilePhoto;
+  final String userName;
+  final String commentContent;
+  final String dateTime;
+  
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const ProfilePictureWithStory(
-          image:
-              'https://firebasestorage.googleapis.com/v0/b/social-app-97290.appspot.com/o/users%2Fprofile%2FIMG_20210310_082337.jpg?alt=media&token=a59cec17-25c5-462d-826b-9419816e6ef4',
+        ProfilePictureWithStory(
+          image: profilePhoto,
           size: 70,
         ),
         const SizedBox(
@@ -26,6 +34,7 @@ class CommentItem extends StatelessWidget {
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                width: double.infinity,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(18),
                   color: const Color(0xffCCC4D0),
@@ -33,25 +42,28 @@ class CommentItem extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Amgad Marghny',
+                    Text(
+                      userName,
                       style: FontsStyle.font21ColorBold,
                     ),
                     const SizedBox(
                       height: 1,
                     ),
-                    Text(
-                      'Amgad Marghnydrgrkscewrvbbbbbbjjjjjjjj',
-                      style: FontsStyle.font18Popin(
-                          isOverflow: false, color: const Color(0xff6D4ACD)),
-                    ),
+                    if (commentContent.isNotEmpty)
+                      Text(
+                        commentContent,
+                        style: FontsStyle.font18Popin(
+                          isOverflow: false,
+                          color: const Color(0xff6D4ACD),
+                        ),
+                      ),
                   ],
                 ),
               ),
               Row(
                 children: [
                   Text(
-                    '1 hour',
+                    dateTime,
                     style: FontsStyle.font18Popin(isShadow: true),
                   ),
                   const Spacer(),

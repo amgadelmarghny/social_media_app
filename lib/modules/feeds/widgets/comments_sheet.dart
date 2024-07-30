@@ -14,26 +14,34 @@ class CommentsSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: themeColor(),
-      padding: const EdgeInsets.only(top: 40),
-      child: Scaffold(
-        appBar: AppBar(),
-        body: BlocListener<CommentsCubit, CommentsState>(
-          listener: (BuildContext context, CommentsState state) {
-            if (state is PickImageFailureState) {
-              showToast(msg: state.errMessage, toastState: ToastState.error);
-            }
-            if (state is UploadCommentImageFailureState) {
-              showToast(msg: state.errMessage, toastState: ToastState.error);
-            }
-            if (state is AddCommentFailure) {
-              showToast(msg: state.error, toastState: ToastState.error);
-            }
-          },
-          child: CommentsSheetBody(
-            userModel: userModel,
-            postId: postId,
+    return BlocProvider(
+      create: (context) => CommentsCubit()..getComments(postId: postId),
+      child: Container(
+        decoration: themeColor(),
+        padding: const EdgeInsets.only(top: 40),
+        child: Scaffold(
+          appBar: AppBar(),
+          body: BlocListener<CommentsCubit, CommentsState>(
+            listener: (BuildContext context, CommentsState state) {
+              if (state is PickImageFailureState) {
+                showToast(
+                    msg: state.errMessage, toastState: ToastState.error);
+              }
+              if (state is UploadCommentImageFailureState) {
+                showToast(
+                    msg: state.errMessage, toastState: ToastState.error);
+              }
+              if (state is GetCommentsFailure) {
+                showToast(msg: state.error, toastState: ToastState.error);
+              }
+              if (state is AddCommentFailure) {
+                showToast(msg: state.error, toastState: ToastState.error);
+              }
+            },
+            child: CommentsSheetBody(
+              userModel: userModel,
+              postId: postId,
+            ),
           ),
         ),
       ),

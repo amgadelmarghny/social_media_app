@@ -41,8 +41,7 @@ class CommentsCubit extends Cubit<CommentsState> {
           .collection(kPostsCollection)
           .doc(postId)
           .collection(kCommentsCollection)
-          .doc(currentUser.uid)
-          .set(commentModel.toMap());
+          .add(commentModel.toMap());
       emit(AddCommentSuccess());
       await getComments(postId: postId);
     } catch (err) {
@@ -71,21 +70,22 @@ class CommentsCubit extends Cubit<CommentsState> {
   List<CommentModel> commentsModelList = [];
   Future<void> getComments({required String postId}) async {
     emit(GetCommentsLoading());
-    try {
-      final commentsCollection = await FirebaseFirestore.instance
-          .collection(kPostsCollection)
-          .doc(postId)
-          .collection(kCommentsCollection)
-          .get();
-      numberOfComment = commentsCollection.docs.length;
-      commentsModelList.clear();
-      for (var comment in commentsCollection.docs) {
-        commentsModelList.add(CommentModel.fromJson(comment.data()));
-      }
-      emit(GetCommentsSuccess());
-    } catch (err) {
-      emit(GetCommentsFailure(error: err.toString()));
+    // try {
+    final commentsCollection = await FirebaseFirestore.instance
+        .collection(kPostsCollection)
+        .doc(postId)
+        .collection(kCommentsCollection)
+        .orderBy(kDateTime, descending: true)
+        .get();
+    numberOfComment = commentsCollection.docs.length;
+    commentsModelList.clear();
+    for (var comment in commentsCollection.docs) {
+      commentsModelList.add(CommentModel.fromJson(comment.data()));
     }
+    emit(GetCommentsSuccess());
+    // } catch (err) {
+    //   emit(GetCommentsFailure(error: err.toString()));
+    // }
   }
 
   void removeImage() {

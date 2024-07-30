@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../shared/components/constants.dart';
 
 class CommentModel {
   final String userName;
@@ -24,7 +25,7 @@ class CommentModel {
       comment: json['comment'],
       profilePhoto: json['profilePhoto'],
       commentPhoto: json['commentPhoto'],
-      dateTime: json['dateTime'].toData(),
+      dateTime: (json['dateTime'] as Timestamp).toDate(),
     );
   }
 
@@ -35,7 +36,7 @@ class CommentModel {
       'comment': comment,
       'profilePhoto': profilePhoto,
       'commentPhoto': commentPhoto,
-      'dateTime': Timestamp.fromDate(dateTime),
+      kDateTime: Timestamp.fromDate(dateTime),
     };
   }
 }
