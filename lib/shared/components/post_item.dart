@@ -4,10 +4,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:readmore/readmore.dart';
 import 'package:social_media_app/models/post_model.dart';
 import 'package:social_media_app/models/user_model.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
+import 'package:social_media_app/shared/style/theme/constant.dart';
 import '../../modules/feeds/widgets/hashtag.dart';
 import '../../modules/feeds/widgets/interactive_row.dart';
 import '../../modules/feeds/widgets/profile_post_row.dart';
@@ -63,8 +65,7 @@ class _PostItemState extends State<PostItem> {
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 5),
-      padding:
-          const EdgeInsets.only(top: 10, bottom: 10, right: 10, left: 10),
+      padding: const EdgeInsets.only(top: 10, bottom: 10, right: 10, left: 10),
       width: double.infinity,
       decoration: BoxDecoration(
         color: const Color(0xff6D4ACD).withOpacity(0.40),
@@ -82,9 +83,16 @@ class _PostItemState extends State<PostItem> {
           if (widget.postModel.content != null)
             Padding(
               padding: const EdgeInsets.only(top: 10),
-              child: Text(
+              child: ReadMoreText(
                 widget.postModel.content!,
+                trimMode: TrimMode.Line,
+                trimLines: 4,
+                colorClickableText: Colors.pink,
+                trimCollapsedText: 'Show more',
+                trimExpandedText: 'Show less',
                 style: FontsStyle.font15Popin(),
+                lessStyle: FontsStyle.font15Popin(color: defaultColor),
+                moreStyle: FontsStyle.font15Popin(color: defaultColor),
               ),
             ),
           // hashtags

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:readmore/readmore.dart';
 import 'package:social_media_app/models/comment_model.dart';
 import 'package:social_media_app/shared/components/profile_picture_with_story.dart';
+import 'package:social_media_app/shared/style/theme/constant.dart';
 import '../style/fonts/font_style.dart';
 import 'custom_time_ago.dart';
 
@@ -49,21 +51,26 @@ class CommentItem extends StatelessWidget {
                         height: 1,
                       ),
                       if (commentModel.comment!.isNotEmpty)
-                        Text(
+                        ReadMoreText(
                           commentModel.comment!,
+                          trimMode: TrimMode.Line,
+                          trimLines: 3,
+                          colorClickableText: Colors.pink,
+                          trimCollapsedText: 'Show more',
+                          trimExpandedText: 'Show less',
                           style: FontsStyle.font18Popin(
                             isOverflow: false,
                             color: const Color(0xff6D4ACD),
                           ),
+                          lessStyle: FontsStyle.font15Popin(
+                              color: Colors.grey.shade700),
+                          moreStyle: FontsStyle.font15Popin(
+                              color: Colors.grey.shade700),
                         ),
                       if (commentModel.commentPhoto != null)
                         Container(
                           clipBehavior: Clip.hardEdge,
-<<<<<<< HEAD
                           margin: const EdgeInsets.symmetric(vertical: 5),
-=======
-                          margin: const EdgeInsets.only(bottom: 5),
->>>>>>> 40b4934daf823d8037bfb41c569c7d7ae1eefecb
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10)),
                           child: Image.network(commentModel.commentPhoto!),

@@ -2,7 +2,6 @@ import 'package:conditional_builder_null_safety/conditional_builder_null_safety.
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
-import 'package:social_media_app/shared/components/custom_time_ago.dart';
 import '../../../models/user_model.dart';
 import '../../../shared/bloc/comments_cubit/comments_cubit.dart';
 import '../../../shared/components/comment_item.dart';
