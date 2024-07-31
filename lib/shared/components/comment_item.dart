@@ -55,16 +55,16 @@ class CommentItem extends StatelessWidget {
                           trimMode: TrimMode.Line,
                           trimLines: 3,
                           colorClickableText: Colors.pink,
-                          trimCollapsedText: 'Show more',
-                          trimExpandedText: 'Show less',
+                          trimCollapsedText: 'more',
+                          trimExpandedText: ' less',
                           style: FontsStyle.font18Popin(
                             isOverflow: false,
                             color: const Color(0xff6D4ACD),
                           ),
                           lessStyle: FontsStyle.font15Popin(
-                              color: Colors.grey.shade700),
+                              color: Colors.grey.shade600),
                           moreStyle: FontsStyle.font15Popin(
-                              color: Colors.grey.shade700),
+                              color: Colors.grey.shade600),
                         ),
                       if (commentModel.commentPhoto != null)
                         Container(
