@@ -6,9 +6,11 @@ import 'package:social_media_app/layout/home/home_view.dart';
 import 'package:social_media_app/modules/edit_profile/edit_profile_view.dart';
 import 'package:social_media_app/modules/login/login_view.dart';
 import 'package:social_media_app/modules/on_boarding/on_boarding_view.dart';
+import 'package:social_media_app/modules/post/post_view.dart';
 import 'package:social_media_app/modules/register/register_view.dart';
 import 'package:social_media_app/shared/bloc/app_cubit/app_cubit.dart';
 import 'package:social_media_app/shared/bloc/bloc_observer.dart';
+import 'package:social_media_app/shared/bloc/comments_cubit/comments_cubit.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/network/local/cache_helper.dart';
 import 'package:social_media_app/shared/components/constants.dart';
@@ -45,6 +47,9 @@ class SocialMediaApp extends StatelessWidget {
       providers: [
         BlocProvider(
           create: (context) => AppCubit(),
+        ),
+        BlocProvider(
+          create: (context) => CommentsCubit(),
         ),
         BlocProvider(
           create: (context) => SocialCubit()

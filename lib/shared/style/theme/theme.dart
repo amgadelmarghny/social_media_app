@@ -19,7 +19,7 @@ abstract class CustomThemeMode {
     ),
     iconButtonTheme: IconButtonThemeData(
       style: ButtonStyle(
-        iconColor: WidgetStateProperty .resolveWith((states) => Colors.white),
+        iconColor: WidgetStateProperty.resolveWith((states) => Colors.white),
       ),
     ),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
@@ -30,9 +30,11 @@ abstract class CustomThemeMode {
       showSelectedLabels: false,
       showUnselectedLabels: false,
     ),
-    appBarTheme: const AppBarTheme(
+    appBarTheme: AppBarTheme(
+      centerTitle: true,
       backgroundColor: Colors.transparent,
-      systemOverlayStyle: SystemUiOverlayStyle(
+      titleTextStyle: FontsStyle.font20Poppins.copyWith(color: Colors.white),
+      systemOverlayStyle: const SystemUiOverlayStyle(
         systemStatusBarContrastEnforced: true,
         statusBarColor: Colors.transparent,
         systemNavigationBarColor: Colors.transparent,
@@ -51,14 +53,14 @@ abstract class CustomThemeMode {
     iconTheme: const IconThemeData(color: Colors.white),
     iconButtonTheme: IconButtonThemeData(
       style: ButtonStyle(
-        iconColor: WidgetStateProperty .resolveWith((states) => Colors.white),
+        iconColor: WidgetStateProperty.resolveWith((states) => Colors.white),
       ),
     ),
     searchBarTheme: SearchBarThemeData(
-      hintStyle: WidgetStateProperty .resolveWith(
-          (states) => FontsStyle.font18Popin()),
+      hintStyle:
+          WidgetStateProperty.resolveWith((states) => FontsStyle.font18Popin()),
       backgroundColor:
-          WidgetStateProperty .resolveWith((states) => const Color(0xff635A8F)),
+          WidgetStateProperty.resolveWith((states) => const Color(0xff635A8F)),
     ),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       selectedItemColor: Color(0xff635A8F),
@@ -68,9 +70,11 @@ abstract class CustomThemeMode {
       showSelectedLabels: false,
       showUnselectedLabels: false,
     ),
-    appBarTheme: const AppBarTheme(
+    appBarTheme: AppBarTheme(
       backgroundColor: Colors.transparent,
-      systemOverlayStyle: SystemUiOverlayStyle(
+      titleTextStyle: FontsStyle.font20Poppins.copyWith(color: Colors.white),
+      centerTitle: true,
+      systemOverlayStyle: const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
         systemNavigationBarColor: Colors.transparent,
         systemNavigationBarDividerColor: Colors.transparent,
