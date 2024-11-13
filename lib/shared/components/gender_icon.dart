@@ -12,8 +12,8 @@ class GenderIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
-      height: 60,
-      width: 100,
+      height: height,
+      width: width,
       duration: const Duration(milliseconds: 300),
       decoration: ShapeDecoration(
         shape: RoundedRectangleBorder(
