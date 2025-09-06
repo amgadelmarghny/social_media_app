@@ -1,15 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social_media_app/layout/home/home_view.dart';
 import 'package:social_media_app/shared/bloc/login_cubit/login_cubit.dart';
-import 'package:social_media_app/shared/components/constants.dart';
 import 'package:social_media_app/shared/components/custom_button.dart';
-import 'package:social_media_app/shared/components/navigators.dart';
-import 'package:social_media_app/shared/components/show_toast.dart';
 import 'package:social_media_app/shared/components/text_form_field.dart';
-import 'package:social_media_app/shared/network/local/cache_helper.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
-
 import '../../../shared/style/theme/constant.dart';
 
 class LoginFieldsAndButton extends StatelessWidget {
@@ -19,16 +13,7 @@ class LoginFieldsAndButton extends StatelessWidget {
   Widget build(BuildContext context) {
     double height = MediaQuery.sizeOf(context).height;
 
-    return BlocConsumer<LoginCubit, LoginState>(
-      listener: (context, state) {
-        if (state is LoginFailureState) {
-          showToast(msg: state.errMessage, toastState: ToastState.error);
-        }
-        if (state is LoginSuccessState) {
-          CacheHelper.setData(key: kUidToken, value: state.uid);
-          pushAndRemoveView(context, newRouteName: HomeView.routeViewName);
-        }
-      },
+    return BlocBuilder<LoginCubit, LoginState>(
       builder: (context, state) {
         LoginCubit loginCubit = BlocProvider.of<LoginCubit>(context);
 

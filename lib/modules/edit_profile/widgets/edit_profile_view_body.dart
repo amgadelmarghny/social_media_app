@@ -16,7 +16,7 @@ class EditProfileViewBody extends StatefulWidget {
 class _EditProfileViewBodyState extends State<EditProfileViewBody> {
   @override
   Widget build(BuildContext context) {
-    return const Padding(
+    return Padding(
       padding: EdgeInsets.only(top: 10, left: 15, right: 15),
       child: SingleChildScrollView(
         child: Column(
@@ -25,18 +25,18 @@ class _EditProfileViewBodyState extends State<EditProfileViewBody> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ProfilePictureSection(),
+                  const ProfilePictureSection(),
                   SizedBox(
                     height: 10,
                   ),
-                  Divider(
+                  const Divider(
                     thickness: 0.9,
                   ),
-                  CoverPhotoSection(),
-                  SizedBox(
+                  const CoverPhotoSection(),
+                  const SizedBox(
                     height: 10,
                   ),
-                  Divider(
+                  const Divider(
                     thickness: 0.9,
                     color: Colors.white70,
                   ),
@@ -44,7 +44,7 @@ class _EditProfileViewBodyState extends State<EditProfileViewBody> {
                     'Profile',
                     style: FontsStyle.font25Bold,
                   ),
-                  Card(
+                  const Card(
                     child: Column(
                       children: [
                         EditUserNameSection(),

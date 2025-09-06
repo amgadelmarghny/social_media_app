@@ -6,7 +6,6 @@ import 'package:social_media_app/layout/home/home_view.dart';
 import 'package:social_media_app/modules/edit_profile/edit_profile_view.dart';
 import 'package:social_media_app/modules/login/login_view.dart';
 import 'package:social_media_app/modules/on_boarding/on_boarding_view.dart';
-import 'package:social_media_app/modules/post/post_view.dart';
 import 'package:social_media_app/modules/register/register_view.dart';
 import 'package:social_media_app/shared/bloc/app_cubit/app_cubit.dart';
 import 'package:social_media_app/shared/bloc/bloc_observer.dart';
@@ -69,6 +68,8 @@ class SocialMediaApp extends StatelessWidget {
           RegisterView.routeViewName: (context) => const RegisterView(),
           HomeView.routeViewName: (context) => const HomeView(),
           EditProfileView.routeViewName: (context) => const EditProfileView(),
+          // Note: PostView is not included in the routes table because it requires arguments to be passed to its constructor.
+          // To navigate to PostView, use Navigator.push and provide the required  to the PostView constructor.attributes
         },
       ),
     );

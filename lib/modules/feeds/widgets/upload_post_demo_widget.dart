@@ -27,7 +27,7 @@ class UploadPostDemo extends StatelessWidget {
                   left: 10),
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Colors.grey.shade300.withOpacity(0.6),
+                color: Colors.grey.shade300.withValues(alpha: 0.6),
                 borderRadius: BorderRadius.circular(25),
               ),
               child: Opacity(

@@ -15,6 +15,8 @@ class InteractiveRow extends StatelessWidget {
     this.onLikeButtonTap,
     required this.postId,
     required this.userModel,
+    // required this.numOfComments,
+    this.showCommentSheet = true,
   });
 
   final int numOfLikes;
@@ -22,6 +24,7 @@ class InteractiveRow extends StatelessWidget {
   final bool isLike;
   final void Function()? onLikeButtonTap;
   final UserModel userModel;
+  final bool showCommentSheet;
 
   @override
   Widget build(BuildContext context) {
@@ -47,24 +50,25 @@ class InteractiveRow extends StatelessWidget {
         const SizedBox(
           width: 5,
         ),
-        InkWell(
-          splashColor: const Color(0xff8862D9),
-          onTap: () {
-            showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              builder: (context) {
-                return FractionallySizedBox(
-                  heightFactor:
-                      1.0, // This makes the bottom sheet take the full height
-                  child: CommentsSheet(
-                    postId: postId,
-                    userModel: userModel,
-                  ),
-                );
-              },
-            );
-          },
+        GestureDetector(
+          onTap: showCommentSheet
+              ? () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (context) {
+                      return FractionallySizedBox(
+                        heightFactor:
+                            1.0, // This makes the bottom sheet take the full height
+                        child: CommentsPostSection(
+                          postId: postId,
+                          userModel: userModel,
+                        ),
+                      );
+                    },
+                  );
+                }
+              : null,
           child: BlocBuilder<CommentsCubit, CommentsState>(
               builder: (context, state) {
             return Row(

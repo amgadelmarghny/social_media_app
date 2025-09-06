@@ -54,7 +54,8 @@ class _EditUserBirthdaySectionState extends State<EditUserBirthdaySection> {
                     lastDate: DateTime.now(),
                   ).then(
                     (value) {
-                      if (value != null) {
+                      if (value != null && context.mounted) {
+                      
                         BlocProvider.of<SocialCubit>(context)
                             .birthdayController
                             .text = DateFormat.yMMMd().format(value);

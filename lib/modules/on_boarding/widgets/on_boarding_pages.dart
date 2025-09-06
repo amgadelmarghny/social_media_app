@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/models/onBoarding/on_boarding_model.dart';
+import 'package:social_media_app/shared/bloc/app_cubit/app_cubit.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
 
 class OnBoardingPages extends StatelessWidget {
@@ -10,36 +12,38 @@ class OnBoardingPages extends StatelessWidget {
   final OnBoardingModel onBoardingModel;
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(
-          height: 15,
-        ),
-        Text(
-          onBoardingModel.title,
-          style: FontsStyle.font36BoldShadow,
-        ),
-        Text(
-          onBoardingModel.subTitle,
-          style: FontsStyle.font24Shadow,
-        ),
-        Row(
+    return BlocBuilder<AppCubit, AppState>(
+      builder: (context, state) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'moment with',
+            Text(
+              onBoardingModel.subTitle,
               style: FontsStyle.font24Shadow,
             ),
-            const SizedBox(
-              width: 8,
-            ),
-            Image.asset(
-              'lib/assets/images/Ciao.png',
-              height: 30,
-            ),
+            BlocProvider.of<AppCubit>(context)
+                        .onBoardingModelsList
+                        .indexOf(onBoardingModel) ==
+                    0
+                ? Row(
+                    children: [
+                      Text(
+                        'moment with',
+                        style: FontsStyle.font24Shadow,
+                      ),
+                      const SizedBox(
+                        width: 8,
+                      ),
+                      Image.asset(
+                        'lib/assets/images/Ciao.png',
+                        height: 30,
+                      ),
+                    ],
+                  )
+                : const SizedBox(),
           ],
-        ),
-      ],
+        );
+      },
     );
   }
 }

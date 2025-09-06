@@ -6,8 +6,8 @@ import 'package:social_media_app/shared/style/theme/theme.dart';
 import '../../../models/user_model.dart';
 import 'comments_sheet_body.dart';
 
-class CommentsSheet extends StatelessWidget {
-  const CommentsSheet(
+class CommentsPostSection extends StatelessWidget {
+  const CommentsPostSection(
       {super.key, required this.postId, required this.userModel});
   final String postId;
   final UserModel userModel;

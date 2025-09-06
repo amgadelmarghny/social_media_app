@@ -1,7 +1,8 @@
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
+import 'package:social_media_app/shared/components/custom_refresh_indicator.dart';
+// import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import '../../../models/user_model.dart';
 import '../../../shared/bloc/comments_cubit/comments_cubit.dart';
 import '../../../shared/components/comment_item.dart';
@@ -26,14 +27,14 @@ class CommentsSheetBody extends StatelessWidget {
             Expanded(
               child: ConditionalBuilder(
                 condition: commentsCubit.commentsModelList.isNotEmpty,
-                builder: (context) => LiquidPullToRefresh(
-                  showChildOpacityTransition: false,
-                  backgroundColor: const Color(0xff8862D9),
-                  springAnimationDurationInMilliseconds: 500,
-                  animSpeedFactor: 1.8,
-                  color: const Color(0xffC58DEB),
-                  borderWidth: 3,
-                  height: 100,
+                builder: (context) => CustomRefreshIndicator(
+                  // showChildOpacityTransition: false,
+                  // backgroundColor: const Color(0xff8862D9),
+                  // springAnimationDurationInMilliseconds: 500,
+                  // animSpeedFactor: 1.8,
+                  // color: const Color(0xffC58DEB),
+                  // borderWidth: 3,
+                  // height: 100,
                   onRefresh: () async {
                     await BlocProvider.of<CommentsCubit>(context)
                         .getComments(postId: postId);
@@ -42,7 +43,7 @@ class CommentsSheetBody extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: ListView.builder(
                       itemBuilder: (context, index) => CommentItem(
-                    commentModel: commentsCubit.commentsModelList[index],
+                        commentModel: commentsCubit.commentsModelList[index],
                       ),
                       itemCount: commentsCubit.commentsModelList.length,
                     ),
@@ -85,12 +86,17 @@ class CommentsSheetBody extends StatelessWidget {
                 ],
               ),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+              padding: EdgeInsets.only(
+                top: 5,
+                right: 15,
+                left: 15,
+                bottom: MediaQuery.paddingOf(context).bottom,
+              ),
               child: SendCommentButton(
                 userModel: userModel,
                 postId: postId,
               ),
-            )
+            ),
           ],
         );
       },

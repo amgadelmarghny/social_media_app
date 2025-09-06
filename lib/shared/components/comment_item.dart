@@ -42,9 +42,15 @@ class CommentItem extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        commentModel.userName,
-                        style: FontsStyle.font21ColorBold,
+                      TextButton(
+                        onPressed: () {
+                          // TODO: Make when press on it navigate to this user profile
+                          // Navigator.pushNamed(context, );
+                        },
+                        child: Text(
+                          commentModel.userName,
+                          style: FontsStyle.font21ColorBold,
+                        ),
                       ),
                       const SizedBox(
                         height: 1,

@@ -21,29 +21,24 @@ class _GenderIconListState extends State<GenderIconList> {
       'Female',
       'Other',
     ];
-    return SizedBox(
-      height: 60,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: genderTypeList.length,
-        itemBuilder: (context, index) => GestureDetector(
-          onTap: () {
-            isSelected = index;
-            setState(() {});
-            if (isSelected == index) {
-              BlocProvider.of<RegisterCubit>(context).gender =
-                  genderTypeList[index];
-            }
-          },
-          child: GenderIcon(
-            genderType: genderTypeList[index],
-            isActive: isSelected == index ? true : false,
-          ),
-        ),
-        separatorBuilder: (context, index) => const SizedBox(
-          width: 35,
-        ),
-      ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: genderTypeList
+          .map((e) => GestureDetector(
+                onTap: () {
+                  isSelected = genderTypeList.indexOf(e);
+                  setState(() {});
+                  if (isSelected == genderTypeList.indexOf(e)) {
+                    BlocProvider.of<RegisterCubit>(context).gender = e;
+                  }
+                },
+                child: GenderIcon(
+                  genderType: e,
+                  isActive:
+                      isSelected == genderTypeList.indexOf(e) ? true : false,
+                ),
+              ))
+          .toList(),
     );
   }
 }

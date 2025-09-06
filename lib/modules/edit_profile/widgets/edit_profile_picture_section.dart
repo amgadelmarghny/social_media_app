@@ -14,7 +14,7 @@ class ProfilePictureSection extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'Profile Picture',
               style: FontsStyle.font25Bold,
             ),

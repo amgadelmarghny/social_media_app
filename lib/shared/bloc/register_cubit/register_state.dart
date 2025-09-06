@@ -29,3 +29,4 @@ final class SaveUserInfoFailureState extends RegisterState {
 
   SaveUserInfoFailureState({required this.errMessage});
 }
+

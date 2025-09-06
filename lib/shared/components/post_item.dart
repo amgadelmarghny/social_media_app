@@ -10,6 +10,8 @@ import 'package:social_media_app/models/user_model.dart';
 import 'package:social_media_app/modules/post/post_view.dart';
 import 'package:social_media_app/shared/bloc/comments_cubit/comments_cubit.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
+import 'package:social_media_app/shared/components/post_item_image.dart';
+import 'package:social_media_app/shared/components/send_comment_button.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
 import '../../modules/feeds/widgets/hashtag.dart';
 import '../../modules/feeds/widgets/interactive_row.dart';
@@ -85,7 +87,7 @@ class _PostItemState extends State<PostItem> {
               const EdgeInsets.only(top: 10, bottom: 10, right: 10, left: 10),
           width: double.infinity,
           decoration: BoxDecoration(
-            color: const Color(0xff6D4ACD).withOpacity(0.40),
+            color: const Color(0xff6D4ACD).withValues(alpha: 0.40),
             borderRadius: BorderRadius.circular(25),
           ),
           child: Column(
@@ -126,39 +128,7 @@ class _PostItemState extends State<PostItem> {
                 ],
               ),
               if (widget.postModel.postImage != null)
-                Padding(
-                  padding: const EdgeInsets.only(top: 15),
-                  child: Container(
-                    padding: const EdgeInsets.all(1.3),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(25),
-                    ),
-                    child: Container(
-                      clipBehavior: Clip.antiAliasWithSaveLayer,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      child: CachedNetworkImage(
-                        fit: BoxFit.fitHeight,
-                        width: double.infinity,
-                        imageUrl: widget.postModel.postImage!,
-                        placeholder: (context, url) => const Center(
-                            child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 20),
-                          child: CircularProgressIndicator(),
-                        )),
-                        errorWidget: (context, url, error) => const Center(
-                          child: Icon(
-                            Icons.error_outline,
-                            size: 30,
-                            color: Colors.red,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                PostItemImage(postImage: widget.postModel.postImage!),
               BlocBuilder<CommentsCubit, CommentsState>(
                 builder: (BuildContext context, state) {
                   return InteractiveRow(
@@ -170,6 +140,7 @@ class _PostItemState extends State<PostItem> {
                   );
                 },
               ),
+            
             ],
           ),
         ),

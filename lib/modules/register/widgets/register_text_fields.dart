@@ -6,14 +6,13 @@ import 'package:social_media_app/shared/components/gender_icon_list.dart';
 import 'package:social_media_app/shared/components/text_form_field.dart';
 import 'package:social_media_app/shared/components/year_picker.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
-import 'bloc_consumer_button.dart';
 
-class RegisterFieldsAndButton extends StatelessWidget {
-  const RegisterFieldsAndButton({super.key});
+class RegisterTextFields extends StatelessWidget {
+  const RegisterTextFields({super.key});
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.sizeOf(context).height;
+    // double height = MediaQuery.sizeOf(context).height;
     return BlocBuilder<RegisterCubit, RegisterState>(
       builder: (context, state) {
         RegisterCubit registerCubit = BlocProvider.of<RegisterCubit>(context);
@@ -44,7 +43,7 @@ class RegisterFieldsAndButton extends StatelessWidget {
               ],
             ),
             SizedBox(
-              height: height * 0.02,
+              height: 15,
             ),
             CustomTextField(
               hintText: 'Email/phone number',
@@ -52,7 +51,7 @@ class RegisterFieldsAndButton extends StatelessWidget {
               controller: registerCubit.emailController,
             ),
             SizedBox(
-              height: height * 0.02,
+              height: 15,
             ),
             CustomTextField(
               hintText: 'Password',
@@ -71,14 +70,14 @@ class RegisterFieldsAndButton extends StatelessWidget {
               ),
             ),
             SizedBox(
-              height: height * 0.015,
+              height: 15,
             ),
             Text(
               'Birth of date',
               style: FontsStyle.font18Popin(),
             ),
             SizedBox(
-              height: height * 0.015,
+              height: 15,
             ),
             Row(
               children: [
@@ -108,7 +107,7 @@ class RegisterFieldsAndButton extends StatelessWidget {
                     suffixIcon: Row(mainAxisSize: MainAxisSize.min, children: [
                       SvgPicture.asset(
                         'lib/assets/images/arrow_bottom.svg',
-                        height: 20,
+                        height: 15,
                       ),
                     ]),
                   ),
@@ -116,26 +115,16 @@ class RegisterFieldsAndButton extends StatelessWidget {
               ],
             ),
             SizedBox(
-              height: height * 0.015,
+              height: 15,
             ),
             Text(
               'Gender',
               style: FontsStyle.font18Popin(),
             ),
             SizedBox(
-              height: height * 0.015,
+              height: 15,
             ),
             const GenderIconList(),
-            SizedBox(
-              height: height * 0.15,
-            ),
-            BlocConsumerButton(
-              emailController: registerCubit.emailController,
-              firstNameController: registerCubit.firstNameController,
-              lastNameController: registerCubit.lastNameController,
-              dateAndMonthController: registerCubit.dateAndMonthController,
-              yearController: registerCubit.yearController,
-            ),
           ],
         );
       },

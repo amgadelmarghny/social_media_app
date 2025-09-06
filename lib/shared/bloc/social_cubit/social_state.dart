@@ -96,6 +96,14 @@ final class GetPostsFailureState extends SocialState {
   GetPostsFailureState({required this.errMessage});
 }
 
+final class GetPostLikesSuccessState extends SocialState {}
+
+final class GetPostLikesFailureState extends SocialState {
+  final String errMessage;
+
+  GetPostLikesFailureState({required this.errMessage});
+}
+
 ////////////////////! update user info /////////////////
 final class UpdateUserInfoLoadingState extends SocialState {}
 

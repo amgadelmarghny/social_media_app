@@ -1,9 +1,12 @@
-class OnBoardingModel {
-  final String title;
+import 'package:equatable/equatable.dart';
+
+class OnBoardingModel extends Equatable {
   final String subTitle;
 
-  OnBoardingModel({
-    required this.title,
+  const OnBoardingModel({
     required this.subTitle,
   });
+ 
+  @override
+  List<Object?> get props => [subTitle];
 }

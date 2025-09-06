@@ -9,6 +9,7 @@ import 'package:social_media_app/shared/components/constants.dart';
 import 'dart:ui' as ui;
 
 import 'package:social_media_app/shared/components/custom_button.dart';
+import 'package:social_media_app/shared/style/fonts/font_style.dart';
 
 class CustomContainerPageView extends StatelessWidget {
   const CustomContainerPageView({
@@ -22,11 +23,10 @@ class CustomContainerPageView extends StatelessWidget {
     return Align(
       alignment: Alignment.bottomCenter,
       child: Container(
-        height: MediaQuery.of(context).size.height * 0.34,
         width: double.infinity,
         clipBehavior: Clip.hardEdge,
         decoration: BoxDecoration(
-          color: const Color(0xffCEA6E7).withOpacity(0.78),
+          color: const Color(0xffCEA6E7).withValues(alpha: 0.78),
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(50),
             topRight: Radius.circular(50),
@@ -37,6 +37,7 @@ class CustomContainerPageView extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.only(top: 30, left: 40, right: 40),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SmoothPageIndicator(
@@ -49,8 +50,15 @@ class CustomContainerPageView extends StatelessWidget {
                       activeDotColor: Color(0xff8C64D5),
                       spacing: 12),
                 ),
+                const SizedBox(
+                  height: 15,
+                ),
+                Text(
+                  'Welcome !',
+                  style: FontsStyle.font36BoldShadow,
+                ),
                 SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.18,
+                  height: MediaQuery.of(context).size.height * 0.12,
                   child: PageView.builder(
                     controller: pageController,
                     onPageChanged: (value) {
@@ -62,29 +70,33 @@ class CustomContainerPageView extends StatelessWidget {
                     ),
                   ),
                 ),
-                BlocBuilder<AppCubit, AppState>(
-                  builder: (context, state) {
-                    return CustomButton(
-                      text: appCubit.currentIndex ==
-                              appCubit.onBoardingModelsList.length - 1
-                          ? 'Get Started'
-                          : 'Next',
-                      onTap: () {
-                        if (appCubit.currentIndex ==
-                            appCubit.onBoardingModelsList.length - 1) {
-                          CacheHelper.setData(
-                              key: kOnBoardingConst, value: true);
-                          Navigator.pushReplacementNamed(
-                              context, LoginView.routeViewName);
-                        } else {
-                          pageController.nextPage(
-                            duration: const Duration(milliseconds: 500),
-                            curve: Curves.linear,
-                          );
-                        }
-                      },
-                    );
-                  },
+                Padding(
+                  padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).padding.bottom),
+                  child: BlocBuilder<AppCubit, AppState>(
+                    builder: (context, state) {
+                      return CustomButton(
+                        text: appCubit.currentIndex ==
+                                appCubit.onBoardingModelsList.length - 1
+                            ? 'Get Started'
+                            : 'Next',
+                        onTap: () {
+                          if (appCubit.currentIndex ==
+                              appCubit.onBoardingModelsList.length - 1) {
+                            CacheHelper.setData(
+                                key: kOnBoardingConst, value: true);
+                            Navigator.pushReplacementNamed(
+                                context, LoginView.routeViewName);
+                          } else {
+                            pageController.nextPage(
+                              duration: const Duration(milliseconds: 500),
+                              curve: Curves.linear,
+                            );
+                          }
+                        },
+                      );
+                    },
+                  ),
                 ),
               ],
             ),

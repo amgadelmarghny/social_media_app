@@ -1,45 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social_media_app/shared/style/theme/constant.dart';
+import 'package:social_media_app/modules/new_post/widgets/new_post_bottom_action_buttons.dart';
 import '../../../shared/bloc/social_cubit/social_cubit.dart';
 import '../../../shared/style/fonts/font_style.dart';
 import '../../feeds/widgets/profile_post_row.dart';
 
+/// The main body widget for creating a new post.
+/// Displays user info, a text field for post content, an optional image preview,
+/// and buttons to add a photo or tags.
 class CreatePostSheetBody extends StatelessWidget {
   const CreatePostSheetBody({
     super.key,
     required this.postContentController,
   });
+
+  /// Controller for the post content text field.
   final TextEditingController postContentController;
 
   @override
   Widget build(BuildContext context) {
-    SocialCubit socialCubit = BlocProvider.of<SocialCubit>(context);
+    // Get the SocialCubit instance from the context.
+    SocialCubit socialCubit = context.read<SocialCubit>();
+
     return Padding(
       padding: const EdgeInsets.only(right: 20, left: 20, bottom: 10),
       child: BlocBuilder<SocialCubit, SocialState>(
         builder: (BuildContext context, SocialState state) {
           return SingleChildScrollView(
             child: SizedBox(
+              // Set the height to fit the available space minus some offset.
               height: MediaQuery.sizeOf(context).height - 105,
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 children: [
+                  // Display the user's profile photo and name at the top.
                   ProfilePostRow(
-                    image: socialCubit.userModel!.photo!,
+                    image: socialCubit.userModel!.photo,
                     userName:
                         '${socialCubit.userModel!.firstName} ${socialCubit.userModel!.lastName}',
                   ),
                   const SizedBox(
                     height: 20,
                   ),
+                  // The main text field for entering post content.
                   Flexible(
                     child: TextField(
                       controller: postContentController,
                       maxLines:
                           null, // Allows the TextField to expand vertically
-                      expands:
-                          true, // Allows the TextField to expand to fill available space
+                      expands: true, // Expands to fill available space
                       style: FontsStyle.font18Popin(),
                       decoration: InputDecoration(
                         hintText: 'What is on your mind?',
@@ -48,21 +57,22 @@ class CreatePostSheetBody extends StatelessWidget {
                       ),
                     ),
                   ),
+                  // If an image is picked, show a preview with a remove button.
                   if (socialCubit.postImagePicked != null)
                     Stack(
                       alignment: Alignment.topRight,
                       children: [
+                        // Display the picked image.
                         Image.file(
                           socialCubit.postImagePicked!,
                         ),
+                        // Button to remove the picked image.
                         Padding(
                           padding: const EdgeInsets.only(top: 10, right: 10),
                           child: CircleAvatar(
                             backgroundColor: Colors.redAccent.shade100,
                             child: IconButton(
-                              onPressed: () {
-                                socialCubit.removePickedFile();
-                              },
+                              onPressed: () => socialCubit.removePickedFile(),
                               icon: Icon(
                                 Icons.close,
                                 color: Colors.red[600],
@@ -72,56 +82,8 @@ class CreatePostSheetBody extends StatelessWidget {
                         ),
                       ],
                     ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: InkWell(
-                          onTap: () async {
-                            socialCubit.postImagePicked =
-                                await socialCubit.pickImage();
-                          },
-                          child: SizedBox(
-                            height: 50,
-                            child: Center(
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(
-                                    Icons.insert_photo_outlined,
-                                    color: defaultColorButton,
-                                    size: 30,
-                                  ),
-                                  const SizedBox(
-                                    width: 5,
-                                  ),
-                                  Text(
-                                    'Add photo',
-                                    style: FontsStyle.font18Popin(
-                                        color: defaultColorButton),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: InkWell(
-                          onTap: () {},
-                          child: SizedBox(
-                            height: 50,
-                            child: Center(
-                              child: Text(
-                                '#tags',
-                                style:
-                                    FontsStyle.font18Popin(color: defaultColorButton),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                  // Row of action buttons: Add photo and Add tags.
+                  const NewPostBottomActionButtons(),
                 ],
               ),
             ),

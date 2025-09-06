@@ -22,9 +22,9 @@ class ProfileImageMenuItem extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 CircleAvatar(
-                  backgroundColor: Colors.white.withOpacity(0.3),
+                  backgroundColor: Colors.white.withValues(alpha: 0.3),
                   radius: 15,
-                  child:const Icon(Icons.file_upload_sharp),
+                  child: const Icon(Icons.file_upload_sharp),
                 ),
                 const SizedBox(
                   width: 5,
@@ -46,9 +46,12 @@ class ProfileImageMenuItem extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 CircleAvatar(
-                  backgroundColor: Colors.white.withOpacity(0.3),
+                  backgroundColor: Colors.white.withValues(alpha: 0.3),
                   radius: 15,
-                  child:const Icon(Icons.photo_outlined,size: 22.5,),
+                  child: const Icon(
+                    Icons.photo_outlined,
+                    size: 22.5,
+                  ),
                 ),
                 const SizedBox(
                   width: 5,

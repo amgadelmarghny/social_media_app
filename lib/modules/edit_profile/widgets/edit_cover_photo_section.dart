@@ -15,7 +15,7 @@ class CoverPhotoSection extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'Cover photo',
               style: FontsStyle.font25Bold,
             ),

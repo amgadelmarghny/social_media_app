@@ -55,7 +55,7 @@ class LoginViewBody extends StatelessWidget {
                   SizedBox(
                     height: height * 0.03,
                   ),
-                  const Text(
+                  Text(
                     'Sign in',
                     style: FontsStyle.font32Bold,
                   ),

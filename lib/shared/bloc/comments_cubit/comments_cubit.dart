@@ -1,9 +1,9 @@
 import 'dart:io';
-import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:social_media_app/models/comment_model.dart';
 import 'package:social_media_app/shared/components/constants.dart';
@@ -83,6 +83,7 @@ class CommentsCubit extends Cubit<CommentsState> {
       commentsModelList.clear();
       for (var comment in commentsCollection.docs) {
         commentIdList.add(comment.id);
+        
         commentsModelList.add(CommentModel.fromJson(comment.data()));
       }
       emit(GetCommentsSuccess());
