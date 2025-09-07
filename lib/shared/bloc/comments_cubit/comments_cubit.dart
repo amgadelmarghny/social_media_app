@@ -83,12 +83,14 @@ class CommentsCubit extends Cubit<CommentsState> {
       commentsModelList.clear();
       for (var comment in commentsCollection.docs) {
         commentIdList.add(comment.id);
-        
+
         commentsModelList.add(CommentModel.fromJson(comment.data()));
       }
       emit(GetCommentsSuccess());
     } catch (err) {
-      emit(GetCommentsFailure(error: err.toString()));
+      if (!isClosed) {
+        emit(GetCommentsFailure(error: err.toString()));
+      }
     }
   }
 

@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/layout/home/components/custom_bottom_nav_bar.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/components/constants.dart';
+import 'package:social_media_app/shared/components/custom_refresh_indicator.dart';
 import 'package:social_media_app/shared/components/show_toast.dart';
 import 'package:social_media_app/shared/network/local/cache_helper.dart';
 import 'package:social_media_app/shared/style/theme/theme.dart';
@@ -51,6 +52,16 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     // Print the current user token for debugging purposes.
     debugPrint('Token ::::: ${CacheHelper.getData(key: kUidToken)}');
+
+    /// Handles pull-to-refresh action.
+    /// Refreshes posts and user data.
+    Future<void> handleRefresh() async {
+      await BlocProvider.of<SocialCubit>(context).getPosts();
+      if (context.mounted) {
+        await BlocProvider.of<SocialCubit>(context).getUserData();
+      }
+    }
+
     return Container(
       decoration: themeColor(), // Set the background theme.
       child: SafeArea(
@@ -96,22 +107,14 @@ class _HomeViewState extends State<HomeView> {
                         );
                       }
                       // Only show the main content if user data and posts are loaded.
-                      return ConditionalBuilder(
-                        condition:
-                            BlocProvider.of<SocialCubit>(context).userModel !=
-                                null,
-                        builder: (context) => SingleChildScrollView(
+                      return CustomRefreshIndicator(
+                        onRefresh: handleRefresh,
+                        child: SingleChildScrollView(
                           controller: _scrollController,
-                          child: BlocProvider.of<SocialCubit>(context)
-                                  .currentBody[
-                              BlocProvider.of<SocialCubit>(context)
-                                  .currentBottomNavBarIndex],
-                        ),
-                        // Show a loading indicator while data is loading.
-                        fallback: (context) => const Center(
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                          ),
+                          child:
+                              BlocProvider.of<SocialCubit>(context).currentBody[
+                                  BlocProvider.of<SocialCubit>(context)
+                                      .currentBottomNavBarIndex],
                         ),
                       );
                     },

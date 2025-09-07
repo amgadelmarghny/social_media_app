@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +10,6 @@ import 'package:social_media_app/modules/post/post_view.dart';
 import 'package:social_media_app/shared/bloc/comments_cubit/comments_cubit.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/components/post_item_image.dart';
-import 'package:social_media_app/shared/components/send_comment_button.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
 import '../../modules/feeds/widgets/hashtag.dart';
 import '../../modules/feeds/widgets/interactive_row.dart';
@@ -37,6 +35,7 @@ class _PostItemState extends State<PostItem> {
   bool isLike = false;
   final currentUser = FirebaseAuth.instance.currentUser!;
   QuerySnapshot<Map<String, dynamic>>? likesCollection;
+
   @override
   void initState() {
     fetchLikes();
@@ -50,9 +49,11 @@ class _PostItemState extends State<PostItem> {
         .collection(kLikesCollection)
         .get();
     final likesDocs = likesCollection!.docs;
-    setState(() {
-      isLike = likesDocs.any((doc) => doc.id == currentUser.uid);
-    });
+    if (mounted) {
+      setState(() {
+        isLike = likesDocs.any((doc) => doc.id == currentUser.uid);
+      });
+    }
   }
 
   @override
@@ -68,82 +69,93 @@ class _PostItemState extends State<PostItem> {
 
     return BlocProvider(
       create: (context) => CommentsCubit()..getComments(postId: widget.postId),
-      child: GestureDetector(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => PostView(
-                postModel: widget.postModel,
-                postId: widget.postId,
-                userModel: widget.userModel,
+      child: BlocBuilder<SocialCubit, SocialState>(
+        builder: (context, state) {
+          return GestureDetector(
+            onTap: () async {
+              // Navigate to PostView and refresh likes and comments when returning
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PostView(
+                    postModel: widget.postModel,
+                    postId: widget.postId,
+                    userModel: widget.userModel,
+                  ),
+                ),
+              );
+              // Refresh likes and comments when returning from PostView
+              fetchLikes();
+              // Refresh comments count
+              if (mounted) {
+                BlocProvider.of<CommentsCubit>(context)
+                    .getComments(postId: widget.postId);
+              }
+            },
+            child: Container(
+              margin: const EdgeInsets.symmetric(vertical: 5),
+              padding: const EdgeInsets.only(
+                  top: 10, bottom: 10, right: 10, left: 10),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: const Color(0xff6D4ACD).withValues(alpha: 0.40),
+                borderRadius: BorderRadius.circular(25),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ProfilePostRow(
+                    image: widget.postModel.profilePhoto,
+                    userName: widget.postModel.userName,
+                    timePosted: DateFormat.yMMMd()
+                        .add_jm()
+                        .format(widget.postModel.dateTime),
+                  ),
+                  if (widget.postModel.content != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: ReadMoreText(
+                        widget.postModel.content!,
+                        trimMode: TrimMode.Line,
+                        trimLines: 4,
+                        colorClickableText: Colors.pink,
+                        trimCollapsedText: 'more',
+                        trimExpandedText: ' less',
+                        style: FontsStyle.font15Popin(),
+                        lessStyle: FontsStyle.font15Popin(
+                          color: Colors.white60,
+                        ),
+                        moreStyle: FontsStyle.font15Popin(
+                          color: Colors.white60,
+                        ),
+                      ),
+                    ),
+                  // hashtags
+                  const Wrap(
+                    children: [
+                      Hashtag(
+                        title: '#Profile',
+                      ),
+                    ],
+                  ),
+                  if (widget.postModel.postImage != null)
+                    PostItemImage(postImage: widget.postModel.postImage!),
+                  BlocBuilder<CommentsCubit, CommentsState>(
+                    builder: (BuildContext context, state) {
+                      return InteractiveRow(
+                        numOfLikes: likesCollection?.docs.length ?? 0,
+                        isLike: isLike,
+                        onLikeButtonTap: toggleLike,
+                        postId: widget.postId,
+                        userModel: widget.userModel,
+                      );
+                    },
+                  ),
+                ],
               ),
             ),
           );
         },
-        child: Container(
-          margin: const EdgeInsets.symmetric(vertical: 5),
-          padding:
-              const EdgeInsets.only(top: 10, bottom: 10, right: 10, left: 10),
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: const Color(0xff6D4ACD).withValues(alpha: 0.40),
-            borderRadius: BorderRadius.circular(25),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ProfilePostRow(
-                image: widget.postModel.profilePhoto,
-                userName: widget.postModel.userName,
-                timePosted: DateFormat.yMMMd()
-                    .add_jm()
-                    .format(widget.postModel.dateTime),
-              ),
-              if (widget.postModel.content != null)
-                Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: ReadMoreText(
-                    widget.postModel.content!,
-                    trimMode: TrimMode.Line,
-                    trimLines: 4,
-                    colorClickableText: Colors.pink,
-                    trimCollapsedText: 'more',
-                    trimExpandedText: ' less',
-                    style: FontsStyle.font15Popin(),
-                    lessStyle: FontsStyle.font15Popin(
-                      color: Colors.white60,
-                    ),
-                    moreStyle: FontsStyle.font15Popin(
-                      color: Colors.white60,
-                    ),
-                  ),
-                ),
-              // hashtags
-              const Wrap(
-                children: [
-                  Hashtag(
-                    title: '#Profile',
-                  ),
-                ],
-              ),
-              if (widget.postModel.postImage != null)
-                PostItemImage(postImage: widget.postModel.postImage!),
-              BlocBuilder<CommentsCubit, CommentsState>(
-                builder: (BuildContext context, state) {
-                  return InteractiveRow(
-                    numOfLikes: likesCollection?.docs.length ?? 0,
-                    isLike: isLike,
-                    onLikeButtonTap: toggleLike,
-                    postId: widget.postId,
-                    userModel: widget.userModel,
-                  );
-                },
-              ),
-            
-            ],
-          ),
-        ),
       ),
     );
   }
