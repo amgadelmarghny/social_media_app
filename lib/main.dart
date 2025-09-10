@@ -53,7 +53,7 @@ class SocialMediaApp extends StatelessWidget {
         BlocProvider(
           create: (context) => SocialCubit()
             ..getPosts()
-            ..getUserData(),
+            ..getUserData(userUid: tokenCache!),
         ),
       ],
       child: MaterialApp(

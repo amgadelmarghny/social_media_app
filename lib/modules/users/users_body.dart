@@ -79,10 +79,9 @@ class UsersBody extends StatelessWidget {
                     height: 15,
                   ),
                   const FollowAndMessageButtons(),
-                  if (userModel.bio != null)
-                    const SizedBox(
-                      height: 20,
-                    ),
+                  const SizedBox(
+                    height: 15,
+                  ),
                   if (userModel.bio != null)
                     Text(
                       '"${userModel.bio}"',

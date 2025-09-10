@@ -18,6 +18,7 @@ class ProfilePictureWithStory extends StatelessWidget {
       width: size,
       decoration: !isWithoutStory
           ? const BoxDecoration(
+              shape: BoxShape.circle,
               image: DecorationImage(
                 fit: BoxFit.fill,
                 image: AssetImage(
@@ -28,7 +29,14 @@ class ProfilePictureWithStory extends StatelessWidget {
           : null,
       child: Container(
         clipBehavior: Clip.hardEdge,
-        decoration: const BoxDecoration(shape: BoxShape.circle),
+        decoration: BoxDecoration(
+          gradient: RadialGradient(radius: 0.8, colors: [
+            Colors.white,
+            Colors.grey[400]!,
+            Colors.grey,
+          ]),
+          shape: BoxShape.circle,
+        ),
         child: image != null
             ? CachedNetworkImage(
                 fit: BoxFit.cover,
@@ -45,11 +53,14 @@ class ProfilePictureWithStory extends StatelessWidget {
                 ),
               )
             : Center(
-                child: Icon(
-                  Icons.person,
-                  color: Colors.grey.shade600,
-                  // if size != 85 that's mean the widget is in edit profile
-                  size: size == 85 ? 65 : 80,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Icon(
+                    Icons.person,
+                    color: Colors.grey.shade600,
+                    // if size != 85 that's mean the widget is in edit profile
+                    size: size == 85 ? 65 : 80,
+                  ),
                 ),
               ),
       ),

@@ -77,6 +77,8 @@ final class RemovePickedFile extends SocialState {}
 final class RemovePostState extends SocialState {}
 
 // //////////////////! like post ///////////////
+final class ToggleLikeLoadingState extends SocialState {}
+
 final class ToggleLikeSuccessState extends SocialState {}
 
 final class LikePostFailureState extends SocialState {
@@ -103,6 +105,19 @@ final class GetPostLikesFailureState extends SocialState {
 
   GetPostLikesFailureState({required this.errMessage});
 }
+
+//////////////////! get users who did likes in post //////////
+final class GetUsersLikesPostLoadingState extends SocialState {}
+
+final class GetUsersLikesPostSuccessState extends SocialState {}
+
+final class GetUsersLikesPostFailureState extends SocialState {
+  final String errMessage;
+
+  GetUsersLikesPostFailureState({required this.errMessage});
+}
+
+
 
 ////////////////////! update user info /////////////////
 final class UpdateUserInfoLoadingState extends SocialState {}

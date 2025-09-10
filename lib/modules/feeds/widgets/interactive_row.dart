@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:social_media_app/models/user_model.dart';
 import 'package:social_media_app/modules/feeds/widgets/comments_sheet.dart';
+import 'package:social_media_app/modules/feeds/widgets/users_likes_sheet.dart';
 import 'package:social_media_app/shared/bloc/comments_cubit/comments_cubit.dart';
+import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/style/theme/constant.dart';
 import '../../../shared/style/fonts/font_style.dart';
 
@@ -30,21 +32,46 @@ class InteractiveRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        IconButton(
-          onPressed: onLikeButtonTap,
-          icon: isLike
-              ? SvgPicture.asset(
-                  'lib/assets/images/like.svg',
-                )
-              : const Icon(Icons.favorite_border),
-          color: defaultColor,
+        BlocBuilder<SocialCubit, SocialState>(
+          builder: (context, state) {
+            return AbsorbPointer(
+              absorbing: state is ToggleLikeLoadingState,
+              child: IconButton(
+                onPressed: onLikeButtonTap,
+                icon: isLike
+                    ? SvgPicture.asset(
+                        'lib/assets/images/like.svg',
+                      )
+                    : const Icon(Icons.favorite_border),
+                color: defaultColor,
+              ),
+            );
+          },
         ),
         if (numOfLikes > 0)
           Transform.translate(
             offset: const Offset(-7, 0),
-            child: Text(
-              numOfLikes.toString(),
-              style: FontsStyle.font18Popin(),
+            child: InkWell(
+              onTap: () async {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  builder: (context) {
+                    return FractionallySizedBox(
+                      heightFactor:
+                          1.0, // This makes the bottom sheet take the full height
+                      child: UsersLikesSheet(),
+                    );
+                  },
+                );
+                await context
+                    .read<SocialCubit>()
+                    .getUsersLikesInPost(postId: postId);
+              },
+              child: Text(
+                numOfLikes.toString(),
+                style: FontsStyle.font18Popin(),
+              ),
             ),
           ),
         const SizedBox(
@@ -60,7 +87,7 @@ class InteractiveRow extends StatelessWidget {
                       return FractionallySizedBox(
                         heightFactor:
                             1.0, // This makes the bottom sheet take the full height
-                        child: CommentsPostSection(
+                        child: CommentsSheet(
                           postId: postId,
                           userModel: userModel,
                         ),

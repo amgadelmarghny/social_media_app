@@ -1,6 +1,7 @@
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:social_media_app/shared/components/custom_refresh_indicator.dart';
 // import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import '../../../models/user_model.dart';
@@ -25,22 +26,15 @@ class CommentsSheetBody extends StatelessWidget {
         return Column(
           children: [
             Expanded(
-              child: ConditionalBuilder(
-                condition: commentsCubit.commentsModelList.isNotEmpty,
-                builder: (context) => CustomRefreshIndicator(
-                  // showChildOpacityTransition: false,
-                  // backgroundColor: const Color(0xff8862D9),
-                  // springAnimationDurationInMilliseconds: 500,
-                  // animSpeedFactor: 1.8,
-                  // color: const Color(0xffC58DEB),
-                  // borderWidth: 3,
-                  // height: 100,
-                  onRefresh: () async {
-                    await BlocProvider.of<CommentsCubit>(context)
-                        .getComments(postId: postId);
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: CustomRefreshIndicator(
+                onRefresh: () async {
+                  await BlocProvider.of<CommentsCubit>(context)
+                      .getComments(postId: postId);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Skeletonizer(
+                    enabled: commentsCubit.commentsModelList.isEmpty,
                     child: ListView.builder(
                       itemBuilder: (context, index) => CommentItem(
                         commentModel: commentsCubit.commentsModelList[index],
@@ -49,7 +43,6 @@ class CommentsSheetBody extends StatelessWidget {
                     ),
                   ),
                 ),
-                fallback: (context) => const SizedBox(),
               ),
             ),
             if (commentsCubit.pickedImage != null)

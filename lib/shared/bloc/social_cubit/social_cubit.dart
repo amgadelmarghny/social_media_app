@@ -70,19 +70,19 @@ class SocialCubit extends Cubit<SocialState> {
       FirebaseFirestore.instance.collection(kUsersCollection);
 
   /// Fetch user data from Firestore and update [userModel]
-  Future<void> getUserData() async {
+  Future<UserModel> getUserData({required String userUid}) async {
     emit(GetUserDataLoadingState());
+    late UserModel spacificUserModel;
     try {
       DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
-          await FirebaseFirestore.instance
-              .collection(kUsersCollection)
-              .doc(uidTokenCache)
-              .get();
+          await _userCollectionRef.doc(userUid).get();
       userModel = UserModel.fromJson(documentSnapshot.data()!);
+      spacificUserModel = userModel!;
       emit(GetUserDataSuccessState());
     } catch (error) {
       emit(GetUserDataFailureState(errMessage: error.toString()));
     }
+    return spacificUserModel;
   }
 
   // Controllers for editing user profile fields
@@ -101,7 +101,7 @@ class SocialCubit extends Cubit<SocialState> {
       await _userCollectionRef
           .doc(uidTokenCache)
           .update(updateUserImplModel.toMap(userModel!));
-      await getUserData();
+      await getUserData(userUid: uidTokenCache);
     } on Exception catch (err) {
       emit(UpdateUserInfoFailureState(errMessage: err.toString()));
     }
@@ -295,11 +295,6 @@ class SocialCubit extends Cubit<SocialState> {
       // numbersOfLikesInPostsList.clear();
       postsModelList.clear();
       for (var postDocInCollection in postsDocumentSnapshot.docs) {
-        // int numberOfLikeInPost =
-        //     // to get post's like number
-        //     await _getLikesInPostDocument(postDocInCollection);
-        // // put likes of every post in the list
-        // numbersOfLikesInPostsList.add(numberOfLikeInPost);
         // Add post ID to the list
         postsIdList.add(postDocInCollection.id);
         // Add post data to the list
@@ -311,21 +306,42 @@ class SocialCubit extends Cubit<SocialState> {
     }
   }
 
-  // Future<int> _getLikesInPostDocument(
-  //     QueryDocumentSnapshot<Map<String, dynamic>>
-  //         postDocumentInCollection) async {
-  //   var likeCollectionInThePostCollection = await postDocumentInCollection
-  //       .reference
-  //       .collection(kLikesCollection)
-  //       .get();
-  //   int numbersOfLikes = likeCollectionInThePostCollection.docs.length;
-  //   return numbersOfLikes;
-  // }
+  //!
+  Future<List<String>> _getUsersLikesUidInPost({required String postId}) async {
+    List<String> usersLikesUid = [];
+    // Access the document(post) from Firestore
+    DocumentReference postDocRef = _postCollectionRef.doc(postId);
+    var likeCollectionInThePostCollection =
+        await postDocRef.collection(kLikesCollection).get();
+    var usersLikesUidDocs = likeCollectionInThePostCollection.docs;
+    for (var usersUid in usersLikesUidDocs) {
+      usersLikesUid.add(usersUid.id);
+    }
+    return usersLikesUid;
+  }
+
+  List<UserModel> userModelList = [];
+  Future<void> getUsersLikesInPost({required String postId}) async {
+    userModelList.clear();
+    emit(GetUsersLikesPostLoadingState());
+
+    try {
+      List<String> usersLikeUids =
+          await _getUsersLikesUidInPost(postId: postId);
+      usersLikeUids.forEach((userUid) async {
+        userModelList.add(await getUserData(userUid: userUid));
+      });
+      emit(GetUsersLikesPostSuccessState());
+    } on Exception catch (e) {
+      emit(GetUsersLikesPostFailureState(errMessage: e.toString()));
+    }
+  }
 
   /// Toggle like/unlike for a post.
   /// If [isLike] is true, add a like; otherwise, remove the like.
   Future<QuerySnapshot<Map<String, dynamic>>> toggleLike(
       {required String postId, required bool isLike}) async {
+    emit(ToggleLikeLoadingState());
     // Access the document(post) from Firestore
     DocumentReference postDocRef = _postCollectionRef.doc(postId);
     // If the user likes the post, add the user's like model

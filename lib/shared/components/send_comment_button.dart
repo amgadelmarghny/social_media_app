@@ -25,17 +25,24 @@ class SendCommentButton extends StatelessWidget {
       decoration: InputDecoration(
         hintStyle: FontsStyle.font18Popin(isShadow: true),
         // Prefix icon for picking an image to attach to the comment
-        prefixIcon: Padding(
-          padding: const EdgeInsets.only(left: 4),
-          child: IconButton(
-            onPressed: () async {
-              // Open image picker and set the picked image in the cubit
-              commentsCubit.pickedImage = await commentsCubit.pickPhoto();
-            },
-            icon: const Icon(
-              Icons.photo_outlined,
-            ),
-          ),
+        prefixIcon: BlocBuilder<CommentsCubit, CommentsState>(
+          builder: (context, state) {
+            return Padding(
+              padding: const EdgeInsets.only(left: 4),
+              child: AbsorbPointer(
+                absorbing: state is PickImageLoadingState,
+                child: IconButton(
+                  onPressed: () async {
+                    // Open image picker and set the picked image in the cubit
+                    commentsCubit.pickedImage = await commentsCubit.pickPhoto();
+                  },
+                  icon: const Icon(
+                    Icons.photo_outlined,
+                  ),
+                ),
+              ),
+            );
+          },
         ),
         prefixIconColor: defaultColor,
         suffixIconColor: defaultColor,

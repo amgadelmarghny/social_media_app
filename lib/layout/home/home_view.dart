@@ -50,15 +50,13 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    // Print the current user token for debugging purposes.
-    debugPrint('Token ::::: ${CacheHelper.getData(key: kUidToken)}');
-
     /// Handles pull-to-refresh action.
     /// Refreshes posts and user data.
     Future<void> handleRefresh() async {
       await BlocProvider.of<SocialCubit>(context).getPosts();
       if (context.mounted) {
-        await BlocProvider.of<SocialCubit>(context).getUserData();
+        await BlocProvider.of<SocialCubit>(context)
+            .getUserData(userUid: CacheHelper.getData(key: kUidToken));
       }
     }
 

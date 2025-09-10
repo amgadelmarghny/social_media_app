@@ -35,15 +35,16 @@ class CommentItem extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(18),
-                    color: const Color(0xffCCC4D0),
+                  decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(18)),
+                    color: Color(0xffCCC4D0),
                   ),
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      TextButton(
-                        onPressed: () {
+                      GestureDetector(
+                        onTap: () {
                           // TODO: Make when press on it navigate to this user profile
                           // Navigator.pushNamed(context, );
                         },

@@ -28,7 +28,7 @@ class CustomCoverAndImageProfile extends StatelessWidget {
               color: profileCover != null ? null : Colors.grey,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.5),
+                  color: Colors.black.withValues(alpha: 0.5),
                   offset: const Offset(0, 2),
                   blurRadius: 4,
                   spreadRadius: 1,
@@ -81,7 +81,7 @@ class CustomCoverAndImageProfile extends StatelessWidget {
                     bodyBuilder: (context) => const ProfileImageMenuItem());
               },
               child: ProfilePictureWithStory(
-                size: 100,
+              //  size: 100,
                 image: profileImage,
               ),
             ),
