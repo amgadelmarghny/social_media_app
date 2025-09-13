@@ -31,8 +31,7 @@ class CreatePostSheet extends StatelessWidget {
                       width: 90,
                       clipBehavior: Clip.hardEdge,
                       decoration: const BoxDecoration(
-                          borderRadius:
-                              BorderRadius.all(Radius.circular(15))),
+                          borderRadius: BorderRadius.all(Radius.circular(15))),
                       child: MaterialButton(
                         color: socialCubit.postImagePicked == null &&
                                 value.text.isEmpty
@@ -58,7 +57,7 @@ class CreatePostSheet extends StatelessWidget {
                         },
                         child: Text(
                           'Post',
-                          style: FontsStyle.font18PopinBold().copyWith(
+                          style: FontsStyle.font18PopinMedium().copyWith(
                             color: socialCubit.postImagePicked == null &&
                                     value.text.isEmpty
                                 ? Colors.black54

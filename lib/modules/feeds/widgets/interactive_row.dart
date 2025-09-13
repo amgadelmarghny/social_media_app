@@ -6,7 +6,6 @@ import 'package:social_media_app/modules/feeds/widgets/comments_sheet.dart';
 import 'package:social_media_app/modules/feeds/widgets/users_likes_sheet.dart';
 import 'package:social_media_app/shared/bloc/comments_cubit/comments_cubit.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
-import 'package:social_media_app/shared/style/theme/constant.dart';
 import '../../../shared/style/fonts/font_style.dart';
 
 class InteractiveRow extends StatelessWidget {
@@ -43,7 +42,6 @@ class InteractiveRow extends StatelessWidget {
                         'lib/assets/images/like.svg',
                       )
                     : const Icon(Icons.favorite_border),
-                color: defaultColor,
               ),
             );
           },
@@ -123,7 +121,6 @@ class InteractiveRow extends StatelessWidget {
           icon: SvgPicture.asset(
             'lib/assets/images/share.svg',
           ),
-          color: defaultColor,
         ),
       ],
     );

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/firebase_options.dart';
 import 'package:social_media_app/layout/home/home_view.dart';
+import 'package:social_media_app/modules/chat/chat_view.dart';
 import 'package:social_media_app/modules/edit_profile/edit_profile_view.dart';
 import 'package:social_media_app/modules/login/login_view.dart';
 import 'package:social_media_app/modules/on_boarding/on_boarding_view.dart';
@@ -68,6 +69,7 @@ class SocialMediaApp extends StatelessWidget {
           RegisterView.routeViewName: (context) => const RegisterView(),
           HomeView.routeViewName: (context) => const HomeView(),
           EditProfileView.routeViewName: (context) => const EditProfileView(),
+          ChatView.routeName: (context) => ChatView(),
           // Note: PostView is not included in the routes table because it requires arguments to be passed to its constructor.
           // To navigate to PostView, use Navigator.push and provide the required  to the PostView constructor.attributes
         },

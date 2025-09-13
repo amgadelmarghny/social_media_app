@@ -32,7 +32,7 @@ class ProfilePostRow extends StatelessWidget {
             children: [
               Text(
                 userName,
-                style: FontsStyle.font18PopinBold(),
+                style: FontsStyle.font18PopinMedium(),
               ),
               if (timePosted != null)
                 Padding(

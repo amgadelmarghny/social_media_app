@@ -54,7 +54,7 @@ class LoginFieldsAndButton extends StatelessWidget {
                   child: Text(
                     'Forgot password?',
                     style: FontsStyle.font18Popin(
-                      color: defaultColor,
+                      color: defaultTextColor,
                     ),
                   ),
                 ),

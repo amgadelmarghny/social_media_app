@@ -79,7 +79,6 @@ class CommentsCubit extends Cubit<CommentsState> {
           .orderBy(kDateTime, descending: true)
           .get();
       numberOfComment = commentsCollection.docs.length;
-      print('numberOfCommenttttttt :: $numberOfComment');
       commentsModelList.clear();
       for (var comment in commentsCollection.docs) {
         commentIdList.add(comment.id);

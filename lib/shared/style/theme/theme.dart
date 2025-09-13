@@ -6,7 +6,7 @@ import '../fonts/font_style.dart';
 abstract class CustomThemeMode {
   static final lightTheme = ThemeData(
     indicatorColor: Colors.white,
-    primaryColor: defaultColor,
+    primaryColor: defaultTextColor,
     scaffoldBackgroundColor: Colors.transparent,
     iconTheme: const IconThemeData(color: Colors.white),
     searchBarTheme: SearchBarThemeData(
@@ -48,7 +48,7 @@ abstract class CustomThemeMode {
   );
 
   static final darkTheme = ThemeData(
-    primaryColor: defaultColor,
+    primaryColor: defaultTextColor,
     scaffoldBackgroundColor: Colors.transparent,
     iconTheme: const IconThemeData(color: Colors.white),
     iconButtonTheme: IconButtonThemeData(
@@ -94,7 +94,7 @@ BoxDecoration themeColor() {
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
       colors: [
-        defaultColor,
+        defaultTextColor,
         Color(0xff8862D9),
         Color(0xff986DDD),
         Color(0xffA878E2),

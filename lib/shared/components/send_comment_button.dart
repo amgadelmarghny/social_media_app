@@ -44,8 +44,8 @@ class SendCommentButton extends StatelessWidget {
             );
           },
         ),
-        prefixIconColor: defaultColor,
-        suffixIconColor: defaultColor,
+        prefixIconColor: defaultTextColor,
+        suffixIconColor: defaultTextColor,
         // Suffix icon for sending the comment
         suffixIcon: BlocBuilder<CommentsCubit, CommentsState>(
           builder: (context, state) {
@@ -65,7 +65,7 @@ class SendCommentButton extends StatelessWidget {
                   ? const CircleAvatar(
                       radius: 10,
                       child: CircularProgressIndicator(
-                        color: defaultColor,
+                        color: defaultTextColor,
                         strokeWidth: 2.5,
                       ),
                     )

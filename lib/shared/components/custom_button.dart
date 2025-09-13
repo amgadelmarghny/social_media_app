@@ -3,15 +3,16 @@ import 'package:social_media_app/shared/style/fonts/font_style.dart';
 import '../style/theme/constant.dart';
 
 class CustomButton extends StatelessWidget {
-  const CustomButton({
-    super.key,
-    required this.text,
-    required this.onTap,
-    this.isLoading = false,
-    this.buttonColor = const Color(0xFF635A8F),
-    this.textColor = Colors.white,
-    this.height = 55, this.width, this.fontSize = 22
-  });
+  const CustomButton(
+      {super.key,
+      required this.text,
+      required this.onTap,
+      this.isLoading = false,
+      this.buttonColor = const Color(0xFF635A8F),
+      this.textColor = Colors.white,
+      this.height = 55,
+      this.width,
+      this.fontSize = 22});
   final void Function()? onTap;
   final String text;
   final bool isLoading;
@@ -19,7 +20,6 @@ class CustomButton extends StatelessWidget {
   final Color textColor;
   final double height;
   final double? width, fontSize;
-  
 
   @override
   Widget build(BuildContext context) {
@@ -44,11 +44,12 @@ class CustomButton extends StatelessWidget {
         child: Center(
           child: isLoading
               ? const CircularProgressIndicator(
-                  color: defaultColor,
+                  color: defaultTextColor,
                 )
               : Text(
                   text,
-                  style: FontsStyle.font22Bold(color: textColor ,fontSize:fontSize! ),
+                  style: FontsStyle.font22Bold(
+                      color: textColor, fontSize: fontSize!),
                 ),
         ),
       ),

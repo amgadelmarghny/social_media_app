@@ -16,7 +16,7 @@ class AuthIcon extends StatelessWidget {
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            defaultColor,
+            defaultTextColor,
             Colors.white,
           ],
         ),

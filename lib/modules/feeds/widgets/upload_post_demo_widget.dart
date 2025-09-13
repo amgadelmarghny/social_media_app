@@ -46,7 +46,7 @@ class UploadPostDemo extends StatelessWidget {
                       const Padding(
                         padding: EdgeInsets.only(top: 10),
                         child: LinearProgressIndicator(
-                          color: defaultColor,
+                          color: defaultTextColor,
                           borderRadius: BorderRadius.all(Radius.circular(200)),
                           backgroundColor: Color(0xffA878E2),
                         ),

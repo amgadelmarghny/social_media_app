@@ -21,7 +21,7 @@ class UsersLikesSheet extends StatelessWidget {
               showToast(msg: state.errMessage, toastState: ToastState.error);
             }
           },
-          child: UserLikeItemsListView(),
+          child: const UserLikeItemsListView(),
         ),
       ),
     );

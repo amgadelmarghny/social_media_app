@@ -18,7 +18,6 @@ class RegisterViewBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.sizeOf(context).height;
 
     return SafeArea(
       child: Padding(
@@ -88,8 +87,8 @@ class RegisterViewBody extends StatelessWidget {
                               },
                               child: Text(
                                 'Sign in',
-                                style:
-                                    FontsStyle.font18Popin(color: defaultColor),
+                                style: FontsStyle.font18Popin(
+                                    color: defaultTextColor),
                               ),
                             ),
                           ],

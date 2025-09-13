@@ -98,7 +98,7 @@ class LoginViewBody extends StatelessWidget {
                         child: Text(
                           'Sign up',
                           style: FontsStyle.font18Popin(
-                            color: defaultColor,
+                            color: defaultTextColor,
                           ),
                         ),
                       ),

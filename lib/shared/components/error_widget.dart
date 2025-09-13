@@ -42,7 +42,7 @@ class FloatingErrorWidget extends StatelessWidget {
                       ),
                       Text(
                         'Cancel',
-                        style: FontsStyle.font18PopinBold(),
+                        style: FontsStyle.font18PopinMedium(),
                       ),
                     ],
                   ),
@@ -81,7 +81,7 @@ class FloatingErrorWidget extends StatelessWidget {
                       ),
                       Text(
                         'Try again',
-                        style: FontsStyle.font18PopinBold()
+                        style: FontsStyle.font18PopinMedium()
                             .copyWith(color: Colors.blue, fontSize: 20),
                       ),
                     ],

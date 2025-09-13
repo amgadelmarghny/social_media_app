@@ -33,7 +33,7 @@ class UserLikeItem extends StatelessWidget {
                     "${userModel.firstName} ${userModel.lastName}",
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
-                    style: FontsStyle.font18PopinBold(),
+                    style: FontsStyle.font18PopinMedium(),
                   ),
                 ),
               ],

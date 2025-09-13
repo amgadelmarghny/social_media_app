@@ -42,7 +42,7 @@ abstract class FontsStyle {
     );
   }
 
-  static TextStyle font18PopinBold() {
+  static TextStyle font18PopinMedium() {
     return GoogleFonts.poppins(
       textStyle: TextStyle(
         color: Colors.white,
@@ -66,7 +66,7 @@ abstract class FontsStyle {
       fontSize: getResponsiveFontSize(fontSize: 20),
       overflow: TextOverflow.ellipsis,
       fontWeight: FontWeight.w600,
-      color: defaultColor,
+      color: defaultTextColor,
     ),
   );
 
