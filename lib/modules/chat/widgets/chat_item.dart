@@ -7,11 +7,13 @@ import 'package:social_media_app/shared/components/profile_picture_with_story.da
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
 
 class ChatItem extends StatelessWidget {
-  const ChatItem({super.key});
+  const ChatItem({super.key, required this.dateTime});
+  final String dateTime;
 
   @override
   Widget build(BuildContext context) {
     UserModel? userModel = BlocProvider.of<SocialCubit>(context).userModel;
+
     return InkWell(
         onTap: () => Navigator.pushNamed(
               context,
@@ -47,7 +49,7 @@ class ChatItem extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        "7:00",
+                        dateTime,
                         style: FontsStyle.font18Popin(color: Colors.white60),
                       ),
                     ],

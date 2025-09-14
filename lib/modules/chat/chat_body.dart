@@ -59,7 +59,7 @@ class _ChatBodyState extends State<ChatBody> {
         child: ListView.separated(
           controller: _scrollController,
           itemCount: 20,
-          itemBuilder: (context, index) => const ChatItem(),
+          itemBuilder: (context, index) => const ChatItem(dateTime: '',),
           separatorBuilder: (context, index) => const SizedBox(
             height: 5,
           ),

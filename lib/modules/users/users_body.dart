@@ -86,6 +86,7 @@ class _UsersBodyState extends State<UsersBody> {
           return Padding(
             padding: EdgeInsets.only(bottom: _bodiesBottomPadding),
             child: CustomScrollView(
+              controller: _scrollController,
               slivers: [
                 SliverToBoxAdapter(
                   child: CustomCoverAndImageProfile(
@@ -93,76 +94,79 @@ class _UsersBodyState extends State<UsersBody> {
                     profileCover: userModel.cover,
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          '${userModel.firstName} ${userModel.lastName}',
-                          style: FontsStyle.font20BoldWithColor,
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            '${userModel.firstName} ${userModel.lastName}',
+                            style: FontsStyle.font20BoldWithColor,
+                          ),
                         ),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          Navigator.pushNamed(
-                              context, EditProfileView.routeViewName);
-                        },
-                        icon: const Icon(
-                          IconBroken.Edit_Square,
-                          size: 32,
+                        IconButton(
+                          onPressed: () {
+                            Navigator.pushNamed(
+                                context, EditProfileView.routeViewName);
+                          },
+                          icon: const Icon(
+                            IconBroken.Edit_Square,
+                            size: 32,
+                            color: defaultTextColor,
+                          ),
                           color: defaultTextColor,
-                        ),
-                        color: defaultTextColor,
-                      )
-                    ],
+                        )
+                      ],
+                    ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    children: [
-                      const CustomPostFollowersFollowingRow(
-                        numOfPosts: '148',
-                        numOfFollowers: '12K',
-                        numOfFollowing: '200',
-                      ),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      const FollowAndMessageButtons(),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      if (userModel.bio != null)
-                        Text(
-                          '"${userModel.bio}"',
-                          style: FontsStyle.font20Poppins,
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      children: [
+                        const CustomPostFollowersFollowingRow(
+                          numOfPosts: '148',
+                          numOfFollowers: '12K',
+                          numOfFollowing: '200',
                         ),
-                      GridView.builder(
-                        controller: _scrollController,
-                        clipBehavior: Clip.none,
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: 20,
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          childAspectRatio: 0.95,
-                          crossAxisSpacing: 8,
-                          mainAxisSpacing: 8,
-                          crossAxisCount: 2,
+                        const SizedBox(
+                          height: 15,
                         ),
-                        itemBuilder: (context, index) {
-                          return Image.network(
-                            fit: BoxFit.cover,
-                            'https://img.freepik.com/free-psd/travel-tourism-facebook-cover-template_106176-2350.jpg?t=st=1718837003~exp=1718840603~hmac=ee693122a4a6abe55342026a5443a20b35e53b8ec5c6c4a8cddcb53e87314dba&w=1380',
-                          );
-                        },
-                      ),
-                    ],
+                        const FollowAndMessageButtons(),
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        if (userModel.bio != null)
+                          Text(
+                            '"${userModel.bio}"',
+                            style: FontsStyle.font20Poppins,
+                          ),
+                      ],
+                    ),
                   ),
-                )
+                ),
+                SliverGrid.builder(
+                  // controller: _scrollController,
+                  // clipBehavior: Clip.none,
+                  // physics: const NeverScrollableScrollPhysics(),
+                  // shrinkWrap: true,
+                  itemCount: 20,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    childAspectRatio: 0.95,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
+                    crossAxisCount: 2,
+                  ),
+                  itemBuilder: (context, index) {
+                    return Image.network(
+                      fit: BoxFit.cover,
+                      'https://img.freepik.com/free-psd/travel-tourism-facebook-cover-template_106176-2350.jpg?t=st=1718837003~exp=1718840603~hmac=ee693122a4a6abe55342026a5443a20b35e53b8ec5c6c4a8cddcb53e87314dba&w=1380',
+                    );
+                  },
+                ),
               ],
             ),
           );

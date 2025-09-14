@@ -81,7 +81,7 @@ class CustomCoverAndImageProfile extends StatelessWidget {
                     bodyBuilder: (context) => const ProfileImageMenuItem());
               },
               child: ProfilePictureWithStory(
-              //  size: 100,
+                size: 100,
                 image: profileImage,
               ),
             ),
