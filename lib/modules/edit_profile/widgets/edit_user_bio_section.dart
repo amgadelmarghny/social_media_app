@@ -38,7 +38,6 @@ class _EditUseBioSectionState extends State<EditUseBioSection> {
             mainAxisSize: MainAxisSize.min,
             children: [
               CustomTextField(
-                outLineBorderColor: Colors.grey,
                 controller: BlocProvider.of<SocialCubit>(context).bioController,
                 contentVerticalPadding: 10,
                 textInputType: TextInputType.text,

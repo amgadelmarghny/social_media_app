@@ -4,16 +4,18 @@ import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
 
 class ProfileImageMenuItem extends StatelessWidget {
-  const ProfileImageMenuItem({super.key});
-
+  const ProfileImageMenuItem({super.key,required this.isUsedInMyAccount});
+  final bool isUsedInMyAccount;
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         GestureDetector(
           onTap: () {
-            BlocProvider.of<SocialCubit>(context).pickAndUploadProfileImage();
-            Navigator.pop(context);
+            if (isUsedInMyAccount) {
+              BlocProvider.of<SocialCubit>(context).pickAndUploadProfileImage();
+              Navigator.pop(context);
+            }
           },
           child: Container(
             height: 50,

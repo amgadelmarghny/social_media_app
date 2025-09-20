@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/models/post_model.dart';
 import 'package:social_media_app/modules/post/widgets/post_view_body.dart';
 import 'package:social_media_app/shared/style/theme/theme.dart';
-import '../../models/user_model.dart';
 import '../../shared/bloc/comments_cubit/comments_cubit.dart';
 
 /// A view that displays a single post, including user info, content, image, hashtags, and interactive actions.
@@ -12,7 +11,6 @@ class PostView extends StatelessWidget {
     super.key,
     required this.postModel,
     required this.postId,
-    required this.userModel,
   });
 
   /// The post data to display.
@@ -22,7 +20,7 @@ class PostView extends StatelessWidget {
   final String postId;
 
   /// The user who created the post.
-  final UserModel userModel;
+//  final UserModel userModel;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +33,6 @@ class PostView extends StatelessWidget {
           body: PostViewBody(
             postModel: postModel,
             postId: postId,
-            userModel: userModel,
           ),
         ),
       ),

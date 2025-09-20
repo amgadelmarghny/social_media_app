@@ -7,14 +7,14 @@ final class SocialInitial extends SocialState {}
 final class BottomNavBarState extends SocialState {}
 
 ////////////////! get user data /////////////////
-final class GetUserDataLoadingState extends SocialState {}
+final class GetMyDataLoadingState extends SocialState {}
 
-final class GetUserDataSuccessState extends SocialState {}
+final class GetMyDataSuccessState extends SocialState {}
 
-final class GetUserDataFailureState extends SocialState {
+final class GetMyDataFailureState extends SocialState {
   final String errMessage;
 
-  GetUserDataFailureState({required this.errMessage});
+  GetMyDataFailureState({required this.errMessage});
 }
 
 // pick image
@@ -76,6 +76,12 @@ final class RemovePickedFile extends SocialState {}
 // cancel upload post
 final class RemovePostState extends SocialState {}
 
+final class RemovePostFailureState extends SocialState {
+  final String errMessage;
+
+  RemovePostFailureState({required this.errMessage});
+}
+
 // //////////////////! like post ///////////////
 final class ToggleLikeLoadingState extends SocialState {}
 
@@ -87,15 +93,25 @@ final class LikePostFailureState extends SocialState {
   LikePostFailureState({required this.errMessage});
 }
 
-////////////////! get posts /////////////////
-final class GetPostsLoadingState extends SocialState {}
+////////////////! get feed posts /////////////////
+final class GetFeedsPostsLoadingState extends SocialState {}
 
-final class GetPostsSuccessState extends SocialState {}
+final class GetFeedsPostsSuccessState extends SocialState {}
 
-final class GetPostsFailureState extends SocialState {
+final class GetFeedsPostsFailureState extends SocialState {
   final String errMessage;
 
-  GetPostsFailureState({required this.errMessage});
+  GetFeedsPostsFailureState({required this.errMessage});
+}
+
+final class GetMyPostsLoading extends SocialState {}
+
+final class GetMyPostsSuccess extends SocialState {}
+
+final class GetMyPostsFailure extends SocialState {
+  final String errMessage;
+
+  GetMyPostsFailure({required this.errMessage});
 }
 
 final class GetPostLikesSuccessState extends SocialState {}
@@ -117,8 +133,6 @@ final class GetUsersLikesPostFailureState extends SocialState {
   GetUsersLikesPostFailureState({required this.errMessage});
 }
 
-
-
 ////////////////////! update user info /////////////////
 final class UpdateUserInfoLoadingState extends SocialState {}
 
@@ -126,4 +140,12 @@ final class UpdateUserInfoFailureState extends SocialState {
   final String errMessage;
 
   UpdateUserInfoFailureState({required this.errMessage});
+}
+
+class GetFollowersSuccessState extends SocialState {
+  GetFollowersSuccessState();
+}
+
+class GetFollowingSuccessState extends SocialState {
+  GetFollowingSuccessState();
 }

@@ -16,7 +16,7 @@ class EditProfileView extends StatelessWidget {
       decoration: themeColor(),
       child: BlocConsumer<SocialCubit, SocialState>(
         listener: (BuildContext context, SocialState state) {
-          if (state is GetUserDataSuccessState) {
+          if (state is GetMyDataSuccessState) {
             showToast(
               msg: 'Update Successfully',
               toastState: ToastState.success,

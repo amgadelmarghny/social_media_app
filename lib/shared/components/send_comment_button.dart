@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/models/user_model.dart';
+import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import '../../../shared/style/fonts/font_style.dart';
 import '../../../shared/style/theme/constant.dart';
 import '../../models/comment_model.dart';
@@ -9,9 +10,8 @@ import '../bloc/comments_cubit/comments_cubit.dart';
 /// A widget that provides a text field for writing and sending comments,
 /// including the ability to attach an image.
 class SendCommentButton extends StatelessWidget {
-  const SendCommentButton(
-      {super.key, required this.userModel, required this.postId});
-  final UserModel userModel;
+  const SendCommentButton({super.key, required this.postId});
+
   final String postId;
 
   @override
@@ -30,7 +30,7 @@ class SendCommentButton extends StatelessWidget {
             return Padding(
               padding: const EdgeInsets.only(left: 4),
               child: AbsorbPointer(
-                absorbing: state is PickImageLoadingState,
+                absorbing: state is PickCommentImageLoadingState,
                 child: IconButton(
                   onPressed: () async {
                     // Open image picker and set the picked image in the cubit
@@ -51,12 +51,13 @@ class SendCommentButton extends StatelessWidget {
           builder: (context, state) {
             return IconButton(
               onPressed: () async {
+                UserModel myUserModel =
+                    BlocProvider.of<SocialCubit>(context).userModel!;
                 // Send the comment when the send button is pressed
                 await _sendCommentMethod(
-                  commentsCubit: commentsCubit,
-                  userModel: userModel,
-                  postId: postId,
-                );
+                    commentsCubit: commentsCubit,
+                    postId: postId,
+                    myUserModel: myUserModel);
               },
               // Show a loading indicator if a comment is being sent or image is uploading
               icon: state is AddCommentLoading ||
@@ -84,8 +85,8 @@ class SendCommentButton extends StatelessWidget {
   /// Handles sending a comment, with or without an attached image.
   Future<void> _sendCommentMethod(
       {required CommentsCubit commentsCubit,
-      required UserModel userModel,
-      required String postId}) async {
+      required String postId,
+      required UserModel myUserModel}) async {
     // Get the current date and time (to the minute)
     final DateTime now = DateTime.now();
     final currentTime =
@@ -98,12 +99,12 @@ class SendCommentButton extends StatelessWidget {
       if (commentPhoto != null) {
         // Create a comment model with the uploaded image
         CommentModel commentModel = CommentModel(
-          userName: '${userModel.firstName} ${userModel.lastName}',
+          userName: '${myUserModel.firstName} ${myUserModel.lastName}',
           comment: commentsCubit.commentController.text,
-          profilePhoto: userModel.photo,
+          profilePhoto: myUserModel.photo,
           commentPhoto: commentPhoto,
           dateTime: currentTime,
-          userUid: userModel.uid,
+          userUid: myUserModel.uid,
         );
         // Add the comment and clear the input after success
         await commentsCubit
@@ -121,12 +122,12 @@ class SendCommentButton extends StatelessWidget {
     // If only text is entered, send the comment without an image
     else if (commentsCubit.commentController.text.isNotEmpty) {
       CommentModel commentModel = CommentModel(
-        userName: '${userModel.firstName} ${userModel.lastName}',
+        userName: '${myUserModel.firstName} ${myUserModel.lastName}',
         comment: commentsCubit.commentController.text,
-        profilePhoto: userModel.photo,
+        profilePhoto: myUserModel.photo,
         commentPhoto: null,
         dateTime: currentTime,
-        userUid: userModel.uid,
+        userUid: myUserModel.uid,
       );
       // Add the comment and clear the input after success
       commentsCubit

@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:social_media_app/shared/components/custom_refresh_indicator.dart';
 // import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
-import '../../../models/user_model.dart';
 import '../../../shared/bloc/comments_cubit/comments_cubit.dart';
 import '../../../shared/components/comment_item.dart';
 import '../../../shared/components/send_comment_button.dart';
@@ -11,10 +10,8 @@ import '../../../shared/components/send_comment_button.dart';
 class CommentsSheetBody extends StatelessWidget {
   const CommentsSheetBody({
     super.key,
-    required this.userModel,
     required this.postId,
   });
-  final UserModel userModel;
   final String postId;
 
   @override
@@ -85,7 +82,6 @@ class CommentsSheetBody extends StatelessWidget {
                 bottom: MediaQuery.paddingOf(context).bottom,
               ),
               child: SendCommentButton(
-                userModel: userModel,
                 postId: postId,
               ),
             ),

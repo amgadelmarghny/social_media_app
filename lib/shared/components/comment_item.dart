@@ -1,7 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:readmore/readmore.dart';
 import 'package:social_media_app/models/comment_model.dart';
+import 'package:social_media_app/models/user_model.dart';
+import 'package:social_media_app/modules/user/user_view.dart';
+import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/components/profile_picture_with_story.dart';
 import '../style/fonts/font_style.dart';
 import 'custom_time_ago.dart';
@@ -21,9 +25,22 @@ class CommentItem extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ProfilePictureWithStory(
-            image: commentModel.profilePhoto,
-            size: 70,
+          GestureDetector(
+            onTap: () async {
+              UserModel userModel = await BlocProvider.of<SocialCubit>(context)
+                  .getUserData(userUid: commentModel.userUid);
+              if (context.mounted) {
+                Navigator.pushNamed(
+                  context,
+                  UserView.routName,
+                  arguments: userModel,
+                );
+              }
+            },
+            child: ProfilePictureWithStory(
+              image: commentModel.profilePhoto,
+              size: 70,
+            ),
           ),
           const SizedBox(
             width: 10,

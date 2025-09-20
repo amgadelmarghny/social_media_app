@@ -31,31 +31,38 @@ class ChatViewBody extends StatelessWidget {
             // Expanded widget to make the message list take available space
             Expanded(
               child: ListView.builder(
-                physics: BouncingScrollPhysics(), // Adds a bounce effect
+                physics: const BouncingScrollPhysics(), // Adds a bounce effect to the list
                 reverse: true, // Show newest messages at the bottom
                 itemCount: messageList.length,
                 itemBuilder: (context, index) {
                   final message = messageList[index];
+                  // Get the current user's UID to distinguish between sent and received messages
                   final currentUserId =
                       BlocProvider.of<SocialCubit>(context).userModel!.uid;
 
-                  // لو دي أول رسالة في اليوم بتاعها → أظهر التاريخ كـ Label
+                  // Determine if this message should display a date header
+                  // (i.e., it's the first message of a new day)
                   bool showHeader = false;
                   String? headerLabel;
 
                   if (index == messageList.length - 1) {
-                    // أول رسالة في الليست
+                    // This is the last message in the list (oldest message)
                     showHeader = true;
                     headerLabel = getMessageDateLabel(message.dateTime);
                   } else {
-                    // قارن مع الرسالة اللي بعدها
-                    DateTime currentMsgDay = DateTime(message.dateTime.year,
-                        message.dateTime.month, message.dateTime.day);
+                    // Compare the date of this message with the next one
+                    DateTime currentMsgDay = DateTime(
+                      message.dateTime.year,
+                      message.dateTime.month,
+                      message.dateTime.day,
+                    );
                     DateTime nextMsgDay = DateTime(
-                        messageList[index + 1].dateTime.year,
-                        messageList[index + 1].dateTime.month,
-                        messageList[index + 1].dateTime.day);
+                      messageList[index + 1].dateTime.year,
+                      messageList[index + 1].dateTime.month,
+                      messageList[index + 1].dateTime.day,
+                    );
 
+                    // If the day changes between this message and the next, show the header
                     if (currentMsgDay != nextMsgDay) {
                       showHeader = true;
                       headerLabel = getMessageDateLabel(message.dateTime);
@@ -64,9 +71,10 @@ class ChatViewBody extends StatelessWidget {
 
                   return Column(
                     children: [
+                      // Show the date header if needed
                       if (showHeader)
                         Container(
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             color: defaultColorButton,
                             borderRadius: BorderRadius.all(
                               Radius.circular(20),
@@ -78,14 +86,14 @@ class ChatViewBody extends StatelessWidget {
                               vertical: 8.0, horizontal: 8),
                           child: Text(
                             headerLabel!,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.white54,
                             ),
                           ),
                         ),
 
-                      // الرسالة نفسها
+                      // Show the message bubble: MyBubbleChat if sent by current user, otherwise FriendBubbleMessage
                       if (message.uid == currentUserId)
                         MyBubbleChat(
                           message: message.message,

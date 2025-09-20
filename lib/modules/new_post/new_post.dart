@@ -39,18 +39,18 @@ class CreatePostSheet extends StatelessWidget {
                             : defaultColorButton,
                         onPressed: () {
                           final DateTime now = DateTime.now();
-                          final currentTime = DateTime(now.year, now.month,
-                              now.day, now.hour, now.minute);
+                          // final currentTime = DateTime(now.year, now.month,
+                          //     now.day, now.hour, now.minute);
                           if (socialCubit.postImagePicked != null) {
                             socialCubit.createPostWithPhoto(
                               postContent: value.text,
-                              dateTime: currentTime,
+                              dateTime: now,
                             );
                             Navigator.pop(context);
                           } else if (value.text.isNotEmpty) {
                             socialCubit.createPostWithContentOnly(
                               postContent: value.text,
-                              dateTime: currentTime,
+                              dateTime: now,
                             );
                             Navigator.pop(context);
                           }

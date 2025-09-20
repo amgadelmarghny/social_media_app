@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:social_media_app/models/post_model.dart';
-import 'package:social_media_app/models/user_model.dart';
 import 'package:social_media_app/modules/feeds/widgets/hashtag.dart';
 import 'package:social_media_app/modules/feeds/widgets/interactive_row.dart';
 import 'package:social_media_app/modules/feeds/widgets/profile_post_row.dart';
@@ -22,13 +21,11 @@ class PostViewBody extends StatefulWidget {
     super.key,
     required this.postModel,
     required this.postId,
-    required this.userModel,
   });
 
   // final PostView widget;
   final PostModel postModel;
   final String postId;
-  final UserModel userModel;
 
   @override
   State<PostViewBody> createState() => _PostViewBodyState();
@@ -90,6 +87,8 @@ class _PostViewBodyState extends State<PostViewBody> {
                   timePosted: DateFormat.yMMMd()
                       .add_jm()
                       .format(widget.postModel.dateTime),
+                  userUid: widget.postModel.uid,
+                  postId: widget.postId,
                 ),
               ),
               // If the post has text content, display it.
@@ -130,7 +129,6 @@ class _PostViewBodyState extends State<PostViewBody> {
                   isLike: isLike,
                   onLikeButtonTap: toggleLike,
                   postId: widget.postId,
-                  userModel: widget.userModel,
                 ),
               ),
               BlocBuilder<CommentsCubit, CommentsState>(
@@ -166,7 +164,6 @@ class _PostViewBodyState extends State<PostViewBody> {
               bottom: MediaQuery.paddingOf(context).bottom,
             ),
             child: SendCommentButton(
-              userModel: widget.userModel,
               postId: widget.postId,
             ),
           ),

@@ -23,18 +23,18 @@ class HomeView extends StatelessWidget {
               body: BlocConsumer<SocialCubit, SocialState>(
                 // Listen for error states and show toasts if needed.
                 listener: (context, state) {
-                  if (state is GetUserDataFailureState) {
+                  if (state is GetMyDataFailureState) {
                     showToast(
                         msg: state.errMessage, toastState: ToastState.error);
                   }
-                  if (state is GetPostsFailureState) {
+                  if (state is GetFeedsPostsFailureState) {
                     showToast(
                         msg: state.errMessage, toastState: ToastState.error);
                   }
                 },
                 builder: (context, state) {
                   // If user data failed to load, show an error message.
-                  if (state is GetUserDataFailureState) {
+                  if (state is GetMyDataFailureState) {
                     return const Center(
                       child: Text('Something went wrong'),
                     );

@@ -28,3 +28,13 @@ final class GetMessagesFailure extends ChatState {
 
   const GetMessagesFailure({required this.errMessage});
 }
+
+final class GetChatsSuccessState extends ChatState {}
+
+final class GetChatsLoadingState extends ChatState {}
+
+final class GetChatsFailureState extends ChatState {
+  final String errMessage;
+
+  const GetChatsFailureState({required this.errMessage});
+}

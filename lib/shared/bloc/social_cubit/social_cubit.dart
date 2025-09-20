@@ -8,11 +8,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:social_media_app/models/create_post_impl_model.dart';
 import 'package:social_media_app/models/post_model.dart';
 import 'package:social_media_app/models/user_model.dart';
-import 'package:social_media_app/modules/chat/chat_body.dart';
+import 'package:social_media_app/modules/chat/chats_body.dart';
 import 'package:social_media_app/modules/feeds/feeds_body.dart';
 import 'package:social_media_app/modules/new_post/new_post.dart';
 import 'package:social_media_app/modules/notifications/notifications_body.dart';
-import 'package:social_media_app/modules/users/users_body.dart';
+import 'package:social_media_app/modules/my_account/my_account_body.dart';
 import 'package:social_media_app/shared/components/constants.dart';
 import 'package:social_media_app/shared/network/local/cache_helper.dart';
 import '../../../models/like_model.dart';
@@ -37,7 +37,7 @@ class SocialCubit extends Cubit<SocialState> {
   // List of widgets for each tab in the bottom navigation bar
   final List<Widget> currentBody = const [
     FeedsBody(),
-    ChatBody(),
+    ChatsBody(),
     CreatePostSheet(),
     UsersBody(),
     NotificationsBody(),
@@ -70,16 +70,17 @@ class SocialCubit extends Cubit<SocialState> {
 
   /// Fetch user data from Firestore and update [userModel]
   Future<UserModel> getUserData({required String userUid}) async {
-    emit(GetUserDataLoadingState());
+    emit(GetMyDataLoadingState());
     late UserModel spacificUserModel;
     try {
       DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
           await _userCollectionRef.doc(userUid).get();
-      userModel = UserModel.fromJson(documentSnapshot.data()!);
-      spacificUserModel = userModel!;
-      emit(GetUserDataSuccessState());
+      spacificUserModel = UserModel.fromJson(documentSnapshot.data()!);
+      //if the userModel != null that means getUserData used to featch friends data
+      userModel ??= spacificUserModel;
+      emit(GetMyDataSuccessState());
     } catch (error) {
-      emit(GetUserDataFailureState(errMessage: error.toString()));
+      emit(GetMyDataFailureState(errMessage: error.toString()));
     }
     return spacificUserModel;
   }
@@ -100,6 +101,7 @@ class SocialCubit extends Cubit<SocialState> {
       await _userCollectionRef
           .doc(uidTokenCache)
           .update(updateUserImplModel.toMap(userModel!));
+      userModel = null;
       await getUserData(userUid: uidTokenCache);
     } on Exception catch (err) {
       emit(UpdateUserInfoFailureState(errMessage: err.toString()));
@@ -224,9 +226,13 @@ class SocialCubit extends Cubit<SocialState> {
     );
     try {
       await _postCollectionRef.add(postModel.toJson());
+      postContentController.clear();
+      postImagePicked = null;
       emit(CreatePostSuccessState());
+
       // Refresh posts after successfully adding a new post
-      await getPosts();
+      getMyUserPosts(userModel!.uid);
+      await getTimelinePosts();
     } catch (err) {
       emit(CreatePostFailureState(errMessage: err.toString()));
     }
@@ -271,37 +277,20 @@ class SocialCubit extends Cubit<SocialState> {
   }
 
   /// Remove the post image and clear the post content
-  void removePost() {
+  void cancelPostDuringCreating() {
     postImagePicked = null;
     postContentController.text = '';
     emit(RemovePostState());
   }
 
-  // List of all posts fetched from Firestore
-  List<PostModel> postsModelList = [];
-  // List of post IDs
-  List<String> postsIdList = [];
-  // List<int> numbersOfLikesInPostsList = [];
-
-  /// Fetch all posts from Firestore and update [postsModelList] and [postsIdList]
-  Future<void> getPosts() async {
-    emit(GetPostsLoadingState());
+  Future<void> deletePost(String postId) async {
     try {
-      var postsDocumentSnapshot =
-          await _postCollectionRef.orderBy(kDateTime, descending: true).get();
-
-      postsIdList.clear();
-      // numbersOfLikesInPostsList.clear();
-      postsModelList.clear();
-      for (var postDocInCollection in postsDocumentSnapshot.docs) {
-        // Add post ID to the list
-        postsIdList.add(postDocInCollection.id);
-        // Add post data to the list
-        postsModelList.add(PostModel.fromJson(postDocInCollection.data()));
-      }
-      emit(GetPostsSuccessState());
-    } catch (error) {
-      emit(GetPostsFailureState(errMessage: error.toString()));
+      await _postCollectionRef.doc(postId).delete();
+      getMyUserPosts(userModel!.uid);
+      await getTimelinePosts();
+      emit(RemovePostState());
+    } on Exception catch (e) {
+      emit(RemovePostFailureState(errMessage: e.toString()));
     }
   }
 
@@ -327,9 +316,10 @@ class SocialCubit extends Cubit<SocialState> {
     try {
       List<String> usersLikeUids =
           await _getUsersLikesUidInPost(postId: postId);
-      usersLikeUids.forEach((userUid) async {
+      for (var userUid in usersLikeUids) {
         userModelList.add(await getUserData(userUid: userUid));
-      });
+      }
+
       emit(GetUsersLikesPostSuccessState());
     } on Exception catch (e) {
       emit(GetUsersLikesPostFailureState(errMessage: e.toString()));
@@ -381,7 +371,7 @@ class SocialCubit extends Cubit<SocialState> {
     return likesCollection;
   }
 
-  /// Get all likes for a given post
+  // Get all likes for a given post
   Future<QuerySnapshot<Map<String, dynamic>>> getPostLikes(
       String postId) async {
     late QuerySnapshot<Map<String, dynamic>> postLikes;
@@ -396,5 +386,107 @@ class SocialCubit extends Cubit<SocialState> {
       emit(GetPostLikesFailureState(errMessage: e.toString()));
     }
     return postLikes;
+  }
+
+  List<UserModel> followings = [];
+  late int numberOfFollowing;
+
+  Future<QuerySnapshot<Map<String, dynamic>>> getFollowing() async {
+    final followingSnapshot = await FirebaseFirestore.instance
+        .collection(kUsersCollection)
+        .doc(uidTokenCache)
+        .collection(kFollowingCollection)
+        .get();
+    followings.clear();
+    numberOfFollowing = followingSnapshot.docs.length;
+    for (var userDoc in followingSnapshot.docs) {
+      final userModel = await getUserData(userUid: userDoc.id);
+      followings.add(userModel);
+    }
+    emit(GetFollowingSuccessState());
+    return followingSnapshot;
+  }
+
+  List<UserModel> followers = [];
+  late int numberOfFollowers;
+
+  Future<void> getFollowers() async {
+    final followersSnapshot = await FirebaseFirestore.instance
+        .collection(kUsersCollection)
+        .doc(uidTokenCache)
+        .collection(kFollowersCollection)
+        .get();
+    followers.clear();
+    numberOfFollowers = followersSnapshot.docs.length;
+    for (var userDoc in followersSnapshot.docs) {
+      final userModel = await getUserData(userUid: userDoc.id);
+      followers.add(userModel);
+    }
+    emit(GetFollowersSuccessState());
+  }
+
+  // List of all posts fetched from Firestore
+  List<PostModel> freindsPostsModelList = [];
+  // List of post IDs
+  List<String> freindsPostsIdList = [];
+
+  /// Fetch all posts from Firestore and update [freindsPostsModelList] and [freindsPostsIdList]
+  Future<void> getTimelinePosts() async {
+    emit(GetFeedsPostsLoadingState());
+
+    //try {
+    // 1. هات الناس اللي متابعهم
+    final followingSnapshot = await getFollowing();
+    // 2. كون ليست من UIDs
+    List<String> uids = followingSnapshot.docs.map((doc) => doc.id).toList();
+
+    // ضيف الـ uid بتاع اليوزر نفسه
+    uids.add(uidTokenCache);
+
+    // 3. هات البوستات
+    final postsSnapshot = await FirebaseFirestore.instance
+        .collection(kPostsCollection)
+        .where('uid', whereIn: uids)
+        .orderBy(kCreatedAt, descending: true)
+        .get();
+
+    freindsPostsModelList.clear();
+    freindsPostsIdList.clear();
+
+    for (var postDoc in postsSnapshot.docs) {
+      freindsPostsModelList.add(PostModel.fromJson(postDoc.data()));
+      freindsPostsIdList.add(postDoc.id);
+    }
+    emit(GetFeedsPostsSuccessState());
+    // } catch (error) {
+    //   emit(GetFeedsPostsFailureState(errMessage: error.toString()));
+    // }
+  }
+
+  // List of all posts fetched from Firestore
+  List<PostModel> postsModelList = [];
+  // List of post IDs
+  List<String> postsIdList = [];
+
+  Future<void> getMyUserPosts(String uid) async {
+    emit(GetMyPostsLoading());
+    try {
+      final postsSnapshot = await FirebaseFirestore.instance
+          .collection(kPostsCollection)
+          .where('uid', isEqualTo: uid)
+          .orderBy(kCreatedAt, descending: true)
+          .get();
+
+      postsModelList.clear();
+      postsIdList.clear();
+
+      for (var postDoc in postsSnapshot.docs) {
+        postsModelList.add(PostModel.fromJson(postDoc.data()));
+        postsIdList.add(postDoc.id);
+        emit(GetMyPostsSuccess());
+      }
+    } on Exception catch (e) {
+      emit(GetMyPostsFailure(errMessage: e.toString()));
+    }
   }
 }

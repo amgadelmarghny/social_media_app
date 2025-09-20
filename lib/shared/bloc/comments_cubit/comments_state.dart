@@ -5,14 +5,14 @@ sealed class CommentsState {}
 final class CommentsInitial extends CommentsState {}
 
 // pick image
-final class PickImageLoadingState extends CommentsState {}
+final class PickCommentImageLoadingState extends CommentsState {}
 
-final class PickImageSuccessState extends CommentsState {}
+final class PickCommentImageSuccessState extends CommentsState {}
 
-final class PickImageFailureState extends CommentsState {
+final class PickCommentImageFailureState extends CommentsState {
   final String errMessage;
 
-  PickImageFailureState({required this.errMessage});
+  PickCommentImageFailureState({required this.errMessage});
 }
 
 // add comment

@@ -36,7 +36,7 @@ class PostModel {
       'profilePhoto': profilePhoto,
       'content': content,
       'postImage': postImage,
-      kDateTime: Timestamp.fromDate(dateTime),
+      kCreatedAt: Timestamp.fromDate(dateTime),
     };
   }
 }

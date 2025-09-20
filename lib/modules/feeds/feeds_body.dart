@@ -53,7 +53,7 @@ class _FeedsBodyState extends State<FeedsBody> {
     /// Handles pull-to-refresh action.
     /// Refreshes posts and user data.
     Future<void> handleRefresh() async {
-      await BlocProvider.of<SocialCubit>(context).getPosts();
+      await BlocProvider.of<SocialCubit>(context).getTimelinePosts();
       if (context.mounted) {
         await BlocProvider.of<SocialCubit>(context)
             .getUserData(userUid: CacheHelper.getData(key: kUidToken));
@@ -84,7 +84,7 @@ class _FeedsBodyState extends State<FeedsBody> {
         child: BlocConsumer<SocialCubit, SocialState>(
           listener: (BuildContext context, SocialState state) {
             if (state is CreatePostSuccessState) {
-              BlocProvider.of<SocialCubit>(context).removePost();
+              BlocProvider.of<SocialCubit>(context).cancelPostDuringCreating();
               showToast(
                   msg: 'Post added successfully',
                   toastState: ToastState.success);
@@ -145,25 +145,28 @@ class _FeedsBodyState extends State<FeedsBody> {
                     SliverList.builder(
                       itemBuilder: (context, index) {
                         return Skeletonizer(
-                          enabled: state is GetPostsLoadingState,
+                          enabled: state is GetFeedsPostsLoadingState,
                           child: PostItem(
-                            postModel: socialCubit.postsModelList[index],
-                            postId: socialCubit.postsIdList[index],
-                            userModel: socialCubit.userModel!,
+                            postModel: socialCubit.freindsPostsModelList[index],
+                            postId: socialCubit.freindsPostsIdList[index],
                           ),
                         );
                       },
-                      itemCount: socialCubit.postsModelList.length,
+                      itemCount: socialCubit.freindsPostsModelList.length,
                     ),
 
-                    if (socialCubit.postsModelList.isEmpty)
+                    if (socialCubit.freindsPostsModelList.isEmpty)
                       SliverToBoxAdapter(
                         child: Padding(
                           padding: EdgeInsets.only(
                               top: MediaQuery.sizeOf(context).height / 5),
-                          child: Text(
-                            'There is no posts yet',
-                            style: FontsStyle.font20Poppins,
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: Text(
+                              'Follow some friends or share your first post ✨',
+                              textAlign: TextAlign.center,
+                              style: FontsStyle.font20Poppins,
+                            ),
                           ),
                         ),
                       ),

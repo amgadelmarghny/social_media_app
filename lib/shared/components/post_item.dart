@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:readmore/readmore.dart';
 import 'package:social_media_app/models/post_model.dart';
-import 'package:social_media_app/models/user_model.dart';
 import 'package:social_media_app/modules/post/post_view.dart';
 import 'package:social_media_app/shared/bloc/comments_cubit/comments_cubit.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
@@ -21,11 +20,10 @@ class PostItem extends StatefulWidget {
     super.key,
     required this.postModel,
     required this.postId,
-    required this.userModel,
   });
   final PostModel postModel;
   final String postId;
-  final UserModel userModel;
+  // final UserModel userModel;
 
   @override
   State<PostItem> createState() => _PostItemState();
@@ -80,13 +78,11 @@ class _PostItemState extends State<PostItem> {
                   builder: (context) => PostView(
                     postModel: widget.postModel,
                     postId: widget.postId,
-                    userModel: widget.userModel,
                   ),
                 ),
               );
               // Refresh likes and comments when returning from PostView
               fetchLikes();
-              // Refresh comments count
               if (mounted) {
                 BlocProvider.of<CommentsCubit>(context)
                     .getComments(postId: widget.postId);
@@ -110,6 +106,8 @@ class _PostItemState extends State<PostItem> {
                     timePosted: DateFormat.yMMMd()
                         .add_jm()
                         .format(widget.postModel.dateTime),
+                    userUid: widget.postModel.uid,
+                    postId: widget.postId,
                   ),
                   if (widget.postModel.content != null)
                     Padding(
@@ -147,7 +145,6 @@ class _PostItemState extends State<PostItem> {
                         isLike: isLike,
                         onLikeButtonTap: toggleLike,
                         postId: widget.postId,
-                        userModel: widget.userModel,
                       );
                     },
                   ),

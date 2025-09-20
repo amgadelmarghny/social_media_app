@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:social_media_app/models/user_model.dart';
 import 'package:social_media_app/modules/feeds/widgets/comments_sheet.dart';
-import 'package:social_media_app/modules/feeds/widgets/users_likes_sheet.dart';
+import 'package:social_media_app/modules/feeds/widgets/users_suggestion_sheet.dart';
 import 'package:social_media_app/shared/bloc/comments_cubit/comments_cubit.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import '../../../shared/style/fonts/font_style.dart';
@@ -15,8 +14,6 @@ class InteractiveRow extends StatelessWidget {
     required this.isLike,
     this.onLikeButtonTap,
     required this.postId,
-    required this.userModel,
-    // required this.numOfComments,
     this.showCommentSheet = true,
   });
 
@@ -24,7 +21,6 @@ class InteractiveRow extends StatelessWidget {
   final String postId;
   final bool isLike;
   final void Function()? onLikeButtonTap;
-  final UserModel userModel;
   final bool showCommentSheet;
 
   @override
@@ -58,7 +54,10 @@ class InteractiveRow extends StatelessWidget {
                     return FractionallySizedBox(
                       heightFactor:
                           1.0, // This makes the bottom sheet take the full height
-                      child: UsersLikesSheet(),
+                      child: UsersSuggestionsSheet(
+                        userModelList:
+                            context.read<SocialCubit>().userModelList,
+                      ),
                     );
                   },
                 );
@@ -87,7 +86,6 @@ class InteractiveRow extends StatelessWidget {
                             1.0, // This makes the bottom sheet take the full height
                         child: CommentsSheet(
                           postId: postId,
-                          userModel: userModel,
                         ),
                       );
                     },

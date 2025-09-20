@@ -17,45 +17,50 @@ class _EditProfileViewBodyState extends State<EditProfileViewBody> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(top: 10, left: 15, right: 15),
+      padding: const EdgeInsets.only(top: 10, left: 15, right: 15),
       child: SingleChildScrollView(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const ProfilePictureSection(),
             SizedBox(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              height: 10,
+            ),
+            const Divider(
+              thickness: 0.9,
+            ),
+            const CoverPhotoSection(),
+            const SizedBox(
+              height: 10,
+            ),
+            const Divider(
+              thickness: 0.9,
+              color: Colors.white70,
+            ),
+            Text(
+              'Profile',
+              style: FontsStyle.font25Bold,
+            ),
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 5),
+              padding: const EdgeInsets.only(
+                  top: 10, bottom: 10, right: 10, left: 10),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: const Color(0xff6D4ACD).withValues(alpha: 0.40),
+                borderRadius: const BorderRadius.all(Radius.circular(25)),
+              ),
+              child: const Column(
                 children: [
-                  const ProfilePictureSection(),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  const Divider(
-                    thickness: 0.9,
-                  ),
-                  const CoverPhotoSection(),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  const Divider(
-                    thickness: 0.9,
-                    color: Colors.white70,
-                  ),
-                  Text(
-                    'Profile',
-                    style: FontsStyle.font25Bold,
-                  ),
-                  const Card(
-                    child: Column(
-                      children: [
-                        EditUserNameSection(),
-                        EditUserBirthdaySection(),
-                        EditUseBioSection(),
-                      ],
-                    ),
-                  )
+                  EditUserNameSection(),
+                  EditUserBirthdaySection(),
+                  EditUseBioSection(),
                 ],
               ),
-            )
+            ),
+            SizedBox(
+              height: MediaQuery.paddingOf(context).bottom,
+            ),
           ],
         ),
       ),

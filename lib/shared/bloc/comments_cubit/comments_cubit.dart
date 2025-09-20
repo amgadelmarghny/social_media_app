@@ -15,15 +15,15 @@ class CommentsCubit extends Cubit<CommentsState> {
   // pike Image
   File? pickedImage;
   Future<File?> pickPhoto() async {
-    emit(PickImageLoadingState());
+    emit(PickCommentImageLoadingState());
     final ImagePicker picker = ImagePicker();
     XFile? returnImage = await picker.pickImage(source: ImageSource.gallery);
 
     if (returnImage != null) {
-      emit(PickImageSuccessState());
+      emit(PickCommentImageSuccessState());
       return File(returnImage.path);
     } else {
-      emit(PickImageFailureState(errMessage: 'No image selected'));
+      emit(PickCommentImageFailureState(errMessage: 'No image selected'));
       return null;
     }
   }
@@ -76,7 +76,7 @@ class CommentsCubit extends Cubit<CommentsState> {
           .collection(kPostsCollection)
           .doc(postId)
           .collection(kCommentsCollection)
-          .orderBy(kDateTime, descending: true)
+          .orderBy(kCreatedAt, descending: true)
           .get();
       numberOfComment = commentsCollection.docs.length;
       commentsModelList.clear();

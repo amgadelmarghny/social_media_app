@@ -40,7 +40,6 @@ class _EditUserNameSectionState extends State<EditUserNameSection> {
               CustomTextField(
                 controller:
                     BlocProvider.of<SocialCubit>(context).firstNameController,
-                outLineBorderColor: Colors.grey,
                 contentVerticalPadding: 10,
                 textInputType: TextInputType.name,
                 hintText: 'First name',
@@ -51,7 +50,6 @@ class _EditUserNameSectionState extends State<EditUserNameSection> {
               CustomTextField(
                 controller:
                     BlocProvider.of<SocialCubit>(context).lastNameController,
-                outLineBorderColor: Colors.grey,
                 contentVerticalPadding: 10,
                 textInputType: TextInputType.name,
                 hintText: 'Last name',

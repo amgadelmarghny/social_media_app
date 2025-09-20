@@ -36,7 +36,7 @@ class CommentModel {
       'comment': comment,
       'profilePhoto': profilePhoto,
       'commentPhoto': commentPhoto,
-      kDateTime: Timestamp.fromDate(dateTime),
+      kCreatedAt: Timestamp.fromDate(dateTime),
     };
   }
 }

@@ -42,7 +42,6 @@ class _EditUserBirthdaySectionState extends State<EditUserBirthdaySection> {
               CustomTextField(
                 controller:
                     BlocProvider.of<SocialCubit>(context).birthdayController,
-                outLineBorderColor: Colors.grey,
                 contentVerticalPadding: 10,
                 textInputType: TextInputType.datetime,
                 hintText: 'DD/MM/YYYY',
@@ -55,15 +54,13 @@ class _EditUserBirthdaySectionState extends State<EditUserBirthdaySection> {
                   ).then(
                     (value) {
                       if (value != null && context.mounted) {
-                      
                         BlocProvider.of<SocialCubit>(context)
                             .birthdayController
                             .text = DateFormat.yMMMd().format(value);
                         BlocProvider.of<SocialCubit>(context)
                                 .updatedDayAndMonth =
                             DateFormat.MMMMd().format(value);
-                        BlocProvider.of<SocialCubit>(context)
-                            .updatedYear =
+                        BlocProvider.of<SocialCubit>(context).updatedYear =
                             DateFormat.y().format(value);
                       }
                     },
