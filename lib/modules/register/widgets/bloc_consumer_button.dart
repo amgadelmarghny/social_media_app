@@ -13,6 +13,7 @@ class BlocConsumerButton extends StatelessWidget {
     required this.lastNameController,
     required this.dateAndMonthController,
     required this.yearController,
+    required this.userNameController,
   });
 
   final TextEditingController emailController;
@@ -20,6 +21,7 @@ class BlocConsumerButton extends StatelessWidget {
   final TextEditingController lastNameController;
   final TextEditingController dateAndMonthController;
   final TextEditingController yearController;
+  final TextEditingController userNameController;
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +41,7 @@ class BlocConsumerButton extends StatelessWidget {
                   dateAndMonth: dateAndMonthController.text,
                   year: yearController.text,
                   gender: registerCubit.gender!,
+                  userName: userNameController.text,
                 );
                 registerCubit.userRegister(userRegisterImpl);
               } else {

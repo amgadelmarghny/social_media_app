@@ -16,6 +16,7 @@ class CustomTextField extends StatelessWidget {
     this.onTap,
     this.outLineBorderColor = Colors.white,
     this.contentVerticalPadding = 16,
+    this.errorText,
   });
 
   final TextEditingController? controller;
@@ -30,6 +31,8 @@ class CustomTextField extends StatelessWidget {
   final void Function()? onTap;
   final Color outLineBorderColor;
   final double contentVerticalPadding;
+  final String? errorText;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -54,8 +57,9 @@ class CustomTextField extends StatelessWidget {
         controller: controller,
         onChanged: onChange,
         decoration: InputDecoration(
-          contentPadding:
-               EdgeInsets.symmetric(horizontal: 20, vertical: contentVerticalPadding),
+          errorText: errorText,
+          contentPadding: EdgeInsets.symmetric(
+              horizontal: 20, vertical: contentVerticalPadding),
           suffixIcon: suffixIcon,
           prefixIcon: prefixIcon != null
               ? Icon(
@@ -63,9 +67,8 @@ class CustomTextField extends StatelessWidget {
                 )
               : null,
           hintText: hintText,
-          hintStyle:  FontsStyle.font18Popin().copyWith(
-            color:
-            outLineBorderColor,
+          hintStyle: FontsStyle.font18Popin().copyWith(
+            color: outLineBorderColor,
           ),
           labelText: labelText,
           labelStyle: const TextStyle(

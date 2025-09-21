@@ -1,24 +1,30 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:social_media_app/modules/register/widgets/user_name_text_field.dart';
 import 'package:social_media_app/shared/bloc/register_cubit/register_cubit.dart';
 import 'package:social_media_app/shared/components/gender_icon_list.dart';
 import 'package:social_media_app/shared/components/text_form_field.dart';
 import 'package:social_media_app/shared/components/year_picker.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
 
+/// Widget that displays all the text fields required for user registration.
 class RegisterTextFields extends StatelessWidget {
   const RegisterTextFields({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // double height = MediaQuery.sizeOf(context).height;
+    // Using BlocBuilder to rebuild the widget when RegisterState changes.
     return BlocBuilder<RegisterCubit, RegisterState>(
       builder: (context, state) {
+        // Access the RegisterCubit instance.
         RegisterCubit registerCubit = BlocProvider.of<RegisterCubit>(context);
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Row for First Name and Last Name fields.
             Row(
               children: [
                 Expanded(
@@ -42,17 +48,23 @@ class RegisterTextFields extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(
+            const SizedBox(
               height: 15,
             ),
+            // Email or phone number field.
             CustomTextField(
               hintText: 'Email/phone number',
               textInputType: TextInputType.emailAddress,
               controller: registerCubit.emailController,
             ),
-            SizedBox(
+            const SizedBox(
               height: 15,
             ),
+            const UserNameTextField(),
+            const SizedBox(
+              height: 15,
+            ),
+            // Password field with visibility toggle.
             CustomTextField(
               hintText: 'Password',
               textInputType: TextInputType.visiblePassword,
@@ -60,6 +72,7 @@ class RegisterTextFields extends StatelessWidget {
               controller: registerCubit.passwordController,
               suffixIcon: IconButton(
                 onPressed: () {
+                  // Toggle password visibility.
                   registerCubit.changeTextFieldObscure();
                 },
                 icon: Icon(
@@ -69,9 +82,10 @@ class RegisterTextFields extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 15,
             ),
+            // Label for birth date section.
             Text(
               'Birth of date',
               style: FontsStyle.font18Popin(),
@@ -79,6 +93,7 @@ class RegisterTextFields extends StatelessWidget {
             SizedBox(
               height: 15,
             ),
+            // Row for date/month and year fields.
             Row(
               children: [
                 Expanded(
@@ -99,31 +114,39 @@ class RegisterTextFields extends StatelessWidget {
                     controller: registerCubit.yearController,
                     textInputType: TextInputType.datetime,
                     onTap: () async {
+                      // Show year picker dialog when tapped.
                       String? selectedYear = await pickYear(context: context);
                       if (selectedYear != null) {
+                        // Set the selected year in the controller.
                         registerCubit.yearController.text = selectedYear;
                       }
                     },
-                    suffixIcon: Row(mainAxisSize: MainAxisSize.min, children: [
-                      SvgPicture.asset(
-                        'lib/assets/images/arrow_bottom.svg',
-                        height: 15,
-                      ),
-                    ]),
+                    suffixIcon: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Down arrow icon for year picker.
+                        SvgPicture.asset(
+                          'lib/assets/images/arrow_bottom.svg',
+                          height: 15,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
             ),
-            SizedBox(
+            const SizedBox(
               height: 15,
             ),
+            // Label for gender selection.
             Text(
               'Gender',
               style: FontsStyle.font18Popin(),
             ),
-            SizedBox(
+            const SizedBox(
               height: 15,
             ),
+            // Gender icon selection widget.
             const GenderIconList(),
           ],
         );

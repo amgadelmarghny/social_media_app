@@ -1,8 +1,12 @@
-class UserModel {
+import 'package:equatable/equatable.dart';
+
+class UserModel extends Equatable {
   final String uid;
   final String firstName;
   final String lastName;
   final String email;
+  final String userName;
+
   final String dateAndMonth;
   final String year;
   final String gender;
@@ -10,16 +14,17 @@ class UserModel {
   final String? cover;
   final String? bio;
 
-  UserModel({
+  const UserModel({
     required this.uid,
     required this.firstName,
     required this.lastName,
     required this.email,
+    required this.userName,
     required this.dateAndMonth,
     required this.year,
     required this.gender,
-     this.photo,
-     this.cover,
+    this.photo,
+    this.cover,
     this.bio,
   });
 
@@ -31,6 +36,7 @@ class UserModel {
       email: json['email'],
       dateAndMonth: json['dateAndMonth'],
       year: json['year'],
+      userName: json['userName'],
       gender: json['gender'],
       photo: json['photo'],
       cover: json['cover'],
@@ -39,7 +45,6 @@ class UserModel {
   }
 
   Map<String, dynamic> toMap() {
-
     return {
       'uid': uid,
       'firstName': firstName,
@@ -47,10 +52,26 @@ class UserModel {
       'email': email,
       'dateAndMonth': dateAndMonth,
       'year': year,
+      'userName': userName,
       'gender': gender,
       'photo': photo,
       'cover': cover,
       'bio': bio,
     };
   }
+
+  @override
+  List<Object?> get props => [
+        uid,
+        firstName,
+        lastName,
+        email,
+        userName,
+        dateAndMonth,
+        year,
+        gender,
+        photo,
+        cover,
+        bio,
+      ];
 }

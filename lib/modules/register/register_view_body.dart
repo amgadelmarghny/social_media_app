@@ -18,7 +18,6 @@ class RegisterViewBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.symmetric(
@@ -72,6 +71,7 @@ class RegisterViewBody extends StatelessWidget {
                           dateAndMonthController:
                               registerCubit.dateAndMonthController,
                           yearController: registerCubit.yearController,
+                          userNameController: registerCubit.userNameController,
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,

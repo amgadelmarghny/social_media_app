@@ -79,7 +79,9 @@ class UserCubit extends Cubit<UserState> {
       emit(GetUserFollowingSuccessState());
     } catch (e) {
       // Emit error state if something goes wrong.
-      emit(GetUserFollowingErrorState(e.toString()));
+      if (!isClosed) {
+        emit(GetUserFollowingErrorState(e.toString()));
+      }
     }
   }
 
@@ -108,7 +110,9 @@ class UserCubit extends Cubit<UserState> {
       emit(GetFollowersSuccessState());
     } catch (e) {
       // Emit error state if something goes wrong.
-      emit(GetUserFollowingErrorState(e.toString()));
+      if (!isClosed) {
+        emit(GetUserFollowingErrorState(e.toString()));
+      }
     }
   }
 

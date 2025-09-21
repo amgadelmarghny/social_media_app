@@ -7,6 +7,7 @@ import 'package:social_media_app/models/user_model.dart';
 import 'package:social_media_app/modules/edit_profile/edit_profile_view.dart';
 import 'package:social_media_app/modules/feeds/widgets/upload_post_demo_widget.dart';
 import 'package:social_media_app/modules/my_account/widgets/custom_cover_and_image_profile.dart';
+import 'package:social_media_app/modules/my_account/widgets/my_account_name_and_update_button.dart';
 import 'package:social_media_app/shared/bloc/user_cubit/user_cubit.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/components/constants.dart';
@@ -102,7 +103,7 @@ class _UsersBodyState extends State<UsersBody> {
                   socialCubit.userModel = null;
                   await socialCubit.getUserData(
                       userUid: CacheHelper.getData(key: kUidToken));
-                  socialCubit.getMyUserPosts(kUidToken);
+                  await socialCubit.getMyUserPosts(kUidToken);
                 },
                 child: CustomScrollView(
                   controller: _scrollController,
@@ -119,38 +120,8 @@ class _UsersBodyState extends State<UsersBody> {
                       ),
                     ),
                     // Name and edit profile button row
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Skeletonizer(
-                              enabled: socialCubit.userModel == null,
-                              child: Flexible(
-                                child: Text(
-                                  '${socialCubit.userModel?.firstName} ${socialCubit.userModel?.lastName}',
-                                  style: FontsStyle.font20BoldWithColor,
-                                ),
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                // Navigate to the edit profile view when edit button is pressed.
-                                Navigator.pushNamed(
-                                    context, EditProfileView.routeViewName);
-                              },
-                              icon: const Icon(
-                                IconBroken.Edit_Square,
-                                size: 32,
-                                color: defaultTextColor,
-                              ),
-                              color: defaultTextColor,
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
+                    MyAccountNameAndUpdateButton(
+                        userModel: socialCubit.userModel),
                     // Stats row (posts, followers, following), follow/message buttons, and bio
                     SliverToBoxAdapter(
                       child: Padding(
@@ -197,14 +168,6 @@ class _UsersBodyState extends State<UsersBody> {
                     //user's posts
                     SliverList.builder(
                       itemCount: socialCubit.postsModelList.length,
-
-                      // gridDelegate:
-                      //     const SliverGridDelegateWithFixedCrossAxisCount(
-                      //   childAspectRatio: 0.95,
-                      //   crossAxisSpacing: 8,
-                      //   mainAxisSpacing: 8,
-                      //   crossAxisCount: 2,
-                      // ),
                       itemBuilder: (context, index) {
                         // Placeholder image for each grid item
                         return Skeletonizer(

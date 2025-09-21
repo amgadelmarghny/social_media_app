@@ -70,6 +70,16 @@ final class CreatePostFailureState extends SocialState {
   CreatePostFailureState({required this.errMessage});
 }
 
+final class SearchUsersLoadingState extends SocialState {}
+
+final class SearchUsersSuccessState extends SocialState {}
+
+final class SearchUsersFailureState extends SocialState {
+  final String errMessage;
+
+  SearchUsersFailureState({required this.errMessage});
+}
+
 //remove image
 final class RemovePickedFile extends SocialState {}
 
@@ -142,10 +152,18 @@ final class UpdateUserInfoFailureState extends SocialState {
   UpdateUserInfoFailureState({required this.errMessage});
 }
 
-class GetFollowersSuccessState extends SocialState {
+final class GetFollowersSuccessState extends SocialState {
   GetFollowersSuccessState();
 }
 
-class GetFollowingSuccessState extends SocialState {
-  GetFollowingSuccessState();
+final class GetFollowingSuccessState extends SocialState {}
+
+final class LogOutLoadingState extends SocialState {}
+
+final class LogOutSuccessState extends SocialState {}
+
+final class LogOutFailureState extends SocialState {
+  final String errMessage;
+
+  LogOutFailureState({required this.errMessage});
 }

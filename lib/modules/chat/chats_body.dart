@@ -65,7 +65,10 @@ class _ChatsBodyState extends State<ChatsBody> {
           builder: (context, state) {
             if (BlocProvider.of<ChatCubit>(context).chatItemsList.isEmpty) {
               return Center(
-                child: Text("There no chats"),
+                child: Image.asset(
+                  'lib/assets/images/empty_box.png',
+                  height: 200,
+                ),
               );
             }
             return ListView.separated(

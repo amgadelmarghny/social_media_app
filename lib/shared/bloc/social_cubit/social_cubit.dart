@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -20,10 +21,20 @@ import '../../../models/update_user_impl_model.dart';
 part 'social_state.dart';
 
 class SocialCubit extends Cubit<SocialState> {
-  SocialCubit() : super(SocialInitial());
-
   // Cached user UID token from local storage
-  String uidTokenCache = CacheHelper.getData(key: kUidToken);
+  String? uidTokenCache;
+
+  SocialCubit() : super(SocialInitial()) {
+    _initializeUidToken();
+  }
+
+  void _initializeUidToken() {
+    uidTokenCache = CacheHelper.getData(key: kUidToken);
+  }
+
+  // Get the current user UID with fallback to Firebase Auth
+  String get currentUserUid =>
+      uidTokenCache ?? FirebaseAuth.instance.currentUser!.uid;
 
   // Current index for bottom navigation bar
   int currentBottomNavBarIndex = 0;
@@ -71,18 +82,20 @@ class SocialCubit extends Cubit<SocialState> {
   /// Fetch user data from Firestore and update [userModel]
   Future<UserModel> getUserData({required String userUid}) async {
     emit(GetMyDataLoadingState());
-    late UserModel spacificUserModel;
     try {
       DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
           await _userCollectionRef.doc(userUid).get();
-      spacificUserModel = UserModel.fromJson(documentSnapshot.data()!);
+      UserModel spacificUserModel =
+          UserModel.fromJson(documentSnapshot.data()!);
       //if the userModel != null that means getUserData used to featch friends data
       userModel ??= spacificUserModel;
+
       emit(GetMyDataSuccessState());
+      return spacificUserModel;
     } catch (error) {
       emit(GetMyDataFailureState(errMessage: error.toString()));
+      rethrow;
     }
-    return spacificUserModel;
   }
 
   // Controllers for editing user profile fields
@@ -99,10 +112,10 @@ class SocialCubit extends Cubit<SocialState> {
     emit(UpdateUserInfoLoadingState());
     try {
       await _userCollectionRef
-          .doc(uidTokenCache)
+          .doc(currentUserUid)
           .update(updateUserImplModel.toMap(userModel!));
       userModel = null;
-      await getUserData(userUid: uidTokenCache);
+      await getUserData(userUid: currentUserUid);
     } on Exception catch (err) {
       emit(UpdateUserInfoFailureState(errMessage: err.toString()));
     }
@@ -211,6 +224,31 @@ class SocialCubit extends Cubit<SocialState> {
       emit(UploadPostImageFailureState(errMessage: e.toString()));
     }
     return postUrl;
+  }
+
+  Future<List<UserModel>?> searchUsers(String query) async {
+    emit(SearchUsersLoadingState());
+    if (query.trim().isEmpty) return [];
+
+    final q = query.toLowerCase();
+    final List<UserModel> usersList;
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection(kUsersCollection)
+          .orderBy('userName')
+          .startAt([q])
+          .endAt(['$q\uf8ff'])
+          .limit(20)
+          .get();
+
+      usersList =
+          snapshot.docs.map((doc) => UserModel.fromJson(doc.data())).toList();
+      emit(SearchUsersSuccessState());
+      return usersList;
+    } on Exception catch (e) {
+      emit(SearchUsersFailureState(errMessage: e.toString()));
+      return null;
+    }
   }
 
   /// Create a new post in Firestore
@@ -394,7 +432,7 @@ class SocialCubit extends Cubit<SocialState> {
   Future<QuerySnapshot<Map<String, dynamic>>> getFollowing() async {
     final followingSnapshot = await FirebaseFirestore.instance
         .collection(kUsersCollection)
-        .doc(uidTokenCache)
+        .doc(currentUserUid)
         .collection(kFollowingCollection)
         .get();
     followings.clear();
@@ -413,7 +451,7 @@ class SocialCubit extends Cubit<SocialState> {
   Future<void> getFollowers() async {
     final followersSnapshot = await FirebaseFirestore.instance
         .collection(kUsersCollection)
-        .doc(uidTokenCache)
+        .doc(currentUserUid)
         .collection(kFollowersCollection)
         .get();
     followers.clear();
@@ -441,7 +479,7 @@ class SocialCubit extends Cubit<SocialState> {
     List<String> uids = followingSnapshot.docs.map((doc) => doc.id).toList();
 
     // ضيف الـ uid بتاع اليوزر نفسه
-    uids.add(uidTokenCache);
+    uids.add(currentUserUid);
 
     // 3. هات البوستات
     final postsSnapshot = await FirebaseFirestore.instance
@@ -487,6 +525,17 @@ class SocialCubit extends Cubit<SocialState> {
       }
     } on Exception catch (e) {
       emit(GetMyPostsFailure(errMessage: e.toString()));
+    }
+  }
+
+  Future<void> logOut() async {
+    emit(LogOutLoadingState());
+    try {
+      await FirebaseAuth.instance.signOut();
+      await CacheHelper.deleteCash(key: kUidToken);
+      emit(LogOutSuccessState());
+    } on Exception catch (e) {
+      emit(LogOutFailureState(errMessage: e.toString()));
     }
   }
 }

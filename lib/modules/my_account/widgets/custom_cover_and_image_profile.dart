@@ -1,6 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:popover/popover.dart';
+import 'package:social_media_app/modules/login/login_view.dart';
+import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import '../../../shared/components/profile_picture_with_story.dart';
 import 'cover_image_menu_items.dart';
 import 'profile_image_menu_items.dart';
@@ -56,7 +60,7 @@ class CustomCoverAndImageProfile extends StatelessWidget {
               boxShadow: [
                 BoxShadow(
                   color: Colors.black
-                      .withValues(alpha:  0.5), // Use withOpacity for clarity.
+                      .withValues(alpha: 0.5), // Use withOpacity for clarity.
                   offset: const Offset(0, 2),
                   blurRadius: 4,
                   spreadRadius: 1,
@@ -134,6 +138,34 @@ class CustomCoverAndImageProfile extends StatelessWidget {
             ),
           ),
         ),
+        if (isUsedInMyAccount)
+          Positioned(
+            left: 10,
+            bottom: 0,
+            child: BlocConsumer<SocialCubit, SocialState>(
+              listener: (context, state) {
+                if (state is LogOutSuccessState) {
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, LoginView.routeViewName, (route) => false);
+                }
+              },
+              builder: (context, state) {
+                return AbsorbPointer(
+                  absorbing: state is LogOutLoadingState,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      await context.read<SocialCubit>().logOut();
+                    },
+                    child: const Icon(
+                      HugeIcons.strokeRoundedLogout02,
+                      color: Colors.red,
+                      size: 30,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
       ],
     );
   }
