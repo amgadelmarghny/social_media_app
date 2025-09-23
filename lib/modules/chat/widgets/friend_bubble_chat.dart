@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:social_media_app/shared/style/fonts/font_style.dart';
+import 'package:social_media_app/shared/components/custom_read_more_text.dart';
 import 'package:social_media_app/shared/style/theme/constant.dart';
 
 /// A chat bubble widget for displaying messages from a friend.
@@ -20,7 +20,6 @@ class FriendBubbleMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     // Format the date to a readable string, e.g., "02:15 PM"
     String date = DateFormat('hh:mm a').format(dateTime);
 
@@ -45,14 +44,11 @@ class FriendBubbleMessage extends StatelessWidget {
           ),
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
+          crossAxisAlignment:
+              CrossAxisAlignment.start, // Align text to the left
           children: [
             // The message text
-            Text(
-              message,
-              overflow: TextOverflow.visible,
-              style: FontsStyle.font18PopinMedium(),
-            ),
+            CustomReadMoreText(text: message),
             // The formatted time below the message
             Text(
               date,

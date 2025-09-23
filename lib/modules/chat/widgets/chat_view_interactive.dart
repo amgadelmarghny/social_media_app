@@ -47,7 +47,7 @@ class ChatViewInteracrive extends StatelessWidget {
                 BlocProvider.of<ChatCubit>(context).sendMessages(model);
                 controller.clear();
               },
-              style: FontsStyle.font18Popin(),
+              style: FontsStyle.font18PopinWithShadowOption(),
               decoration: InputDecoration(
                 suffixIcon: IconButton(
                   onPressed: () {

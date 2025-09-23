@@ -1,23 +1,17 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:icon_broken/icon_broken.dart';
-import 'package:skeletonizer/skeletonizer.dart';
-import 'package:social_media_app/models/user_model.dart';
-import 'package:social_media_app/modules/edit_profile/edit_profile_view.dart';
 import 'package:social_media_app/modules/feeds/widgets/upload_post_demo_widget.dart';
 import 'package:social_media_app/modules/my_account/widgets/custom_cover_and_image_profile.dart';
 import 'package:social_media_app/modules/my_account/widgets/my_account_name_and_update_button.dart';
+import 'package:social_media_app/modules/my_account/widgets/my_followers_and_followind_and_bio_account.dart';
+import 'package:social_media_app/modules/my_account/widgets/my_sliver_posts_list_account.dart';
 import 'package:social_media_app/shared/bloc/user_cubit/user_cubit.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/components/constants.dart';
 import 'package:social_media_app/shared/components/custom_refresh_indicator.dart';
-import 'package:social_media_app/shared/components/post_item.dart';
 import 'package:social_media_app/shared/components/show_toast.dart';
 import 'package:social_media_app/shared/network/local/cache_helper.dart';
-import 'package:social_media_app/shared/style/fonts/font_style.dart';
-import '../../shared/style/theme/constant.dart';
-import 'widgets/custom_follower_following_row.dart';
 
 /// The main body widget for the user's own account/profile page.
 /// Displays cover, profile image, name, edit button, stats, follow/message buttons, bio, and a grid of images.
@@ -110,52 +104,16 @@ class _UsersBodyState extends State<UsersBody> {
                   slivers: [
                     // Cover and profile image section
                     SliverToBoxAdapter(
-                      child: Skeletonizer(
-                        enabled: socialCubit.userModel == null,
-                        child: CustomCoverAndImageProfile(
-                          profileImage: socialCubit.userModel?.photo,
-                          profileCover: socialCubit.userModel?.cover,
-                          isUsedInMyAccount: true,
-                        ),
+                      child: CustomCoverAndImageProfile(
+                        profileImage: socialCubit.userModel?.photo,
+                        profileCover: socialCubit.userModel?.cover,
+                        isUsedInMyAccount: true,
                       ),
                     ),
                     // Name and edit profile button row
-                    MyAccountNameAndUpdateButton(
-                        userModel: socialCubit.userModel),
+                    const MyAccountNameAndUpdateButton(),
                     // Stats row (posts, followers, following), follow/message buttons, and bio
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Column(
-                          children: [
-                            // Row showing number of posts, followers, and following
-                            CustomPostFollowersFollowingRow(
-                              numOfPosts:
-                                  socialCubit.postsModelList.length.toString(),
-                              numOfFollowers:
-                                  socialCubit.numberOfFollowers.toString(),
-                              numOfFollowing:
-                                  socialCubit.numberOfFollowing.toString(),
-                              following: socialCubit.followings,
-                              followers: socialCubit.followers,
-                            ),
-                            const SizedBox(
-                              height: 15,
-                            ),
-                            // Show bio if it exists
-                            if (socialCubit.userModel?.bio != null)
-                              Text(
-                                '"${socialCubit.userModel!.bio}"',
-                                style: FontsStyle.font20Poppins,
-                              ),
-                            if (socialCubit.userModel?.bio != null)
-                              const SizedBox(
-                                height: 15,
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
+                    const MyFollowersAndFollowindAndBioAccount(),
                     // upload post demo
                     if (socialCubit.postContentController.text.isNotEmpty ||
                         socialCubit.postImagePicked != null)
@@ -166,22 +124,7 @@ class _UsersBodyState extends State<UsersBody> {
                           state is CreatePostFailureState)
                         const SliverToBoxAdapter(child: UploadPostDemo()),
                     //user's posts
-                    SliverList.builder(
-                      itemCount: socialCubit.postsModelList.length,
-                      itemBuilder: (context, index) {
-                        // Placeholder image for each grid item
-                        return Skeletonizer(
-                          enabled: state is GetMyDataLoadingState,
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 10),
-                            child: PostItem(
-                              postModel: socialCubit.postsModelList[index],
-                              postId: socialCubit.postsIdList[index],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+                    const MySliverPostsListAccount(),
                   ],
                 ),
               ),

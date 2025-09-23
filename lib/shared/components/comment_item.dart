@@ -81,7 +81,7 @@ class CommentItem extends StatelessWidget {
                           colorClickableText: Colors.pink,
                           trimCollapsedText: 'more',
                           trimExpandedText: ' less',
-                          style: FontsStyle.font18Popin(
+                          style: FontsStyle.font18PopinWithShadowOption(
                             isOverflow: false,
                             color: const Color(0xff6D4ACD),
                           ),
@@ -94,8 +94,8 @@ class CommentItem extends StatelessWidget {
                         Container(
                           clipBehavior: Clip.hardEdge,
                           margin: const EdgeInsets.symmetric(vertical: 5),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
+                          decoration: const BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
                           ),
                           child: CachedNetworkImage(
                             fit: BoxFit.cover,
@@ -122,14 +122,16 @@ class CommentItem extends StatelessWidget {
                   children: [
                     Text(
                       timeAgo(commentModel.dateTime),
-                      style: FontsStyle.font18Popin(isShadow: true),
+                      style: FontsStyle.font18PopinWithShadowOption(
+                          isShadow: true),
                     ),
                     const Spacer(),
                     TextButton(
                       onPressed: () {},
                       child: Text(
                         'Like',
-                        style: FontsStyle.font18Popin(isShadow: true),
+                        style: FontsStyle.font18PopinWithShadowOption(
+                            isShadow: true),
                       ),
                     ),
                     const Spacer(),
@@ -137,7 +139,8 @@ class CommentItem extends StatelessWidget {
                       onPressed: () {},
                       child: Text(
                         'Reply',
-                        style: FontsStyle.font18Popin(isShadow: true),
+                        style: FontsStyle.font18PopinWithShadowOption(
+                            isShadow: true),
                       ),
                     ),
                     const Spacer(

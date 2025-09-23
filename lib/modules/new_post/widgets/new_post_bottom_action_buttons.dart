@@ -7,15 +7,13 @@ import 'package:social_media_app/shared/style/theme/constant.dart';
 /// A widget that displays two action buttons for adding a photo and tags to a post.
 /// The buttons are styled with a purple color and a popin font.
 class NewPostBottomActionButtons extends StatelessWidget {
-  const NewPostBottomActionButtons({
-    super.key
-  });
+  const NewPostBottomActionButtons({super.key});
 
   @override
   Widget build(BuildContext context) {
     // Obtain the SocialCubit instance from the context.
     SocialCubit socialCubit = context.read<SocialCubit>();
-    
+
     return Row(
       children: [
         // Expanded widget for the "Add photo" button.
@@ -24,8 +22,7 @@ class NewPostBottomActionButtons extends StatelessWidget {
             // When tapped, open the image picker and assign the picked image to the cubit.
             onTap: () async {
               // Pick an image and assign it to the cubit.
-              socialCubit.postImagePicked =
-                  await socialCubit.pickImage();
+              socialCubit.postImagePicked = await socialCubit.pickImage();
             },
             child: SizedBox(
               height: 50,
@@ -45,7 +42,7 @@ class NewPostBottomActionButtons extends StatelessWidget {
                     // Text label for the photo button.
                     Text(
                       'Add photo',
-                      style: FontsStyle.font18Popin(
+                      style: FontsStyle.font18PopinWithShadowOption(
                           color: defaultColorButton),
                     )
                   ],
@@ -64,7 +61,7 @@ class NewPostBottomActionButtons extends StatelessWidget {
               child: Center(
                 child: Text(
                   '#tags',
-                  style: FontsStyle.font18Popin(
+                  style: FontsStyle.font18PopinWithShadowOption(
                       color: defaultColorButton),
                 ),
               ),

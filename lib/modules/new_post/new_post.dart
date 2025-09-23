@@ -73,9 +73,7 @@ class CreatePostSheet extends StatelessWidget {
                 )
               ],
             ),
-            body: CreatePostSheetBody(
-              postContentController: socialCubit.postContentController,
-            ),
+            body: const CreatePostSheetBody(),
           );
         },
       ),

@@ -17,7 +17,7 @@ class GenderIcon extends StatelessWidget {
       duration: const Duration(milliseconds: 300),
       decoration: ShapeDecoration(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: const BorderRadius.all(Radius.circular(30)),
           side: BorderSide(
             color: isActive ? const Color(0xff8B64DA) : Colors.white,
             width: 2.4,
@@ -27,7 +27,7 @@ class GenderIcon extends StatelessWidget {
       child: Center(
         child: Text(
           genderType,
-          style: FontsStyle.font18Popin(),
+          style: FontsStyle.font18PopinWithShadowOption(),
         ),
       ),
     );

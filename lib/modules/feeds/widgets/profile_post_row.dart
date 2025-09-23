@@ -109,7 +109,7 @@ class ProfilePostRow extends StatelessWidget {
                         ),
                         Text(
                           'Delete post',
-                          style: FontsStyle.font18Popin(),
+                          style: FontsStyle.font18PopinWithShadowOption(),
                         )
                       ],
                     ),

@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/layout/home/home_view.dart';
-import 'package:social_media_app/modules/login/login_view.dart';
 import 'package:social_media_app/modules/register/widgets/bloc_consumer_button.dart';
 import 'package:social_media_app/modules/register/widgets/register_text_fields.dart';
+import 'package:social_media_app/modules/register/widgets/sign_in_navigator_row.dart';
 import 'package:social_media_app/shared/network/local/cache_helper.dart';
 import 'package:social_media_app/shared/bloc/register_cubit/register_cubit.dart';
 import 'package:social_media_app/shared/components/constants.dart';
 import 'package:social_media_app/shared/components/navigators.dart';
 import 'package:social_media_app/shared/components/show_toast.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
-
-import '../../shared/style/theme/constant.dart';
 
 class RegisterViewBody extends StatelessWidget {
   const RegisterViewBody({super.key});
@@ -73,26 +71,7 @@ class RegisterViewBody extends StatelessWidget {
                           yearController: registerCubit.yearController,
                           userNameController: registerCubit.userNameController,
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'I have an account',
-                              style: FontsStyle.font18Popin(isShadow: true),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pushNamedAndRemoveUntil(context,
-                                    LoginView.routeViewName, (route) => false);
-                              },
-                              child: Text(
-                                'Sign in',
-                                style: FontsStyle.font18Popin(
-                                    color: defaultTextColor),
-                              ),
-                            ),
-                          ],
-                        ),
+                       const SigninNavigaorRow(),
                       ],
                     ),
                   )
@@ -105,3 +84,4 @@ class RegisterViewBody extends StatelessWidget {
     );
   }
 }
+

@@ -10,10 +10,10 @@ abstract class CustomThemeMode {
     scaffoldBackgroundColor: Colors.transparent,
     iconTheme: const IconThemeData(color: Colors.white),
     searchBarTheme: SearchBarThemeData(
-      textStyle:
-          WidgetStateProperty.resolveWith((states) => FontsStyle.font18Popin()),
-      hintStyle:
-          WidgetStateProperty.resolveWith((states) => FontsStyle.font18Popin()),
+      textStyle: WidgetStateProperty.resolveWith(
+          (states) => FontsStyle.font18PopinWithShadowOption()),
+      hintStyle: WidgetStateProperty.resolveWith(
+          (states) => FontsStyle.font18PopinWithShadowOption()),
       backgroundColor:
           WidgetStateProperty.resolveWith((states) => const Color(0xff635A8F)),
     ),
@@ -57,8 +57,8 @@ abstract class CustomThemeMode {
       ),
     ),
     searchBarTheme: SearchBarThemeData(
-      hintStyle:
-          WidgetStateProperty.resolveWith((states) => FontsStyle.font18Popin()),
+      hintStyle: WidgetStateProperty.resolveWith(
+          (states) => FontsStyle.font18PopinWithShadowOption()),
       backgroundColor:
           WidgetStateProperty.resolveWith((states) => const Color(0xff635A8F)),
     ),

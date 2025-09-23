@@ -44,7 +44,7 @@ class CustomTextField extends StatelessWidget {
         maxLines: 1,
         keyboardType: textInputType,
         obscureText: obscureText,
-        style: FontsStyle.font18Popin().copyWith(
+        style: FontsStyle.font18PopinWithShadowOption().copyWith(
           color:
               outLineBorderColor != Colors.white ? Colors.black : Colors.white,
         ),
@@ -67,7 +67,7 @@ class CustomTextField extends StatelessWidget {
                 )
               : null,
           hintText: hintText,
-          hintStyle: FontsStyle.font18Popin().copyWith(
+          hintStyle: FontsStyle.font18PopinWithShadowOption().copyWith(
             color: outLineBorderColor,
           ),
           labelText: labelText,

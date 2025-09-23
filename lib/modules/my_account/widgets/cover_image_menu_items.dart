@@ -51,7 +51,7 @@ class CoverImageMenuItem extends StatelessWidget {
                 // Label for upload action
                 Text(
                   'Upload photo',
-                  style: FontsStyle.font18Popin(),
+                  style: FontsStyle.font18PopinWithShadowOption(),
                 )
               ],
             ),
@@ -87,7 +87,7 @@ class CoverImageMenuItem extends StatelessWidget {
                 // Label for see cover photo action
                 Text(
                   'See cover photo',
-                  style: FontsStyle.font18Popin(),
+                  style: FontsStyle.font18PopinWithShadowOption(),
                 )
               ],
             ),

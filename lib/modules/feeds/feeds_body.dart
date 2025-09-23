@@ -1,17 +1,15 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:social_media_app/models/user_model.dart';
+import 'package:social_media_app/modules/feeds/widgets/sliver_list_feed_items.dart';
 import 'package:social_media_app/modules/feeds/widgets/upload_post_demo_widget.dart';
 import 'package:social_media_app/modules/feeds/widgets/user_suggestion_item.dart';
 import 'package:social_media_app/modules/user/user_view.dart';
 import 'package:social_media_app/shared/components/constants.dart';
 import 'package:social_media_app/shared/components/custom_refresh_indicator.dart';
-import 'package:social_media_app/shared/components/post_item.dart';
 import 'package:social_media_app/modules/feeds/widgets/story_list_view.dart';
 import 'package:social_media_app/shared/components/show_toast.dart';
 import 'package:social_media_app/shared/network/local/cache_helper.dart';
@@ -176,19 +174,7 @@ class _FeedsBodyState extends State<FeedsBody> {
                               state is UploadPostImageFailureState ||
                               state is CreatePostFailureState)
                             const SliverToBoxAdapter(child: UploadPostDemo()),
-                        SliverList.builder(
-                          itemBuilder: (context, index) {
-                            return Skeletonizer(
-                              enabled: state is GetFeedsPostsLoadingState,
-                              child: PostItem(
-                                postModel:
-                                    socialCubit.freindsPostsModelList[index],
-                                postId: socialCubit.freindsPostsIdList[index],
-                              ),
-                            );
-                          },
-                          itemCount: socialCubit.freindsPostsModelList.length,
-                        ),
+                        const SliverListfeedItems(),
                         if (socialCubit.freindsPostsModelList.isEmpty)
                           SliverToBoxAdapter(
                             child: Padding(
@@ -208,58 +194,57 @@ class _FeedsBodyState extends State<FeedsBody> {
                     ),
                   ),
                 ),
-                if (searchResults.isNotEmpty)
+                // if (searchResults.isNotEmpty)
+                /// Dropdown suggestions
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  top: 63, // تحت السيرش بار بشوية
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                    height: isSearching && searchResults.isNotEmpty
+                        ? (searchResults.length * 80).toDouble().clamp(0, 300)
+                        : 0,
+                    child: Material(
+                      elevation: 6,
+                      color: defaultColor,
+                      borderRadius: const BorderRadius.all(Radius.circular(12)),
+                      child: ListView.builder(
+                        padding: const EdgeInsets.all(8),
+                        itemCount: searchResults.length,
+                        itemBuilder: (context, index) {
+                          return GestureDetector(
+                            onTap: () async {
+                              // روح لصفحة البروفايل
+                              await Navigator.pushNamed(
+                                context,
+                                UserView.routName,
+                                arguments: searchResults[index],
+                              );
 
-                  /// Dropdown suggestions
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    top: 65, // تحت السيرش بار بشوية
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                      height: isSearching && searchResults.isNotEmpty
-                          ? (searchResults.length * 80).toDouble().clamp(0, 300)
-                          : 0,
-                      child: Material(
-                        elevation: 6,
-                        color: defaultColor,
-                        borderRadius: BorderRadius.circular(12),
-                        child: ListView.builder(
-                          padding: const EdgeInsets.all(8),
-                          itemCount: searchResults.length,
-                          itemBuilder: (context, index) {
-                            return GestureDetector(
-                              onTap: () async {
-                                // روح لصفحة البروفايل
-                                await Navigator.pushNamed(
-                                  context,
-                                  UserView.routName,
-                                  arguments: searchResults[index],
-                                );
-
-                                // بعد ما يرجع
-                                if (mounted) {
-                                  setState(() {
-                                    searchResults.clear(); // فضي الليستة
-                                    isSearching =
-                                        false; // عشان يخفي AnimatedContainer
-                                    _searchController.clear(); // فضي السيرش بار
-                                  });
-                                  FocusScope.of(context)
-                                      .unfocus(); // اقفل الكيبورد
-                                }
-                              },
-                              child: UserSuggestionItem(
-                                userModel: searchResults[index],
-                                isFromSearch: true,
-                              ),
-                            );
-                          },
-                        ),
+                              // بعد ما يرجع
+                              if (mounted) {
+                                setState(() {
+                                  searchResults.clear(); // فضي الليستة
+                                  isSearching =
+                                      false;
+                                  _searchController.clear(); // فضي السيرش بار
+                                });
+                                FocusScope.of(context)
+                                    .unfocus();
+                              }
+                            },
+                            child: UserSuggestionItem(
+                              userModel: searchResults[index],
+                              isFromSearch: true,
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ),
+                ),
               ],
             );
           },

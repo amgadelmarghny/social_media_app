@@ -4,7 +4,7 @@ import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
 
 class ProfileImageMenuItem extends StatelessWidget {
-  const ProfileImageMenuItem({super.key,required this.isUsedInMyAccount});
+  const ProfileImageMenuItem({super.key, required this.isUsedInMyAccount});
   final bool isUsedInMyAccount;
   @override
   Widget build(BuildContext context) {
@@ -33,7 +33,7 @@ class ProfileImageMenuItem extends StatelessWidget {
                 ),
                 Text(
                   'Upload photo',
-                  style: FontsStyle.font18Popin(),
+                  style: FontsStyle.font18PopinWithShadowOption(),
                 )
               ],
             ),
@@ -60,7 +60,7 @@ class ProfileImageMenuItem extends StatelessWidget {
                 ),
                 Text(
                   'See profile photo',
-                  style: FontsStyle.font18Popin(),
+                  style: FontsStyle.font18PopinWithShadowOption(),
                 )
               ],
             ),
@@ -74,7 +74,7 @@ class ProfileImageMenuItem extends StatelessWidget {
             child: Center(
               child: Text(
                 'View story',
-                style: FontsStyle.font18Popin(),
+                style: FontsStyle.font18PopinWithShadowOption(),
               ),
             ),
           ),

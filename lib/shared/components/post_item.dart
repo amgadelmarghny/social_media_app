@@ -3,13 +3,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:readmore/readmore.dart';
 import 'package:social_media_app/models/post_model.dart';
 import 'package:social_media_app/modules/post/post_view.dart';
 import 'package:social_media_app/shared/bloc/comments_cubit/comments_cubit.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
+import 'package:social_media_app/shared/components/custom_read_more_text.dart';
 import 'package:social_media_app/shared/components/post_item_image.dart';
-import 'package:social_media_app/shared/style/fonts/font_style.dart';
 import '../../modules/feeds/widgets/hashtag.dart';
 import '../../modules/feeds/widgets/interactive_row.dart';
 import '../../modules/feeds/widgets/profile_post_row.dart';
@@ -95,7 +94,7 @@ class _PostItemState extends State<PostItem> {
               width: double.infinity,
               decoration: BoxDecoration(
                 color: const Color(0xff6D4ACD).withValues(alpha: 0.40),
-                borderRadius: BorderRadius.circular(25),
+                borderRadius: const BorderRadius.all(Radius.circular(25)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,21 +111,8 @@ class _PostItemState extends State<PostItem> {
                   if (widget.postModel.content != null)
                     Padding(
                       padding: const EdgeInsets.only(top: 10),
-                      child: ReadMoreText(
-                        widget.postModel.content!,
-                        trimMode: TrimMode.Line,
-                        trimLines: 4,
-                        colorClickableText: Colors.pink,
-                        trimCollapsedText: 'more',
-                        trimExpandedText: ' less',
-                        style: FontsStyle.font15Popin(),
-                        lessStyle: FontsStyle.font15Popin(
-                          color: Colors.white60,
-                        ),
-                        moreStyle: FontsStyle.font15Popin(
-                          color: Colors.white60,
-                        ),
-                      ),
+                      child:
+                          CustomReadMoreText(text: widget.postModel.content!),
                     ),
                   // hashtags
                   const Wrap(

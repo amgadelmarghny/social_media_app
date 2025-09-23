@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:social_media_app/shared/style/fonts/font_style.dart';
+import 'package:social_media_app/shared/components/custom_read_more_text.dart';
 import 'package:social_media_app/shared/style/theme/constant.dart';
 
 /// A chat bubble widget for displaying the current user's messages.
@@ -47,11 +47,7 @@ class MyBubbleChat extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end, // Align text to the right
           children: [
             // The message text
-            Text(
-              message,
-              overflow: TextOverflow.visible,
-              style: FontsStyle.font18PopinMedium(),
-            ),
+            CustomReadMoreText(text: message),
             // The formatted time below the message
             Text(
               date,

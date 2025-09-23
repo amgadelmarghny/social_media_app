@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/models/user_model.dart';
-import 'package:social_media_app/modules/my_account/widgets/custom_cover_and_image_profile.dart';
-import 'package:social_media_app/modules/my_account/widgets/custom_follower_following_row.dart';
-import 'package:social_media_app/modules/my_account/widgets/follow_and_message_buttons.dart';
+import 'package:social_media_app/modules/user/widgets/user_followers_followings_bio_and_follow_and_message_button.dart';
+import 'package:social_media_app/modules/user/widgets/user_profile_and_cover_image_section.dart';
+import 'package:social_media_app/modules/user/widgets/user_sliver_posts_list_builder.dart';
 import 'package:social_media_app/shared/bloc/user_cubit/user_cubit.dart';
-import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
-import 'package:social_media_app/shared/components/post_item.dart';
 import 'package:social_media_app/shared/components/show_toast.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
 
@@ -25,6 +23,12 @@ class UserViewBody extends StatelessWidget {
         if (state is GetUserPostsFailure) {
           showToast(msg: state.errMessage, toastState: ToastState.error);
         }
+        if (state is GetUserFollowingErrorState) {
+          showToast(msg: state.errMessage, toastState: ToastState.error);
+        }
+        if (state is GetUserFollowersFailureState) {
+          showToast(msg: state.errMessage, toastState: ToastState.error);
+        }
       },
       builder: (context, state) {
         UserCubit userCubit = context.read<UserCubit>();
@@ -34,26 +38,10 @@ class UserViewBody extends StatelessWidget {
           child: CustomScrollView(
             slivers: [
               // Cover and profile image section
-              SliverToBoxAdapter(
-                child: Stack(
-                  children: [
-                    CustomCoverAndImageProfile(
-                      profileImage: userModel.photo,
-                      profileCover: userModel.cover,
-                      isUsedInMyAccount:
-                          context.read<SocialCubit>().userModel!.uid ==
-                              userModel.uid,
-                    ),
-                    Positioned(
-                      top: MediaQuery.paddingOf(context).top,
-                      left: 15,
-                      child: ElevatedButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Icon(Icons.arrow_back_ios),
-                      ),
-                    )
-                  ],
-                ),
+              UserProfileAndCoverImageSection(
+                profileCover: userModel.cover,
+                profileImage: userModel.photo,
+                uid: userModel.uid,
               ),
               const SliverToBoxAdapter(
                 child: SizedBox(
@@ -77,62 +65,10 @@ class UserViewBody extends StatelessWidget {
                 ),
               ),
               // Stats row (posts, followers, following), follow/message buttons, and bio
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    children: [
-                      // Row showing number of posts, followers, and following
-                      CustomPostFollowersFollowingRow(
-                        numOfPosts: userCubit.postsModelList.length.toString(),
-                        numOfFollowers: userCubit.numberOfFollowers.toString(),
-                        numOfFollowing: userCubit.numberOfFollowing.toString(),
-                        following: userCubit.followings,
-                        followers: userCubit.followers,
-                      ),
-                      const SizedBox(
-                        height: 15,
-                      ),
-
-                      if (context.read<SocialCubit>().userModel!.uid !=
-                          userModel.uid)
-                        FollowAndMessageButtons(
-                          userModel: userModel,
-                        ),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      // Show bio if it exists
-                      if (userModel.bio != null)
-                        Text(
-                          '"${userModel.bio}"',
-                          style: FontsStyle.font20Poppins,
-                        ),
-                      if (userModel.bio != null)
-                        const SizedBox(
-                          height: 15,
-                        ),
-                    ],
-                  ),
-                ),
-              ),
+              UserFollowersFollowingsBioAndFollowAndMessageButton(
+                  userModel: userModel),
               //user's posts
-              SliverGrid.builder(
-                itemCount: userCubit.postsModelList.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  childAspectRatio: 0.95,
-                  crossAxisSpacing: 8,
-                  mainAxisSpacing: 8,
-                  crossAxisCount: 2,
-                ),
-                itemBuilder: (context, index) {
-                  // Placeholder image for each grid item
-                  return PostItem(
-                    postModel: userCubit.postsModelList[index],
-                    postId: userCubit.postsIdList[index],
-                  );
-                },
-              ),
+             const UserSliverPostsListBuilder()
             ],
           ),
         );
@@ -140,3 +76,20 @@ class UserViewBody extends StatelessWidget {
     );
   }
 }
+
+     // SliverGrid.builder(
+              //   itemCount: userCubit.postsModelList.length,
+              //   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              //     childAspectRatio: 0.95,
+              //     crossAxisSpacing: 8,
+              //     mainAxisSpacing: 8,
+              //     crossAxisCount: 2,
+              //   ),
+              //   itemBuilder: (context, index) {
+              //     // Placeholder image for each grid item
+              //     return PostItem(
+              //       postModel: userCubit.postsModelList[index],
+              //       postId: userCubit.postsIdList[index],
+              //     );
+              //   },
+              // ),

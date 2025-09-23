@@ -69,13 +69,14 @@ class _ChatItemState extends State<ChatItem> {
                             widget.chatItemModel.message,
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
-                            style:
-                                FontsStyle.font18Popin(color: Colors.white60),
+                            style: FontsStyle.font18PopinWithShadowOption(
+                                color: Colors.white60),
                           ),
                         ),
                         Text(
                           getMessageDateLabel(widget.chatItemModel.dateTime),
-                          style: FontsStyle.font18Popin(color: Colors.white60),
+                          style: FontsStyle.font18PopinWithShadowOption(
+                              color: Colors.white60),
                         ),
                       ],
                     )

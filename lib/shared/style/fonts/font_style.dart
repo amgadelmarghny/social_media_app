@@ -19,7 +19,7 @@ abstract class FontsStyle {
     );
   }
 
-  static TextStyle font18Popin(
+  static TextStyle font18PopinWithShadowOption(
       {Color color = Colors.white,
       bool isShadow = false,
       bool isOverflow = true}) {
@@ -42,12 +42,12 @@ abstract class FontsStyle {
     );
   }
 
-  static TextStyle font18PopinMedium() {
+  static TextStyle font18PopinMedium({bool isEllipsisOverFlow = true}) {
     return GoogleFonts.poppins(
       textStyle: TextStyle(
         color: Colors.white,
         fontSize: getResponsiveFontSize(fontSize: 18),
-        overflow: TextOverflow.ellipsis,
+        overflow: isEllipsisOverFlow ? TextOverflow.ellipsis : null,
         fontWeight: FontWeight.w500,
       ),
     );

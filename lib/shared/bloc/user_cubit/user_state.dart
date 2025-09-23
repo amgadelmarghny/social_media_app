@@ -19,13 +19,16 @@ final class GetUserPostsFailure extends UserState {
 /// State when a user-related operation is loading.
 class GetUserFollowingLoadingState extends UserState {}
 
+/// State indicating that fetching following users was successful.
+class GetUserFollowingSuccessState extends UserState {}
+
 /// State when an error occurs in a user-related operation.
 class GetUserFollowingErrorState extends UserState {
   /// Error message describing what went wrong.
-  final String error;
+  final String errMessage;
 
   /// Constructor for [GetUserFollowingErrorState].
-  GetUserFollowingErrorState(this.error);
+  GetUserFollowingErrorState(this.errMessage);
 }
 
 /// State indicating that the follow status has changed.
@@ -37,8 +40,13 @@ class FollowStatusChanged extends UserState {
   FollowStatusChanged(this.isFollowing);
 }
 
-/// State indicating that fetching followers was successful.
-class GetFollowersSuccessState extends UserState {}
+class GetUserFollowersLoadingState extends UserState {}
 
-/// State indicating that fetching following users was successful.
-class GetUserFollowingSuccessState extends UserState {}
+/// State indicating that fetching followers was successful.
+ class GetUserFollowersSuccessState extends UserState {}
+
+class GetUserFollowersFailureState extends UserState {
+  final String errMessage;
+
+  GetUserFollowersFailureState({required this.errMessage});
+}

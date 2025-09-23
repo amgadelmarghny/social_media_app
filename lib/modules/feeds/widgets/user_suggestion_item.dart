@@ -46,7 +46,7 @@ class UserSuggestionItem extends StatelessWidget {
                       ),
                       Text(
                         '@${userModel.userName}',
-                        style: FontsStyle.font18Popin(
+                        style: FontsStyle.font18PopinWithShadowOption(
                           color: Colors.white70,
                         ),
                       )

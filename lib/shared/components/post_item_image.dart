@@ -15,14 +15,14 @@ class PostItemImage extends StatelessWidget {
       padding: const EdgeInsets.only(top: 15),
       child: Container(
         padding: const EdgeInsets.all(1.3),
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(25),
+          borderRadius: BorderRadius.all(Radius.circular(25)),
         ),
         child: Container(
           clipBehavior: Clip.antiAliasWithSaveLayer,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(25),
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(25)),
           ),
           child: CachedNetworkImage(
             fit: BoxFit.fitHeight,

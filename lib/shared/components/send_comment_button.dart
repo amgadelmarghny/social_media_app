@@ -20,10 +20,10 @@ class SendCommentButton extends StatelessWidget {
     CommentsCubit commentsCubit = BlocProvider.of<CommentsCubit>(context);
 
     return TextField(
-      style: FontsStyle.font18Popin(isShadow: true),
+      style: FontsStyle.font18PopinWithShadowOption(isShadow: true),
       controller: commentsCubit.commentController,
       decoration: InputDecoration(
-        hintStyle: FontsStyle.font18Popin(isShadow: true),
+        hintStyle: FontsStyle.font18PopinWithShadowOption(isShadow: true),
         // Prefix icon for picking an image to attach to the comment
         prefixIcon: BlocBuilder<CommentsCubit, CommentsState>(
           builder: (context, state) {

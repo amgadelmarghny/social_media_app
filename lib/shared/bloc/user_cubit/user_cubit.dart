@@ -89,7 +89,7 @@ class UserCubit extends Cubit<UserState> {
   ///
   /// [userUid] - The UID of the user whose followers are to be fetched.
   Future<void> getFollowers(String userUid) async {
-    emit(GetUserFollowingLoadingState());
+    emit(GetUserFollowersLoadingState());
     try {
       // Get the followers collection for the user.
       final snapshot = await _userCollection
@@ -107,11 +107,11 @@ class UserCubit extends Cubit<UserState> {
         final userModel = await _userCollection.doc(doc.id).get();
         followers.add(UserModel.fromJson(userModel.data()!));
       }
-      emit(GetFollowersSuccessState());
+      emit(GetUserFollowersSuccessState());
     } catch (e) {
       // Emit error state if something goes wrong.
       if (!isClosed) {
-        emit(GetUserFollowingErrorState(e.toString()));
+        emit(GetUserFollowersFailureState(errMessage: e.toString()));
       }
     }
   }

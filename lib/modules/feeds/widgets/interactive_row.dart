@@ -67,7 +67,7 @@ class InteractiveRow extends StatelessWidget {
               },
               child: Text(
                 numOfLikes.toString(),
-                style: FontsStyle.font18Popin(),
+                style: FontsStyle.font18PopinWithShadowOption(),
               ),
             ),
           ),
@@ -107,7 +107,7 @@ class InteractiveRow extends StatelessWidget {
                     BlocProvider.of<CommentsCubit>(context)
                         .numberOfComment
                         .toString(),
-                    style: FontsStyle.font18Popin(),
+                    style: FontsStyle.font18PopinWithShadowOption(),
                   )
               ],
             );

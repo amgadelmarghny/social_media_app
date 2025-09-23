@@ -11,11 +11,7 @@ import '../../feeds/widgets/profile_post_row.dart';
 class CreatePostSheetBody extends StatelessWidget {
   const CreatePostSheetBody({
     super.key,
-    required this.postContentController,
   });
-
-  /// Controller for the post content text field.
-  final TextEditingController postContentController;
 
   @override
   Widget build(BuildContext context) {
@@ -45,14 +41,14 @@ class CreatePostSheetBody extends StatelessWidget {
                   // The main text field for entering post content.
                   Flexible(
                     child: TextField(
-                      controller: postContentController,
+                      controller: socialCubit.postContentController,
                       maxLines:
                           null, // Allows the TextField to expand vertically
                       expands: true, // Expands to fill available space
-                      style: FontsStyle.font18Popin(),
+                      style: FontsStyle.font18PopinWithShadowOption(),
                       decoration: InputDecoration(
                         hintText: 'What is on your mind?',
-                        hintStyle: FontsStyle.font18Popin(),
+                        hintStyle: FontsStyle.font18PopinWithShadowOption(),
                         border: InputBorder.none,
                       ),
                     ),

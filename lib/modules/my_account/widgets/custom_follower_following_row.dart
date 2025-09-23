@@ -13,9 +13,9 @@ class CustomPostFollowersFollowingRow extends StatelessWidget {
     required this.following,
     required this.followers,
   });
-  final String numOfPosts;
-  final String numOfFollowers;
-  final String numOfFollowing;
+  final String? numOfPosts;
+  final String? numOfFollowers;
+  final String? numOfFollowing;
   final List<UserModel> following, followers;
 
   @override
@@ -24,12 +24,12 @@ class CustomPostFollowersFollowingRow extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         CustomNumberWithTitleColumn(
-          number: numOfPosts,
+          number: numOfPosts ?? '',
           title: 'Post',
         ),
         const CustomVerticalDivider(),
         CustomNumberWithTitleColumn(
-          number: numOfFollowers,
+          number: numOfFollowers ?? '',
           title: 'Followers',
           onTap: () {
             showModalBottomSheet(
@@ -49,7 +49,7 @@ class CustomPostFollowersFollowingRow extends StatelessWidget {
         ),
         const CustomVerticalDivider(),
         CustomNumberWithTitleColumn(
-          number: numOfFollowing,
+          number: numOfFollowing ?? '',
           title: 'Following',
           onTap: () {
             showModalBottomSheet(

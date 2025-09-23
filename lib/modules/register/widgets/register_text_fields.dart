@@ -1,5 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -88,7 +86,7 @@ class RegisterTextFields extends StatelessWidget {
             // Label for birth date section.
             Text(
               'Birth of date',
-              style: FontsStyle.font18Popin(),
+              style: FontsStyle.font18PopinWithShadowOption(),
             ),
             SizedBox(
               height: 15,
@@ -141,7 +139,7 @@ class RegisterTextFields extends StatelessWidget {
             // Label for gender selection.
             Text(
               'Gender',
-              style: FontsStyle.font18Popin(),
+              style: FontsStyle.font18PopinWithShadowOption(),
             ),
             const SizedBox(
               height: 15,

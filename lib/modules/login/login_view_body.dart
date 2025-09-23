@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social_media_app/modules/register/register_view.dart';
+import 'package:social_media_app/modules/login/widgets/sign_up_navigator_row.dart';
 import 'package:social_media_app/shared/bloc/login_cubit/login_cubit.dart';
 import 'package:social_media_app/shared/components/auth_icon_list.dart';
 import 'package:social_media_app/shared/components/navigators.dart';
@@ -9,7 +9,6 @@ import '../../layout/home/home_view.dart';
 import '../../shared/components/constants.dart';
 import '../../shared/components/show_toast.dart';
 import '../../shared/network/local/cache_helper.dart';
-import '../../shared/style/theme/constant.dart';
 import 'widgets/login_fields_and_button.dart';
 
 class LoginViewBody extends StatelessWidget {
@@ -71,7 +70,7 @@ class LoginViewBody extends StatelessWidget {
                     children: [
                       Text(
                         'Or sign in with',
-                        style: FontsStyle.font18Popin(),
+                        style: FontsStyle.font18PopinWithShadowOption(),
                       ),
                     ],
                   ),
@@ -82,28 +81,7 @@ class LoginViewBody extends StatelessWidget {
                   SizedBox(
                     height: height * 0.0125,
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Don\'t have an account?',
-                        style: FontsStyle.font18Popin(),
-                      ),
-                      const Spacer(),
-                      TextButton(
-                        onPressed: () {
-                          pushAndRemoveView(context,
-                              newRouteName: RegisterView.routeViewName);
-                        },
-                        child: Text(
-                          'Sign up',
-                          style: FontsStyle.font18Popin(
-                            color: defaultTextColor,
-                          ),
-                        ),
-                      ),
-                    ],
-                  )
+                  const SignUpNavigatorRow()
                 ],
               ),
             ),
