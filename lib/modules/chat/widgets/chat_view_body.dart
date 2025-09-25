@@ -12,8 +12,8 @@ import 'package:social_media_app/shared/style/theme/constant.dart';
 /// The main body widget for the chat view.
 /// Displays the list of messages and the input area for sending new messages.
 class ChatViewBody extends StatelessWidget {
-  const ChatViewBody({super.key, required this.friendUid});
-  final String friendUid;
+  const ChatViewBody({super.key, required this.friendUid, required this.friendToken});
+  final String friendUid,friendToken;
 
   @override
   Widget build(BuildContext context) {
@@ -111,7 +111,7 @@ class ChatViewBody extends StatelessWidget {
             ),
             // Widget for the chat input area (sending messages, etc.)
             ChatViewInteracrive(
-              friendUid: friendUid,
+              friendUid: friendUid, friendToken: friendToken,
             ),
           ],
         );

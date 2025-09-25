@@ -1,5 +1,7 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:social_media_app/layout/home/components/custom_bottom_nav_bar.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/components/show_toast.dart';
@@ -7,46 +9,106 @@ import 'package:social_media_app/shared/style/theme/theme.dart';
 
 /// The main HomeView widget, which is a StatefulWidget.
 /// This is the entry point for the home screen of the app.
-class HomeView extends StatelessWidget {
+class HomeView extends StatefulWidget {
   const HomeView({super.key});
   static const routeViewName = 'home view';
 
   @override
+  State<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
+  @override
+  void initState() {
+    // Initialize Firebase Messaging and request notification permissions when the HomeView is first created.
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    requestNotificationPermision(messaging);
+    super.initState();
+  }
+
+  /// Requests notification permissions from the user.
+  /// Shows a toast message based on the user's response.
+
+  Future<void> requestNotificationPermision(FirebaseMessaging messaging) async {
+    final status = await Permission.notification.request();
+    // Handle the user's response to the permission request.
+    if (status.isGranted) {
+      // User granted provisional permission.
+      showToast(
+          msg: 'You granted provisional permission',
+          toastState: ToastState.worrning);
+    } else if (status.isProvisional) {
+      // User granted provisional permission.
+      showToast(
+          msg: 'You granted provisional permission',
+          toastState: ToastState.worrning);
+    } else {
+      // User declined or has not accepted permission.
+      showToast(
+          msg: 'You declined or has not accepted permission',
+          toastState: ToastState.error);
+    }
+
+    // // Handle the user's response to the permission request.
+    // if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+    //   // User granted permission.
+    //   showToast(msg: 'You granted permission', toastState: ToastState.success);
+    // } else if (settings.authorizationStatus ==
+    //     AuthorizationStatus.provisional) {
+    //   // User granted provisional permission.
+    //   showToast(
+    //       msg: 'You granted provisional permission',
+    //       toastState: ToastState.worrning);
+    // } else {
+    //   // User declined or has not accepted permission.
+    //   showToast(
+    //       msg: 'You declined or has not accepted permission',
+    //       toastState: ToastState.error);
+    // }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // The main build method for the HomeView.
     return Container(
-      decoration: themeColor(), // Set the background theme.
+      decoration:
+          themeColor(), // Set the background theme using a custom function.
       child: SafeArea(
+        // Ensures that the UI avoids system UI areas (like the notch, status bar, etc.).
         child: Stack(
           children: [
-            // Main content area.
+            // Main content area of the app.
             Scaffold(
               body: BlocConsumer<SocialCubit, SocialState>(
                 // Listen for error states and show toasts if needed.
                 listener: (context, state) {
                   if (state is GetMyDataFailureState) {
+                    // Show an error toast if user data fails to load.
                     showToast(
                         msg: state.errMessage, toastState: ToastState.error);
                   }
                   if (state is GetFeedsPostsFailureState) {
+                    // Show an error toast if feed posts fail to load.
                     showToast(
                         msg: state.errMessage, toastState: ToastState.error);
                   }
                 },
                 builder: (context, state) {
-                  // If user data failed to load, show an error message.
+                  // If user data failed to load, show an error message in the center of the screen.
                   if (state is GetMyDataFailureState) {
                     return const Center(
                       child: Text('Something went wrong'),
                     );
                   }
                   // Only show the main content if user data and posts are loaded.
+                  // The currentBody is selected based on the currentBottomNavBarIndex from the SocialCubit.
                   return BlocProvider.of<SocialCubit>(context).currentBody[
                       BlocProvider.of<SocialCubit>(context)
                           .currentBottomNavBarIndex];
                 },
               ),
             ),
-            // The custom bottom navigation bar, always aligned to the bottom.
+            // The custom bottom navigation bar, always aligned to the bottom of the screen.
             const Align(
               alignment: Alignment.bottomCenter,
               child: Padding(

@@ -47,6 +47,7 @@ class ChatView extends StatelessWidget {
         ),
         body: ChatViewBody(
           friendUid: userModel.uid,
+          friendToken: userModel.fcmToken,
         ),
       ),
     );

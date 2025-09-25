@@ -2,11 +2,11 @@ import 'package:equatable/equatable.dart';
 
 class UserModel extends Equatable {
   final String uid;
+  final String fcmToken;
   final String firstName;
   final String lastName;
   final String email;
   final String userName;
-
   final String dateAndMonth;
   final String year;
   final String gender;
@@ -16,6 +16,7 @@ class UserModel extends Equatable {
 
   const UserModel({
     required this.uid,
+    required this.fcmToken,
     required this.firstName,
     required this.lastName,
     required this.email,
@@ -41,12 +42,14 @@ class UserModel extends Equatable {
       photo: json['photo'],
       cover: json['cover'],
       bio: json['bio'],
+      fcmToken: json['fcnToken'],
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
       'uid': uid,
+      'fcmToken': fcmToken,
       'firstName': firstName,
       'lastName': lastName,
       'email': email,
@@ -63,6 +66,7 @@ class UserModel extends Equatable {
   @override
   List<Object?> get props => [
         uid,
+        fcmToken,
         firstName,
         lastName,
         email,

@@ -19,6 +19,14 @@ final class SendMessageFailure extends ChatState {
   const SendMessageFailure({required this.errMessage});
 }
 
+final class PushMessageNotificationToTheFriendSuccess extends ChatState {}
+
+final class PushMessageNotificationToTheFriendFailure extends ChatState {
+  final String errMessage;
+
+  const PushMessageNotificationToTheFriendFailure({required this.errMessage});
+}
+
 final class GetMessagesLoading extends ChatState {}
 
 final class GetMessagesSuccess extends ChatState {}

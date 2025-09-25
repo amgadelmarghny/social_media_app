@@ -12,8 +12,10 @@ class ChatViewInteracrive extends StatelessWidget {
   const ChatViewInteracrive({
     super.key,
     required this.friendUid,
+    required this.friendToken,
   });
   final String friendUid;
+  final String friendToken;
   @override
   Widget build(BuildContext context) {
     TextEditingController controller = TextEditingController();
@@ -38,13 +40,24 @@ class ChatViewInteracrive extends StatelessWidget {
           Expanded(
             child: TextFormField(
               controller: controller,
-              onFieldSubmitted: (value) {
+              onFieldSubmitted: (value) async {
                 MessageModel model = MessageModel(
                     message: controller.text,
                     uid: CacheHelper.getData(key: kUidToken),
                     friendUid: friendUid,
                     dateTime: DateTime.now());
-                BlocProvider.of<ChatCubit>(context).sendMessages(model);
+                await BlocProvider.of<ChatCubit>(context)
+                    .sendMessages(model)
+                    .then((value) {
+                  if (context.mounted) {
+                    BlocProvider.of<ChatCubit>(context)
+                        .pushMessageNotificationToTheFriend(
+                            token: friendToken,
+                            title: "New message from ${model.uid}",
+                            content: controller.text);
+                  }
+                });
+
                 controller.clear();
               },
               style: FontsStyle.font18PopinWithShadowOption(),

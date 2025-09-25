@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/models/user_model.dart';
@@ -62,6 +63,7 @@ class RegisterCubit extends Cubit<RegisterState> {
         email: userRegisterImpl.email,
         password: userRegisterImpl.password,
       );
+       String? token = await FirebaseMessaging.instance.getToken();
 
       // Create a user model with the provided registration data.
       UserModel userModel = UserModel(
@@ -72,7 +74,7 @@ class RegisterCubit extends Cubit<RegisterState> {
         dateAndMonth: userRegisterImpl.dateAndMonth,
         year: userRegisterImpl.year,
         gender: userRegisterImpl.gender,
-        userName: userRegisterImpl.userName,
+        userName: userRegisterImpl.userName, fcmToken: token!,
       );
 
       // Save the user data to Firestore.

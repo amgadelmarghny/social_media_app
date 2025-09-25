@@ -4,6 +4,8 @@ import 'package:social_media_app/modules/new_post/new_post.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/components/bottom_bar_cilper.dart';
 
+/// Custom bottom navigation bar widget with a floating action button for creating posts.
+/// Uses a custom clipper for a unique shape and integrates with SocialCubit for navigation state.
 class CustomBottomNavBat extends StatelessWidget {
   const CustomBottomNavBat({
     super.key,
@@ -11,37 +13,45 @@ class CustomBottomNavBat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // BlocBuilder listens to SocialCubit state changes to update the navigation bar.
     return BlocBuilder<SocialCubit, SocialState>(
       builder: (context, state) {
         return Stack(
-          clipBehavior: Clip.none,
+          clipBehavior: Clip.none, // Allows the FAB to overflow the stack.
           children: [
+            // The custom-shaped bottom navigation bar using a ClipPath and BottomBarClipper.
             ClipPath(
               clipper: BottomBarClipper(context, height: 73),
               child: Container(
                 height: 80,
                 padding: const EdgeInsets.all(1.5),
-                color: const Color(0xffBA85E8),
+                color: const Color(0xffBA85E8), // Outer border color.
                 child: ClipPath(
                   clipper: BottomBarClipper(context, height: 73),
                   child: BottomNavigationBar(
+                    // The current selected index from the SocialCubit.
                     currentIndex: BlocProvider.of<SocialCubit>(context)
                         .currentBottomNavBarIndex,
+                    // When a navigation item is tapped, update the index in the cubit.
                     onTap: (value) {
                       BlocProvider.of<SocialCubit>(context)
                           .changeBottomNavBar(value);
                     },
                     iconSize: 28,
+                    // The navigation items provided by the SocialCubit.
                     items: BlocProvider.of<SocialCubit>(context)
                         .bottomNavigationBarItem,
                   ),
                 ),
               ),
             ),
+            // The floating action button, positioned to overlap the navigation bar.
             Positioned(
-              top: -17.5,
+              top: -17.5, // Raise the FAB above the bar.
+              // Center the FAB horizontally.
               left: (MediaQuery.sizeOf(context).width - 25) / 2 - 17.5,
               child: FloatingActionButton(
+                // When pressed, show the CreatePostSheet in a modal bottom sheet.
                 onPressed: () {
                   showModalBottomSheet(
                     context: context,
@@ -57,7 +67,7 @@ class CustomBottomNavBat extends StatelessWidget {
                 },
                 child: const Icon(
                   Icons.add,
-                  color: Color(0xffD2C0DD),
+                  color: Color(0xffD2C0DD), // Icon color.
                 ),
               ),
             )
