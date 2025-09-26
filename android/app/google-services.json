@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "117242017465",
-    "project_id": "social-app-97290",
-    "storage_bucket": "social-app-97290.appspot.com"
+    "project_number": "872697067623",
+    "project_id": "zmlni-6c5f7",
+    "storage_bucket": "zmlni-6c5f7.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:117242017465:android:1d95b31df45273c860cd68",
+        "mobilesdk_app_id": "1:872697067623:android:e531dfdf2c3c9662433cc2",
         "android_client_info": {
           "package_name": "com.example.social_media_app"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCm2GPTeEUUPWYAm58y1VamJcfI70sbd9k"
+          "current_key": "AIzaSyBKLj4L4IVFnGEMAnMfFw7BPiI1sYf1tKc"
         }
       ],
       "services": {

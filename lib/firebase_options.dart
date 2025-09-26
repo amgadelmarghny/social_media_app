@@ -50,19 +50,20 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCm2GPTeEUUPWYAm58y1VamJcfI70sbd9k',
-    appId: '1:117242017465:android:1d95b31df45273c860cd68',
-    messagingSenderId: '117242017465',
-    projectId: 'social-app-97290',
-    storageBucket: 'social-app-97290.appspot.com',
+    apiKey: 'AIzaSyBKLj4L4IVFnGEMAnMfFw7BPiI1sYf1tKc',
+    appId: '1:872697067623:android:e531dfdf2c3c9662433cc2',
+    messagingSenderId: '872697067623',
+    projectId: 'zmlni-6c5f7',
+    storageBucket: 'zmlni-6c5f7.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAQRLHKdK1N52rkNErlJkh3Copf7o7z5-M',
-    appId: '1:117242017465:ios:21bb91b1ddccdd7d60cd68',
-    messagingSenderId: '117242017465',
-    projectId: 'social-app-97290',
-    storageBucket: 'social-app-97290.appspot.com',
+    apiKey: 'AIzaSyDkY_T03g5jA-fnEtuL8P2R2BQNmrOqPfo',
+    appId: '1:872697067623:ios:ee238c4d1137dcef433cc2',
+    messagingSenderId: '872697067623',
+    projectId: 'zmlni-6c5f7',
+    storageBucket: 'zmlni-6c5f7.firebasestorage.app',
     iosBundleId: 'com.example.socialMediaApp',
   );
+
 }

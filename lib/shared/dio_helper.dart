@@ -1,11 +1,11 @@
 import 'package:dio/dio.dart';
+import 'package:social_media_app/shared/keys.dart';
 
 abstract class DioHelper {
   static late Dio _dio;
   static init() {
     _dio = Dio(BaseOptions(
-      // TODO: change api to the new one
-      baseUrl: 'https://fcm.googleapis.com/fcm/',
+      baseUrl: 'https://fcm.googleapis.com/v1/projects/zmlni-6c5f7/',
       receiveDataWhenStatusError: true,
     ));
   }
@@ -16,12 +16,12 @@ abstract class DioHelper {
     required String bodyContent,
   }) async {
     await _dio.post(
-      'send',
+      'messages:send',
       options: Options(
         headers: {
           'Content-Type': 'application/json',
           'Authorization':
-              'key=$YOUR_SERVER_KEY', // ✨ من Firebase Console > Project settings > Cloud Messaging > Server key
+              'Bearer ${ApiKeys.cloudMessagingKey}',
         },
       ),
       data: {
