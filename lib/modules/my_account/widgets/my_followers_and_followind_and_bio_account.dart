@@ -18,33 +18,30 @@ class MyFollowersAndFollowindAndBioAccount extends StatelessWidget {
         child: BlocBuilder<SocialCubit, SocialState>(
           builder: (context, state) {
             SocialCubit socialCubit = context.read<SocialCubit>();
-            return Skeletonizer(
-              enabled: socialCubit.userModel== null,
-              child: Column(
-                children: [
-                  // Row showing number of posts, followers, and following
-                  CustomPostFollowersFollowingRow(
-                    numOfPosts: socialCubit.postsModelList.length.toString(),
-                    numOfFollowers: socialCubit.numberOfFollowers.toString(),
-                    numOfFollowing: socialCubit.numberOfFollowing.toString(),
-                    following: socialCubit.followings,
-                    followers: socialCubit.followers,
+            return Column(
+              children: [
+                // Row showing number of posts, followers, and following
+                CustomPostFollowersFollowingRow(
+                  numOfPosts: socialCubit.postsModelList.length.toString(),
+                  numOfFollowers: socialCubit.numberOfFollowers.toString(),
+                  numOfFollowing: socialCubit.numberOfFollowing.toString(),
+                  following: socialCubit.followings,
+                  followers: socialCubit.followers,
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                // Show bio if it exists
+                if (socialCubit.userModel?.bio != null)
+                  Text(
+                    '"${socialCubit.userModel!.bio}"',
+                    style: FontsStyle.font20Poppins,
                   ),
+                if (socialCubit.userModel?.bio != null)
                   const SizedBox(
                     height: 15,
                   ),
-                  // Show bio if it exists
-                  if (socialCubit.userModel?.bio != null)
-                    Text(
-                      '"${socialCubit.userModel!.bio}"',
-                      style: FontsStyle.font20Poppins,
-                    ),
-                  if (socialCubit.userModel?.bio != null)
-                    const SizedBox(
-                      height: 15,
-                    ),
-                ],
-              ),
+              ],
             );
           },
         ),

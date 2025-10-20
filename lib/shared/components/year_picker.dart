@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:social_media_app/shared/style/theme/constant.dart';
 // Call this in the select year button.
 
 Future<String?> pickYear({required BuildContext context}) async {
@@ -8,7 +9,12 @@ Future<String?> pickYear({required BuildContext context}) async {
     builder: (context) {
       final Size size = MediaQuery.of(context).size;
       return AlertDialog(
-        title: const Text('Select a Year'),
+        backgroundColor: defaultColorButton,
+
+        title: const Text(
+          'Select a Year',
+          style: TextStyle(color: Colors.white),
+        ),
         // Changing default contentPadding to make the content looks better
 
         contentPadding: const EdgeInsets.all(10),
@@ -37,10 +43,12 @@ Future<String?> pickYear({required BuildContext context}) async {
                     padding: const EdgeInsets.all(8.0),
                     child: Chip(
                       label: Container(
+                        color: Colors.white,
                         padding: const EdgeInsets.all(5),
                         child: Text(
                           // Showing the year text, it starts from 2022 and ends in 1900 (you can modify this as you like)
                           (2024 - index).toString(),
+                          style: TextStyle(color: Colors.black54),
                         ),
                       ),
                     ),

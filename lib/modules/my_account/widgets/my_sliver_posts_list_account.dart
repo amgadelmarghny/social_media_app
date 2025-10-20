@@ -13,17 +13,33 @@ class MySliverPostsListAccount extends StatelessWidget {
       builder: (context, state) {
         SocialCubit socialCubit = context.read<SocialCubit>();
         return SliverList.builder(
-          itemCount: socialCubit.postsModelList.length,
+          itemCount: socialCubit.postsModelList.isEmpty &&
+                  (state is GetMyDataLoadingState || state is GetMyPostsLoading)
+              ? 3 // Show 3 skeleton items while loading
+              : socialCubit.postsModelList.length,
           itemBuilder: (context, index) {
             // Placeholder image for each grid item
             return Skeletonizer(
-              enabled: state is GetMyDataLoadingState,
+              enabled:
+                  state is GetMyDataLoadingState || state is GetMyPostsLoading,
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 10),
-                child: PostItem(
-                  postModel: socialCubit.postsModelList[index],
-                  postId: socialCubit.postsIdList[index],
-                ),
+                child: socialCubit.postsModelList.isNotEmpty
+                    ? PostItem(
+                        postModel: socialCubit.postsModelList[index],
+                        postId: socialCubit.postsIdList[index],
+                      )
+                    : Container(
+                        height: 200,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Center(
+                          child:
+                              Icon(Icons.image, size: 50, color: Colors.grey),
+                        ),
+                      ),
               ),
             );
           },

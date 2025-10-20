@@ -29,7 +29,7 @@ class UserRegisterImpl extends Equatable {
       'year': year,
       'userName': userName,
       'gender': gender,
-      'password': gender
+      'password': password
     };
   }
 

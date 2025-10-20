@@ -56,6 +56,11 @@ class RegisterViewBody extends StatelessWidget {
                   const SliverToBoxAdapter(
                     child: RegisterTextFields(),
                   ),
+                  const SliverToBoxAdapter(
+                    child: SizedBox(
+                      height: 15,
+                    ),
+                  ),
                   SliverFillRemaining(
                     hasScrollBody: false,
                     child: Column(
@@ -71,7 +76,7 @@ class RegisterViewBody extends StatelessWidget {
                           yearController: registerCubit.yearController,
                           userNameController: registerCubit.userNameController,
                         ),
-                       const SigninNavigaorRow(),
+                        const SigninNavigaorRow(),
                       ],
                     ),
                   )
@@ -84,4 +89,3 @@ class RegisterViewBody extends StatelessWidget {
     );
   }
 }
-

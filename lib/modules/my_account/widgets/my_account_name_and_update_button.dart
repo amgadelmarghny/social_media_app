@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:icon_broken/icon_broken.dart';
-import 'package:skeletonizer/skeletonizer.dart';
 import 'package:social_media_app/modules/edit_profile/edit_profile_view.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
@@ -25,13 +24,10 @@ class MyAccountNameAndUpdateButton extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Skeletonizer(
-                      enabled: socialCubit.userModel == null,
-                      child: Flexible(
-                        child: Text(
-                          '${socialCubit.userModel?.firstName} ${socialCubit.userModel?.lastName}',
-                          style: FontsStyle.font20BoldWithColor,
-                        ),
+                    Flexible(
+                      child: Text(
+                        '${socialCubit.userModel?.firstName} ${socialCubit.userModel?.lastName}',
+                        style: FontsStyle.font20BoldWithColor,
                       ),
                     ),
                     IconButton(

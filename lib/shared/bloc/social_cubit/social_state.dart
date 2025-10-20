@@ -17,6 +17,18 @@ final class GetMyDataFailureState extends SocialState {
   GetMyDataFailureState({required this.errMessage});
 }
 
+final class SendEmailVerificationLoadingState extends SocialState {}
+
+final class SendEmailVerificationSuccessState extends SocialState {
+  final String message;
+  SendEmailVerificationSuccessState({required this.message});
+}
+
+final class SendEmailVerificationFailureState extends SocialState {
+  final String errMessage;
+  SendEmailVerificationFailureState({required this.errMessage});
+}
+
 // pick image
 final class PickImageLoadingState extends SocialState {}
 

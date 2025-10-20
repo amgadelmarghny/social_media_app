@@ -36,6 +36,13 @@ class SocialCubit extends Cubit<SocialState> {
   String get currentUserUid =>
       uidTokenCache ?? FirebaseAuth.instance.currentUser!.uid;
 
+  // Get current user email for debugging
+  String? get currentUserEmail => FirebaseAuth.instance.currentUser?.email;
+
+  // Check if current user email is verified
+  bool get isCurrentUserEmailVerified =>
+      FirebaseAuth.instance.currentUser?.emailVerified ?? false;
+
   // Current index for bottom navigation bar
   int currentBottomNavBarIndex = 0;
 
@@ -70,6 +77,28 @@ class SocialCubit extends Cubit<SocialState> {
     BottomNavigationBarItem(icon: Icon(IconBroken.Notification), label: ''),
   ];
 
+  Future<void> sendEmailVerification() async {
+    emit(SendEmailVerificationLoadingState());
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        emit(
+            SendEmailVerificationFailureState(errMessage: 'No user logged in'));
+        return;
+      }
+
+      print('Sending verification email to: ${user.email}');
+      print('User email verified: ${user.emailVerified}');
+
+      await user.sendEmailVerification();
+      emit(SendEmailVerificationSuccessState(
+          message: 'Email sent successfully to ${user.email}'));
+    } catch (e) {
+      print('Error sending email verification: $e');
+      emit(SendEmailVerificationFailureState(errMessage: e.toString()));
+    }
+  }
+
   // User model for the currently logged-in user
   UserModel? userModel;
 
@@ -82,20 +111,19 @@ class SocialCubit extends Cubit<SocialState> {
   /// Fetch user data from Firestore and update [userModel]
   Future<UserModel> getUserData({required String userUid}) async {
     emit(GetMyDataLoadingState());
-    try {
-      DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
-          await _userCollectionRef.doc(userUid).get();
-      UserModel spacificUserModel =
-          UserModel.fromJson(documentSnapshot.data()!);
-      //if the userModel != null that means getUserData used to featch friends data
-      userModel ??= spacificUserModel;
+    // try {
+    DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
+        await _userCollectionRef.doc(userUid).get();
+    UserModel spacificUserModel = UserModel.fromJson(documentSnapshot.data()!);
+    // if the userModel != null that means getUserData used to featch friends data
+    userModel ??= spacificUserModel;
 
-      emit(GetMyDataSuccessState());
-      return spacificUserModel;
-    } catch (error) {
-      emit(GetMyDataFailureState(errMessage: error.toString()));
-      rethrow;
-    }
+    emit(GetMyDataSuccessState());
+    return spacificUserModel;
+    // } catch (error) {
+    //   emit(GetMyDataFailureState(errMessage: error.toString()));
+    //   rethrow;
+    // }
   }
 
   // Controllers for editing user profile fields
@@ -521,8 +549,8 @@ class SocialCubit extends Cubit<SocialState> {
       for (var postDoc in postsSnapshot.docs) {
         postsModelList.add(PostModel.fromJson(postDoc.data()));
         postsIdList.add(postDoc.id);
-        emit(GetMyPostsSuccess());
       }
+      emit(GetMyPostsSuccess());
     } on Exception catch (e) {
       emit(GetMyPostsFailure(errMessage: e.toString()));
     }

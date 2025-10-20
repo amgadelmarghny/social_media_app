@@ -57,6 +57,7 @@ class CustomTextField extends StatelessWidget {
         controller: controller,
         onChanged: onChange,
         decoration: InputDecoration(
+          
           errorText: errorText,
           contentPadding: EdgeInsets.symmetric(
               horizontal: 20, vertical: contentVerticalPadding),

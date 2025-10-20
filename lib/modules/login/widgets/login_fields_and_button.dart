@@ -50,7 +50,40 @@ class LoginFieldsAndButton extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    String email = loginCubit.emailController.text.trim();
+                    if (email.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('يرجى إدخال البريد الإلكتروني أولاً'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                      return;
+                    }
+
+                    try {
+                      await loginCubit.sendPasswordResetEmail(email);
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                                'تم إرسال رابط إعادة تعيين كلمة المرور إلى $email'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('خطأ: $e'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    }
+                  },
                   child: Text(
                     'Forgot password?',
                     style: FontsStyle.font18PopinWithShadowOption(
@@ -75,6 +108,39 @@ class LoginFieldsAndButton extends StatelessWidget {
                   loginCubit.noticeTextFormFieldValidation();
                 }
               },
+            ),
+            SizedBox(height: height * 0.02),
+            // زر اختبار Firebase مؤقت - يمكن حذفه لاحقاً
+            TextButton(
+              onPressed: () async {
+                try {
+                  await loginCubit.testFirebaseConnection();
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                            '✅ اختبار Firebase نجح - الاتصال يعمل بشكل صحيح'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('❌ اختبار Firebase فشل: $e'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                }
+              },
+              child: Text(
+                'Test Firebase Connection',
+                style: FontsStyle.font18PopinWithShadowOption(
+                  color: Colors.orange,
+                ),
+              ),
             ),
           ],
         );

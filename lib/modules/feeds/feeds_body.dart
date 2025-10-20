@@ -1,8 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:social_media_app/layout/home/components/verify_email_container.dart';
 import 'package:social_media_app/models/user_model.dart';
 import 'package:social_media_app/modules/feeds/widgets/sliver_list_feed_items.dart';
 import 'package:social_media_app/modules/feeds/widgets/upload_post_demo_widget.dart';
@@ -132,6 +134,13 @@ class _FeedsBodyState extends State<FeedsBody> {
                     child: CustomScrollView(
                       controller: _scrollController,
                       slivers: [
+                        if (BlocProvider.of<SocialCubit>(context)
+                                    .userModel
+                                    ?.email !=
+                                null &&
+                            FirebaseAuth.instance.currentUser?.emailVerified ==
+                                false)
+                          SliverToBoxAdapter(child: VerifyEmailContainer()),
                         SliverToBoxAdapter(
                           child: SearchBar(
                             textStyle: WidgetStateProperty.all(
@@ -199,7 +208,7 @@ class _FeedsBodyState extends State<FeedsBody> {
                 Positioned(
                   left: 0,
                   right: 0,
-                  top: 63, // تحت السيرش بار بشوية
+                  top: 63,
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
                     curve: Curves.easeInOut,
@@ -227,12 +236,10 @@ class _FeedsBodyState extends State<FeedsBody> {
                               if (mounted) {
                                 setState(() {
                                   searchResults.clear(); // فضي الليستة
-                                  isSearching =
-                                      false;
+                                  isSearching = false;
                                   _searchController.clear(); // فضي السيرش بار
                                 });
-                                FocusScope.of(context)
-                                    .unfocus();
+                                FocusScope.of(context).unfocus();
                               }
                             },
                             child: UserSuggestionItem(

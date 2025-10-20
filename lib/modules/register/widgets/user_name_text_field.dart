@@ -39,21 +39,23 @@ class _UserNameTextFieldState extends State<UserNameTextField> {
   void _checkUsername(String value) async {
     if (value.isEmpty) {
       // If the field is empty, clear any error message
-      setState(() => errorText = null);
+      if (mounted) setState(() => errorText = null);
       return;
     }
 
     // Set loading state to true
-    setState(() => isChecking = true);
+    if (mounted) setState(() => isChecking = true);
 
     // Check username availability asynchronously
     final available = await registerCubit.checkUsernameAvailable(value);
 
     // Update UI based on availability result
-    setState(() {
-      isChecking = false;
-      errorText = available ? null : "Username already taken!";
-    });
+    if (mounted) {
+      setState(() {
+        isChecking = false;
+        errorText = available ? null : "Username already taken!";
+      });
+    }
   }
 
   @override
@@ -64,11 +66,13 @@ class _UserNameTextFieldState extends State<UserNameTextField> {
       // Show a loading spinner as a suffix icon while checking username
       suffixIcon: isChecking
           ? const SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: Colors.white,
+              width: 10,
+              height: 10,
+              child: Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
               ),
             )
           : null,

@@ -52,13 +52,13 @@ class ChatViewInteracrive extends StatelessWidget {
                   if (context.mounted) {
                     BlocProvider.of<ChatCubit>(context)
                         .pushMessageNotificationToTheFriend(
-                            token: friendToken,
-                            title: "New message from ${model.uid}",
-                            content: controller.text);
+                      token: friendToken,
+                      title: "New message from ${model.uid}",
+                      content: controller.text,
+                    );
+                    controller.clear();
                   }
                 });
-
-                controller.clear();
               },
               style: FontsStyle.font18PopinWithShadowOption(),
               decoration: InputDecoration(
@@ -93,7 +93,9 @@ class ChatViewInteracrive extends StatelessWidget {
             ),
           ),
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              //TODO: add voice recording functionality
+            },
             icon: const Icon(
               HugeIcons.strokeRoundedMic01,
               color: Color(0XFFC4C2CB),

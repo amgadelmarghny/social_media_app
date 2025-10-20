@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:social_media_app/modules/feeds/widgets/comments_sheet.dart';
 import 'package:social_media_app/modules/feeds/widgets/users_suggestion_sheet.dart';
-import 'package:social_media_app/shared/bloc/comments_cubit/comments_cubit.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import '../../../shared/style/fonts/font_style.dart';
 
@@ -15,6 +14,7 @@ class InteractiveRow extends StatelessWidget {
     this.onLikeButtonTap,
     required this.postId,
     this.showCommentSheet = true,
+    this.numOfComments = 0,
   });
 
   final int numOfLikes;
@@ -22,6 +22,7 @@ class InteractiveRow extends StatelessWidget {
   final bool isLike;
   final void Function()? onLikeButtonTap;
   final bool showCommentSheet;
+  final int numOfComments;
 
   @override
   Widget build(BuildContext context) {
@@ -92,26 +93,21 @@ class InteractiveRow extends StatelessWidget {
                   );
                 }
               : null,
-          child: BlocBuilder<CommentsCubit, CommentsState>(
-              builder: (context, state) {
-            return Row(
-              children: [
-                SvgPicture.asset(
-                  'lib/assets/images/comments.svg',
-                ),
-                const SizedBox(
-                  width: 5,
-                ),
-                if (BlocProvider.of<CommentsCubit>(context).numberOfComment > 0)
-                  Text(
-                    BlocProvider.of<CommentsCubit>(context)
-                        .numberOfComment
-                        .toString(),
-                    style: FontsStyle.font18PopinWithShadowOption(),
-                  )
-              ],
-            );
-          }),
+          child: Row(
+            children: [
+              SvgPicture.asset(
+                'lib/assets/images/comments.svg',
+              ),
+              const SizedBox(
+                width: 5,
+              ),
+              if (numOfComments > 0)
+                Text(
+                  numOfComments.toString(),
+                  style: FontsStyle.font18PopinWithShadowOption(),
+                )
+            ],
+          ),
         ),
         const Spacer(),
         IconButton(

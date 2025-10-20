@@ -31,7 +31,6 @@ class UserViewBody extends StatelessWidget {
         }
       },
       builder: (context, state) {
-        UserCubit userCubit = context.read<UserCubit>();
         return Padding(
           padding:
               EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom),

@@ -42,7 +42,7 @@ class UserModel extends Equatable {
       photo: json['photo'],
       cover: json['cover'],
       bio: json['bio'],
-      fcmToken: json['fcnToken'],
+      fcmToken: json['fcmToken'],
     );
   }
 

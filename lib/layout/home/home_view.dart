@@ -1,4 +1,3 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -20,51 +19,16 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   @override
   void initState() {
-    // Initialize Firebase Messaging and request notification permissions when the HomeView is first created.
-    FirebaseMessaging messaging = FirebaseMessaging.instance;
-    requestNotificationPermision(messaging);
+    // request notification permissions when the HomeView is first created.
+    requestNotificationPermision();
     super.initState();
   }
 
   /// Requests notification permissions from the user.
   /// Shows a toast message based on the user's response.
 
-  Future<void> requestNotificationPermision(FirebaseMessaging messaging) async {
-    final status = await Permission.notification.request();
-    // Handle the user's response to the permission request.
-    if (status.isGranted) {
-      // User granted provisional permission.
-      showToast(
-          msg: 'You granted provisional permission',
-          toastState: ToastState.worrning);
-    } else if (status.isProvisional) {
-      // User granted provisional permission.
-      showToast(
-          msg: 'You granted provisional permission',
-          toastState: ToastState.worrning);
-    } else {
-      // User declined or has not accepted permission.
-      showToast(
-          msg: 'You declined or has not accepted permission',
-          toastState: ToastState.error);
-    }
-
-    // // Handle the user's response to the permission request.
-    // if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-    //   // User granted permission.
-    //   showToast(msg: 'You granted permission', toastState: ToastState.success);
-    // } else if (settings.authorizationStatus ==
-    //     AuthorizationStatus.provisional) {
-    //   // User granted provisional permission.
-    //   showToast(
-    //       msg: 'You granted provisional permission',
-    //       toastState: ToastState.worrning);
-    // } else {
-    //   // User declined or has not accepted permission.
-    //   showToast(
-    //       msg: 'You declined or has not accepted permission',
-    //       toastState: ToastState.error);
-    // }
+  Future<void> requestNotificationPermision() async {
+    await Permission.notification.request();
   }
 
   @override

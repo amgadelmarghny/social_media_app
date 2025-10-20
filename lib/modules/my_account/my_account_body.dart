@@ -11,7 +11,6 @@ import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/components/constants.dart';
 import 'package:social_media_app/shared/components/custom_refresh_indicator.dart';
 import 'package:social_media_app/shared/components/show_toast.dart';
-import 'package:social_media_app/shared/network/local/cache_helper.dart';
 
 /// The main body widget for the user's own account/profile page.
 /// Displays cover, profile image, name, edit button, stats, follow/message buttons, bio, and a grid of images.
@@ -94,9 +93,6 @@ class _UsersBodyState extends State<UsersBody> {
               padding: EdgeInsets.only(bottom: _bodiesBottomPadding),
               child: CustomRefreshIndicator(
                 onRefresh: () async {
-                  socialCubit.userModel = null;
-                  await socialCubit.getUserData(
-                      userUid: CacheHelper.getData(key: kUidToken));
                   await socialCubit.getMyUserPosts(kUidToken);
                 },
                 child: CustomScrollView(
