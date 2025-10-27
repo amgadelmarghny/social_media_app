@@ -66,7 +66,6 @@ class CommentsCubit extends Cubit<CommentsState> {
   }
 
   // get comments
-  int numberOfComment = 0;
   List<CommentModel> commentsModelList = [];
   List<String> commentIdList = [];
   Future<void> getComments({required String? postId}) async {
@@ -78,7 +77,6 @@ class CommentsCubit extends Cubit<CommentsState> {
           .collection(kCommentsCollection)
           .orderBy(kCreatedAt, descending: true)
           .get();
-      numberOfComment = commentsCollection.docs.length;
       commentsModelList.clear();
       for (var comment in commentsCollection.docs) {
         commentIdList.add(comment.id);

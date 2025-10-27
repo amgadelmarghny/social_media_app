@@ -9,10 +9,15 @@ import '../bloc/comments_cubit/comments_cubit.dart';
 
 /// A widget that provides a text field for writing and sending comments,
 /// including the ability to attach an image.
-class SendCommentButton extends StatelessWidget {
-  const SendCommentButton({super.key, required this.postId});
+class AddCommentButton extends StatelessWidget {
+  const AddCommentButton(
+      {super.key,
+      required this.postId,
+      required this.commentsNum,
+      required this.creatorUid});
 
-  final String postId;
+  final String postId, creatorUid;
+  final int commentsNum;
 
   @override
   Widget build(BuildContext context) {
@@ -51,13 +56,16 @@ class SendCommentButton extends StatelessWidget {
           builder: (context, state) {
             return IconButton(
               onPressed: () async {
-                UserModel myUserModel =
-                    BlocProvider.of<SocialCubit>(context).userModel!;
+                SocialCubit socialCubit = BlocProvider.of<SocialCubit>(context);
+                UserModel myUserModel = socialCubit.userModel!;
                 // Send the comment when the send button is pressed
                 await _sendCommentMethod(
-                    commentsCubit: commentsCubit,
-                    postId: postId,
-                    myUserModel: myUserModel);
+                  commentsCubit: commentsCubit,
+                  postId: postId,
+                  myUserModel: myUserModel,
+                  socialCubit: socialCubit,
+                  commentsNum: commentsNum,
+                );
               },
               // Show a loading indicator if a comment is being sent or image is uploading
               icon: state is AddCommentLoading ||
@@ -86,7 +94,9 @@ class SendCommentButton extends StatelessWidget {
   Future<void> _sendCommentMethod(
       {required CommentsCubit commentsCubit,
       required String postId,
-      required UserModel myUserModel}) async {
+      required UserModel myUserModel,
+      required SocialCubit socialCubit,
+      required int commentsNum}) async {
     // Get the current date and time (to the minute)
     final DateTime now = DateTime.now();
     final currentTime =
@@ -112,10 +122,17 @@ class SendCommentButton extends StatelessWidget {
           postId: postId,
           commentModel: commentModel,
         )
-            .then((value) {
+            .then((value) async {
           // Remove comment text and image after adding comment successfully
+
           commentsCubit.commentController.clear();
           commentsCubit.removeImage();
+          await socialCubit.updatePostCommentsNum(
+              commentsNum: commentsNum + 1, postId: postId);
+          socialCubit.getTimelinePosts();
+          if (creatorUid == socialCubit.userModel!.uid) {
+            socialCubit.getMyUserPosts(socialCubit.userModel!.uid);
+          }
         });
       }
     }
@@ -136,10 +153,16 @@ class SendCommentButton extends StatelessWidget {
         commentModel: commentModel,
       )
           .then(
-        (value) {
+        (value) async {
           // Remove comment text and image after adding comment successfully
           commentsCubit.commentController.clear();
           commentsCubit.removeImage();
+          await socialCubit.updatePostCommentsNum(
+              commentsNum: commentsNum + 1, postId: postId);
+          socialCubit.getTimelinePosts();
+          if (creatorUid == socialCubit.userModel!.uid) {
+            socialCubit.getMyUserPosts(socialCubit.userModel!.uid);
+          }
         },
       );
     }

@@ -57,14 +57,14 @@ class FloatingErrorWidget extends StatelessWidget {
                     if (socialCubit.postImagePicked != null) {
                       socialCubit.createPostWithPhoto(
                         postContent: socialCubit.postContentController.text,
-                        dateTime: currentTime,
+                        dateTime: currentTime, commentsNum: 0,
                       );
                       return;
                     } else if (socialCubit
                         .postContentController.text.isNotEmpty) {
                       socialCubit.createPostWithContentOnly(
                         postContent: socialCubit.postContentController.text,
-                        dateTime: currentTime,
+                        dateTime: currentTime, commentsNum: 0,
                       );
                     }
                   },

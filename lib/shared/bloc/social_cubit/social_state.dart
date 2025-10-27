@@ -29,6 +29,15 @@ final class SendEmailVerificationFailureState extends SocialState {
   SendEmailVerificationFailureState({required this.errMessage});
 }
 
+final class CheckEmailLoadingState extends SocialState {}
+
+final class CheckEmailSuccessState extends SocialState {}
+
+final class CheckEmailErrorState extends SocialState {
+  final String errMessage;
+  CheckEmailErrorState(this.errMessage);
+}
+
 // pick image
 final class PickImageLoadingState extends SocialState {}
 
@@ -136,6 +145,15 @@ final class GetMyPostsFailure extends SocialState {
   GetMyPostsFailure({required this.errMessage});
 }
 
+final class UpdateCommentsSuccessState extends SocialState {}
+
+final class UpdateCommentsFailureState extends SocialState {
+  final String errMessage;
+
+  UpdateCommentsFailureState({required this.errMessage});
+}
+
+//! get postLikes
 final class GetPostLikesSuccessState extends SocialState {}
 
 final class GetPostLikesFailureState extends SocialState {

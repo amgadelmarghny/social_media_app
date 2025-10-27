@@ -5,14 +5,17 @@ import 'package:social_media_app/shared/components/custom_refresh_indicator.dart
 // import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import '../../../shared/bloc/comments_cubit/comments_cubit.dart';
 import '../../../shared/components/comment_item.dart';
-import '../../../shared/components/send_comment_button.dart';
+import '../../../shared/components/add_comment_button.dart';
 
 class CommentsSheetBody extends StatelessWidget {
   const CommentsSheetBody({
     super.key,
     required this.postId,
+    required this.commentsNum,
+    required this.creatorUid,
   });
-  final String postId;
+  final String postId, creatorUid;
+  final int commentsNum;
 
   @override
   Widget build(BuildContext context) {
@@ -81,8 +84,10 @@ class CommentsSheetBody extends StatelessWidget {
                 left: 15,
                 bottom: MediaQuery.paddingOf(context).bottom,
               ),
-              child: SendCommentButton(
+              child: AddCommentButton(
                 postId: postId,
+                commentsNum: commentsNum,
+                creatorUid: creatorUid,
               ),
             ),
           ],

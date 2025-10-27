@@ -9,8 +9,11 @@ class CommentsSheet extends StatelessWidget {
   const CommentsSheet({
     super.key,
     required this.postId,
+    required this.commentsNum,
+    required this.creatorUid,
   });
-  final String postId;
+  final String postId, creatorUid;
+  final int commentsNum;
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +41,8 @@ class CommentsSheet extends StatelessWidget {
             },
             child: CommentsSheetBody(
               postId: postId,
+              commentsNum: commentsNum,
+              creatorUid: creatorUid,
             ),
           ),
         ),

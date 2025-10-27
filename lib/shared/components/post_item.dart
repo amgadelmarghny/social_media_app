@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:social_media_app/models/post_model.dart';
 import 'package:social_media_app/modules/post/post_view.dart';
-import 'package:social_media_app/shared/bloc/comments_cubit/comments_cubit.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/components/custom_read_more_text.dart';
 import 'package:social_media_app/shared/components/post_item_image.dart';
@@ -64,82 +63,72 @@ class _PostItemState extends State<PostItem> {
           .toggleLike(postId: widget.postId, isLike: isLike);
     }
 
-    return BlocProvider(
-      create: (context) => CommentsCubit()..getComments(postId: widget.postId),
-      child: BlocBuilder<SocialCubit, SocialState>(
-        builder: (context, state) {
-          return GestureDetector(
-            onTap: () async {
-              // Navigate to PostView and refresh likes and comments when returning
-              await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => PostView(
-                    postModel: widget.postModel,
-                    postId: widget.postId,
-                  ),
+    return BlocBuilder<SocialCubit, SocialState>(
+      builder: (context, state) {
+        return GestureDetector(
+          onTap: () async {
+            // Navigate to PostView and refresh likes and comments when returning
+            await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PostView(
+                  postModel: widget.postModel,
+                  postId: widget.postId,
                 ),
-              );
-              // Refresh likes and comments when returning from PostView
-              fetchLikes();
-              if (mounted) {
-                BlocProvider.of<CommentsCubit>(context)
-                    .getComments(postId: widget.postId);
-              }
-            },
-            child: Container(
-              margin: const EdgeInsets.symmetric(vertical: 5),
-              padding: const EdgeInsets.only(
-                  top: 10, bottom: 10, right: 10, left: 10),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: const Color(0xff6D4ACD).withValues(alpha: 0.40),
-                borderRadius: const BorderRadius.all(Radius.circular(25)),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ProfilePostRow(
-                    image: widget.postModel.profilePhoto,
-                    userName: widget.postModel.userName,
-                    timePosted: DateFormat.yMMMd()
-                        .add_jm()
-                        .format(widget.postModel.dateTime),
-                    userUid: widget.postModel.uid,
-                    postId: widget.postId,
-                  ),
-                  if (widget.postModel.content != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10),
-                      child:
-                          CustomReadMoreText(text: widget.postModel.content!),
-                    ),
-                  // hashtags
-                  const Wrap(
-                    children: [
-                      Hashtag(
-                        title: '#Profile',
-                      ),
-                    ],
-                  ),
-                  if (widget.postModel.postImage != null)
-                    PostItemImage(postImage: widget.postModel.postImage!),
-                  BlocBuilder<CommentsCubit, CommentsState>(
-                    builder: (BuildContext context, state) {
-                      return InteractiveRow(
-                        numOfLikes: likesCollection?.docs.length ?? 0,
-                        isLike: isLike,
-                        onLikeButtonTap: toggleLike,
-                        postId: widget.postId,
-                      );
-                    },
-                  ),
-                ],
-              ),
+            );
+            // Refresh likes and comments when returning from PostView
+            fetchLikes();
+          },
+          child: Container(
+            margin: const EdgeInsets.symmetric(vertical: 5),
+            padding:
+                const EdgeInsets.only(top: 10, bottom: 10, right: 10, left: 10),
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: const Color(0xff6D4ACD).withValues(alpha: 0.40),
+              borderRadius: const BorderRadius.all(Radius.circular(25)),
             ),
-          );
-        },
-      ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ProfilePostRow(
+                  image: widget.postModel.profilePhoto,
+                  userName: widget.postModel.userName,
+                  timePosted: DateFormat.yMMMd()
+                      .add_jm()
+                      .format(widget.postModel.dateTime),
+                  userUid: widget.postModel.creatorUid,
+                  postId: widget.postId,
+                ),
+                if (widget.postModel.content != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: CustomReadMoreText(text: widget.postModel.content!),
+                  ),
+                // hashtags
+                const Wrap(
+                  children: [
+                    Hashtag(
+                      title: '#Profile',
+                    ),
+                  ],
+                ),
+                if (widget.postModel.postImage != null)
+                  PostItemImage(postImage: widget.postModel.postImage!),
+                InteractiveRow(
+                      numOfLikes: likesCollection?.docs.length ?? 0,
+                      isLike: isLike,
+                      onLikeButtonTap: toggleLike,
+                      postId: widget.postId,
+                      creatorUid: widget.postModel.creatorUid,
+                      commentsNum: widget.postModel.commentsNum,
+                    ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

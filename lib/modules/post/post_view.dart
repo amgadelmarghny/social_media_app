@@ -25,7 +25,7 @@ class PostView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => CommentsCubit(),
+      create: (context) => CommentsCubit()..getComments(postId: postId),
       child: Container(
         decoration: themeColor(), // Set the background theme color.
         child: Scaffold(

@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
@@ -16,6 +19,9 @@ class VerifyEmailContainer extends StatelessWidget {
       listener: (context, state) {
         if (state is SendEmailVerificationSuccessState) {
           showToast(msg: state.message, toastState: ToastState.success);
+        }
+        if (state is CheckEmailErrorState) {
+          showToast(msg: state.errMessage, toastState: ToastState.success);
         }
         if (state is SendEmailVerificationFailureState) {
           showToast(msg: state.errMessage, toastState: ToastState.error);
@@ -58,25 +64,47 @@ class VerifyEmailContainer extends StatelessWidget {
                         style: FontsStyle.font15Popin()),
                     SizedBox(height: 4),
                     Text(
-                        'Verified: ${BlocProvider.of<SocialCubit>(context).isCurrentUserEmailVerified ? 'Yes' : 'No'}',
+                        'Verified: ${BlocProvider.of<SocialCubit>(context).userVerification!.emailVerified ? 'Yes' : 'No'}',
                         style: FontsStyle.font15Popin()),
                   ],
                 ),
               ),
               SizedBox(height: 10),
-              Align(
-                alignment: Alignment.centerRight,
-                child: AbsorbPointer(
+              Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                AbsorbPointer(
                   absorbing: state is SendEmailVerificationLoadingState,
                   child: ElevatedButton(
-                    child: Text('Send email'),
+                    child: const Text('Send email'),
                     onPressed: () async {
                       await BlocProvider.of<SocialCubit>(context)
                           .sendEmailVerification();
+                      //  log('${FirebaseAuth.instance.currentUser?.emailVerified}');
                     },
                   ),
                 ),
-              ),
+                if (state is SendEmailVerificationSuccessState)
+                  SizedBox(
+                    width: 10,
+                  ),
+                if (state is SendEmailVerificationSuccessState)
+                  AbsorbPointer(
+                    absorbing: state is CheckEmailLoadingState,
+                    child: TextButton(
+                      onPressed: () async {
+                        await BlocProvider.of<SocialCubit>(context)
+                            .checkEmailStatus();
+                      },
+                      child: const Text(
+                        'I\'ve Verified My Email',
+                        style: TextStyle(
+                          color: Colors.deepOrangeAccent,
+                          decoration: TextDecoration.underline,
+                          decorationColor: Colors.deepOrangeAccent,
+                        ),
+                      ),
+                    ),
+                  )
+              ]),
             ],
           ),
         );

@@ -64,9 +64,6 @@ class SocialMediaApp extends StatelessWidget {
           create: (context) => AppCubit(),
         ),
         BlocProvider(
-          create: (context) => CommentsCubit(),
-        ),
-        BlocProvider(
           create: (context) => SocialCubit()
             ..getUserData(
                 userUid: tokenCache ?? FirebaseAuth.instance.currentUser!.uid)

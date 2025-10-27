@@ -22,7 +22,7 @@ class MyFollowersAndFollowindAndBioAccount extends StatelessWidget {
               children: [
                 // Row showing number of posts, followers, and following
                 CustomPostFollowersFollowingRow(
-                  numOfPosts: socialCubit.postsModelList.length.toString(),
+                  numOfPosts: socialCubit.myPostsModelList.length.toString(),
                   numOfFollowers: socialCubit.numberOfFollowers.toString(),
                   numOfFollowing: socialCubit.numberOfFollowing.toString(),
                   following: socialCubit.followings,

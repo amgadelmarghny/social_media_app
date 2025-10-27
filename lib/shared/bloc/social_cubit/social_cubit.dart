@@ -39,10 +39,6 @@ class SocialCubit extends Cubit<SocialState> {
   // Get current user email for debugging
   String? get currentUserEmail => FirebaseAuth.instance.currentUser?.email;
 
-  // Check if current user email is verified
-  bool get isCurrentUserEmailVerified =>
-      FirebaseAuth.instance.currentUser?.emailVerified ?? false;
-
   // Current index for bottom navigation bar
   int currentBottomNavBarIndex = 0;
 
@@ -76,26 +72,48 @@ class SocialCubit extends Cubit<SocialState> {
     BottomNavigationBarItem(icon: Icon(IconBroken.Profile), label: ''),
     BottomNavigationBarItem(icon: Icon(IconBroken.Notification), label: ''),
   ];
-
+  User? userVerification = FirebaseAuth.instance.currentUser;
   Future<void> sendEmailVerification() async {
     emit(SendEmailVerificationLoadingState());
     try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
+      if (userVerification == null) {
         emit(
             SendEmailVerificationFailureState(errMessage: 'No user logged in'));
         return;
+      } else {
+        await userVerification!.sendEmailVerification();
+        emit(SendEmailVerificationSuccessState(
+            message: 'Email sent successfully to ${userVerification!.email}'));
       }
-
-      print('Sending verification email to: ${user.email}');
-      print('User email verified: ${user.emailVerified}');
-
-      await user.sendEmailVerification();
-      emit(SendEmailVerificationSuccessState(
-          message: 'Email sent successfully to ${user.email}'));
     } catch (e) {
-      print('Error sending email verification: $e');
       emit(SendEmailVerificationFailureState(errMessage: e.toString()));
+    }
+  }
+
+  /// Checks the current user's email verification status.
+  Future<void> checkEmailStatus() async {
+    emit(CheckEmailLoadingState()); // Show loading indicator state
+
+    try {
+      // Reload user's data to get latest email verification status
+      await FirebaseAuth.instance.currentUser?.reload();
+      userVerification = FirebaseAuth.instance.currentUser;
+
+      // Email is verified
+      if (userVerification != null && userVerification!.emailVerified) {
+        emit(CheckEmailSuccessState()); // Success state
+      }
+      // Email is not verified
+      else {
+        emit(
+          SendEmailVerificationFailureState(
+            errMessage: 'You didn\'t verify your account',
+          ),
+        ); // Failure state
+      }
+    } catch (e) {
+      // Emit error state with error message
+      emit(CheckEmailErrorState(e.toString()));
     }
   }
 
@@ -114,7 +132,8 @@ class SocialCubit extends Cubit<SocialState> {
     // try {
     DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
         await _userCollectionRef.doc(userUid).get();
-    UserModel spacificUserModel = UserModel.fromJson(documentSnapshot.data()!);
+    Map<String, dynamic> userModelData = documentSnapshot.data()!;
+    UserModel spacificUserModel = UserModel.fromJson(userModelData);
     // if the userModel != null that means getUserData used to featch friends data
     userModel ??= spacificUserModel;
 
@@ -284,11 +303,12 @@ class SocialCubit extends Cubit<SocialState> {
     emit(CreatePostLoadingState());
     PostModel postModel = PostModel(
       userName: '${userModel!.firstName} ${userModel!.lastName}',
-      uid: userModel!.uid,
+      creatorUid: userModel!.uid,
       profilePhoto: userModel!.photo,
       dateTime: createPostImplModel.dateTime,
       content: createPostImplModel.content,
       postImage: createPostImplModel.postImage,
+      commentsNum: createPostImplModel.commentsNum,
     );
     try {
       await _postCollectionRef.add(postModel.toJson());
@@ -311,7 +331,9 @@ class SocialCubit extends Cubit<SocialState> {
 
   /// Create a post with a photo (and optional content)
   Future<void> createPostWithPhoto(
-      {required String? postContent, required DateTime dateTime}) async {
+      {required String? postContent,
+      required DateTime dateTime,
+      required int commentsNum}) async {
     if (postImagePicked != null) {
       String? postUrl = await _uploadPostImage(file: postImagePicked!);
       if (postUrl != null) {
@@ -319,6 +341,7 @@ class SocialCubit extends Cubit<SocialState> {
           content: postContent,
           postImage: postUrl,
           dateTime: dateTime,
+          commentsNum: commentsNum,
         );
         await _createPost(createPostImplModel);
       }
@@ -333,11 +356,14 @@ class SocialCubit extends Cubit<SocialState> {
 
   /// Create a post with only content (no image)
   Future<void> createPostWithContentOnly(
-      {required String? postContent, required DateTime dateTime}) async {
+      {required String? postContent,
+      required DateTime dateTime,
+      required int commentsNum}) async {
     CreatePostImplModel createPostImplModel = CreatePostImplModel(
       content: postContent,
       postImage: null,
       dateTime: dateTime,
+      commentsNum: commentsNum,
     );
     await _createPost(createPostImplModel);
   }
@@ -389,6 +415,16 @@ class SocialCubit extends Cubit<SocialState> {
       emit(GetUsersLikesPostSuccessState());
     } on Exception catch (e) {
       emit(GetUsersLikesPostFailureState(errMessage: e.toString()));
+    }
+  }
+
+  Future<void> updatePostCommentsNum(
+      {required int commentsNum, required String postId}) async {
+    try {
+      await _postCollectionRef.doc(postId).update({'commentsNum': commentsNum});
+      emit(UpdateCommentsSuccessState());
+    } catch (e) {
+      emit(UpdateCommentsFailureState(errMessage: e.toString()));
     }
   }
 
@@ -500,39 +536,39 @@ class SocialCubit extends Cubit<SocialState> {
   Future<void> getTimelinePosts() async {
     emit(GetFeedsPostsLoadingState());
 
-    //try {
-    // 1. هات الناس اللي متابعهم
-    final followingSnapshot = await getFollowing();
-    // 2. كون ليست من UIDs
-    List<String> uids = followingSnapshot.docs.map((doc) => doc.id).toList();
+    try {
+      // 1. هات الناس اللي متابعهم
+      final followingSnapshot = await getFollowing();
+      // 2. كون ليست من UIDs
+      List<String> uids = followingSnapshot.docs.map((doc) => doc.id).toList();
 
-    // ضيف الـ uid بتاع اليوزر نفسه
-    uids.add(currentUserUid);
+      // ضيف الـ uid بتاع اليوزر نفسه
+      uids.add(currentUserUid);
 
-    // 3. هات البوستات
-    final postsSnapshot = await FirebaseFirestore.instance
-        .collection(kPostsCollection)
-        .where('uid', whereIn: uids)
-        .orderBy(kCreatedAt, descending: true)
-        .get();
+      // 3. هات البوستات
+      final postsSnapshot = await FirebaseFirestore.instance
+          .collection(kPostsCollection)
+          .where('uid', whereIn: uids)
+          .orderBy(kCreatedAt, descending: true)
+          .get();
 
-    freindsPostsModelList.clear();
-    freindsPostsIdList.clear();
+      freindsPostsModelList.clear();
+      freindsPostsIdList.clear();
 
-    for (var postDoc in postsSnapshot.docs) {
-      freindsPostsModelList.add(PostModel.fromJson(postDoc.data()));
-      freindsPostsIdList.add(postDoc.id);
+      for (var postDoc in postsSnapshot.docs) {
+        freindsPostsModelList.add(PostModel.fromJson(postDoc.data()));
+        freindsPostsIdList.add(postDoc.id);
+      }
+      emit(GetFeedsPostsSuccessState());
+    } catch (error) {
+      emit(GetFeedsPostsFailureState(errMessage: error.toString()));
     }
-    emit(GetFeedsPostsSuccessState());
-    // } catch (error) {
-    //   emit(GetFeedsPostsFailureState(errMessage: error.toString()));
-    // }
   }
 
   // List of all posts fetched from Firestore
-  List<PostModel> postsModelList = [];
+  List<PostModel> myPostsModelList = [];
   // List of post IDs
-  List<String> postsIdList = [];
+  List<String> myPostsIdList = [];
 
   Future<void> getMyUserPosts(String uid) async {
     emit(GetMyPostsLoading());
@@ -543,12 +579,12 @@ class SocialCubit extends Cubit<SocialState> {
           .orderBy(kCreatedAt, descending: true)
           .get();
 
-      postsModelList.clear();
-      postsIdList.clear();
+      myPostsModelList.clear();
+      myPostsIdList.clear();
 
       for (var postDoc in postsSnapshot.docs) {
-        postsModelList.add(PostModel.fromJson(postDoc.data()));
-        postsIdList.add(postDoc.id);
+        myPostsModelList.add(PostModel.fromJson(postDoc.data()));
+        myPostsIdList.add(postDoc.id);
       }
       emit(GetMyPostsSuccess());
     } on Exception catch (e) {

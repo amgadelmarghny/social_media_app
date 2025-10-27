@@ -45,12 +45,14 @@ class CreatePostSheet extends StatelessWidget {
                             socialCubit.createPostWithPhoto(
                               postContent: value.text,
                               dateTime: now,
+                              commentsNum: 0,
                             );
                             Navigator.pop(context);
                           } else if (value.text.isNotEmpty) {
                             socialCubit.createPostWithContentOnly(
                               postContent: value.text,
                               dateTime: now,
+                              commentsNum: 0,
                             );
                             Navigator.pop(context);
                           }

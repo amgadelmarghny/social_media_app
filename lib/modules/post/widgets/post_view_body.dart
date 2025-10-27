@@ -12,7 +12,7 @@ import 'package:social_media_app/shared/bloc/comments_cubit/comments_cubit.dart'
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/components/comment_item.dart';
 import 'package:social_media_app/shared/components/constants.dart';
-import 'package:social_media_app/shared/components/send_comment_button.dart';
+import 'package:social_media_app/shared/components/add_comment_button.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -48,7 +48,6 @@ class _PostViewBodyState extends State<PostViewBody> {
     commentsCubit = context.read<CommentsCubit>();
     // Fetch the initial like state for this post.
     fetchLikes();
-    commentsCubit.getComments(postId: widget.postId);
     super.initState();
   }
 
@@ -87,7 +86,7 @@ class _PostViewBodyState extends State<PostViewBody> {
                   timePosted: DateFormat.yMMMd()
                       .add_jm()
                       .format(widget.postModel.dateTime),
-                  userUid: widget.postModel.uid,
+                  userUid: widget.postModel.creatorUid,
                   postId: widget.postId,
                 ),
               ),
@@ -129,6 +128,8 @@ class _PostViewBodyState extends State<PostViewBody> {
                   isLike: isLike,
                   onLikeButtonTap: toggleLike,
                   postId: widget.postId,
+                  commentsNum: widget.postModel.commentsNum,
+                  creatorUid: widget.postModel.userName,
                 ),
               ),
               BlocBuilder<CommentsCubit, CommentsState>(
@@ -163,8 +164,10 @@ class _PostViewBodyState extends State<PostViewBody> {
               left: 15,
               bottom: MediaQuery.paddingOf(context).bottom,
             ),
-            child: SendCommentButton(
+            child: AddCommentButton(
               postId: widget.postId,
+              commentsNum: widget.postModel.commentsNum,
+              creatorUid: widget.postModel.creatorUid,
             ),
           ),
         ),

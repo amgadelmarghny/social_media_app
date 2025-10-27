@@ -14,15 +14,15 @@ class InteractiveRow extends StatelessWidget {
     this.onLikeButtonTap,
     required this.postId,
     this.showCommentSheet = true,
-    this.numOfComments = 0,
+    required this.commentsNum,
+    required this.creatorUid,
   });
 
-  final int numOfLikes;
-  final String postId;
+  final int numOfLikes, commentsNum;
+  final String postId, creatorUid;
   final bool isLike;
   final void Function()? onLikeButtonTap;
   final bool showCommentSheet;
-  final int numOfComments;
 
   @override
   Widget build(BuildContext context) {
@@ -87,6 +87,8 @@ class InteractiveRow extends StatelessWidget {
                             1.0, // This makes the bottom sheet take the full height
                         child: CommentsSheet(
                           postId: postId,
+                          commentsNum: commentsNum,
+                          creatorUid: creatorUid,
                         ),
                       );
                     },
@@ -101,9 +103,9 @@ class InteractiveRow extends StatelessWidget {
               const SizedBox(
                 width: 5,
               ),
-              if (numOfComments > 0)
+              if (commentsNum > 0)
                 Text(
-                  numOfComments.toString(),
+                  commentsNum.toString(),
                   style: FontsStyle.font18PopinWithShadowOption(),
                 )
             ],
