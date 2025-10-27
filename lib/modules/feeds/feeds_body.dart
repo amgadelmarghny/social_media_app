@@ -196,13 +196,13 @@ class _FeedsBodyState extends State<FeedsBody> {
                           child: SizedBox(height: 15),
                         ),
 
-                        // Stories horizontally scrollable list
-                        const SliverToBoxAdapter(child: StoryListView()),
+                        // // Stories horizontally scrollable list
+                        // const SliverToBoxAdapter(child: StoryListView()),
 
-                        // Space below stories
-                        const SliverToBoxAdapter(
-                          child: SizedBox(height: 20),
-                        ),
+                        // // Space below stories
+                        // const SliverToBoxAdapter(
+                        //   child: SizedBox(height: 20),
+                        // ),
 
                         // If a new post is being composed, and there is a pending post or error/loading, show the upload preview
                         if (socialCubit.postContentController.text.isNotEmpty ||
@@ -235,54 +235,56 @@ class _FeedsBodyState extends State<FeedsBody> {
                     ),
                   ),
                 ),
+                if (_searchController.text.isNotEmpty)
 
-                /// Dropdown user search suggestions. Only visible when actively searching
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  top: 63,
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
-                    // Height is dynamic: #suggestions * 80, clamped to max 300
-                    height: isSearching && searchResults.isNotEmpty
-                        ? (searchResults.length * 80).toDouble().clamp(0, 300)
-                        : 0,
-                    child: Material(
-                      elevation: 6,
-                      color: defaultColor,
-                      borderRadius: const BorderRadius.all(Radius.circular(12)),
-                      child: ListView.builder(
-                        padding: const EdgeInsets.all(8),
-                        itemCount: searchResults.length,
-                        itemBuilder: (context, index) {
-                          return GestureDetector(
-                            onTap: () async {
-                              FocusScope.of(context).unfocus();
+                  /// Dropdown user search suggestions. Only visible when actively searching
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    top: 63,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                      // Height is dynamic: #suggestions * 80, clamped to max 300
+                      height: isSearching && searchResults.isNotEmpty
+                          ? (searchResults.length * 80).toDouble().clamp(0, 300)
+                          : 0,
+                      child: Material(
+                        elevation: 6,
+                        color: defaultColor,
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(12)),
+                        child: ListView.builder(
+                          padding: const EdgeInsets.all(8),
+                          itemCount: searchResults.length,
+                          itemBuilder: (context, index) {
+                            return GestureDetector(
+                              onTap: () async {
+                                FocusScope.of(context).unfocus();
 
-                              // Navigates to the selected user's profile view
-                              await Navigator.pushNamed(
-                                context,
-                                UserView.routName,
-                                arguments: searchResults[index],
-                              );
-                              // After returning from profile, clear suggestions & remove focus
-                              setState(() {
-                                searchResults.clear();
-                                isSearching = false;
-                                _searchController.clear();
-                              });
-                            },
-                            child: UserSuggestionItem(
-                              userModel: searchResults[index],
-                              isFromSearch: true,
-                            ),
-                          );
-                        },
+                                // Navigates to the selected user's profile view
+                                await Navigator.pushNamed(
+                                  context,
+                                  UserView.routName,
+                                  arguments: searchResults[index],
+                                );
+                                // After returning from profile, clear suggestions & remove focus
+                                setState(() {
+                                  searchResults.clear();
+                                  isSearching = false;
+                                  _searchController.clear();
+                                });
+                              },
+                              child: UserSuggestionItem(
+                                userModel: searchResults[index],
+                                isFromSearch: true,
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     ),
                   ),
-                ),
               ],
             );
           },
