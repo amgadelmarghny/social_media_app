@@ -104,26 +104,26 @@ class RegisterCubit extends Cubit<RegisterState> {
       String errorMessage;
       switch (e.code) {
         case 'weak-password':
-          errorMessage = 'كلمة المرور ضعيفة جداً';
+          errorMessage = 'The password is too weak.';
           break;
         case 'email-already-in-use':
-          errorMessage = 'هذا البريد الإلكتروني مستخدم بالفعل';
+          errorMessage = 'This email address is already in use.';
           break;
         case 'invalid-email':
-          errorMessage = 'البريد الإلكتروني غير صحيح';
+          errorMessage = 'The email address is not valid.';
           break;
         case 'operation-not-allowed':
-          errorMessage = 'عملية التسجيل غير مسموحة';
+          errorMessage = 'Registration operation is not allowed.';
           break;
         case 'network-request-failed':
-          errorMessage = 'خطأ في الاتصال بالإنترنت';
+          errorMessage = 'Network connection error.';
           break;
         default:
-          errorMessage = 'حدث خطأ غير متوقع: ${e.message}';
+          errorMessage = 'An unexpected error occurred: ${e.message}';
       }
       emit(RegisterFailureState(errMessage: errorMessage));
     } catch (error) {
-      emit(RegisterFailureState(errMessage: 'حدث خطأ غير متوقع: $error'));
+      emit(RegisterFailureState(errMessage: 'An unexpected error occurred: $error'));
     }
   }
 
