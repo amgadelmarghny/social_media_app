@@ -30,6 +30,12 @@ class LoginViewBody extends StatelessWidget {
           if (state is LoginFailureState) {
             showToast(msg: state.errMessage, toastState: ToastState.error);
           }
+          if (state is SendPasswordResetEmailSuccess) {
+            showToast(msg: state.message, toastState: ToastState.success);
+          }
+          if (state is SendPasswordResetEmailFailure) {
+            showToast(msg: state.errMessage, toastState: ToastState.error);
+          }
         },
         builder: (context, state) {
           LoginCubit loginCubit = BlocProvider.of<LoginCubit>(context);

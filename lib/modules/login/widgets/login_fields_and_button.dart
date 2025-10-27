@@ -49,45 +49,28 @@ class LoginFieldsAndButton extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                TextButton(
-                  onPressed: () async {
-                    String email = loginCubit.emailController.text.trim();
-                    if (email.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('يرجى إدخال البريد الإلكتروني أولاً'),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
-                      return;
-                    }
-
-                    try {
-                      await loginCubit.sendPasswordResetEmail(email);
-                      if (context.mounted) {
+                AbsorbPointer(
+                  absorbing: state is SendPasswordResetEmailLoading,
+                  child: TextButton(
+                    onPressed: () async {
+                      String email = loginCubit.emailController.text.trim();
+                      if (email.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                                'تم إرسال رابط إعادة تعيين كلمة المرور إلى $email'),
-                            backgroundColor: Colors.green,
-                          ),
-                        );
-                      }
-                    } catch (e) {
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('خطأ: $e'),
+                          const SnackBar(
+                            content: Text('Please enter your email first'),
                             backgroundColor: Colors.red,
                           ),
                         );
+                        return;
                       }
-                    }
-                  },
-                  child: Text(
-                    'Forgot password?',
-                    style: FontsStyle.font18PopinWithShadowOption(
-                      color: defaultTextColor,
+
+                      await loginCubit.sendPasswordResetEmail(email);
+                    },
+                    child: Text(
+                      'Forgot password?',
+                      style: FontsStyle.font18PopinWithShadowOption(
+                        color: defaultTextColor,
+                      ),
                     ),
                   ),
                 ),
@@ -99,48 +82,15 @@ class LoginFieldsAndButton extends StatelessWidget {
             CustomButton(
               text: 'Sign in',
               isLoading: state is LoginLoadingState,
-              onTap: () {
+              onTap: () async {
                 if (loginCubit.formKey.currentState!.validate()) {
-                  loginCubit.loginUser(
+                  await loginCubit.loginUser(
                       email: loginCubit.emailController.text,
                       password: loginCubit.passwordController.text);
                 } else {
                   loginCubit.noticeTextFormFieldValidation();
                 }
               },
-            ),
-            SizedBox(height: height * 0.02),
-            // زر اختبار Firebase مؤقت - يمكن حذفه لاحقاً
-            TextButton(
-              onPressed: () async {
-                try {
-                  await loginCubit.testFirebaseConnection();
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                            '✅ اختبار Firebase نجح - الاتصال يعمل بشكل صحيح'),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
-                  }
-                } catch (e) {
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('❌ اختبار Firebase فشل: $e'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
-                }
-              },
-              child: Text(
-                'Test Firebase Connection',
-                style: FontsStyle.font18PopinWithShadowOption(
-                  color: Colors.orange,
-                ),
-              ),
             ),
           ],
         );

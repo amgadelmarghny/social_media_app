@@ -258,22 +258,20 @@ class _FeedsBodyState extends State<FeedsBody> {
                         itemBuilder: (context, index) {
                           return GestureDetector(
                             onTap: () async {
+                              FocusScope.of(context).unfocus();
+
                               // Navigates to the selected user's profile view
                               await Navigator.pushNamed(
                                 context,
                                 UserView.routName,
                                 arguments: searchResults[index],
                               );
-
                               // After returning from profile, clear suggestions & remove focus
-                              if (mounted) {
-                                setState(() {
-                                  searchResults.clear();
-                                  isSearching = false;
-                                  _searchController.clear();
-                                });
-                                FocusScope.of(context).unfocus();
-                              }
+                              setState(() {
+                                searchResults.clear();
+                                isSearching = false;
+                                _searchController.clear();
+                              });
                             },
                             child: UserSuggestionItem(
                               userModel: searchResults[index],

@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -12,10 +10,11 @@ part 'login_state.dart';
 class LoginCubit extends Cubit<LoginState> {
   LoginCubit() : super(LoginInitial());
 
-  // text field obscure
+  // Controls if the password field is obscured
   bool isObscure = true;
   IconData eyeIcon = Icons.visibility_off_outlined;
 
+  /// Toggle the visibility of the password text field
   void changeTextFieldObscure() {
     isObscure = !isObscure;
     eyeIcon =
@@ -23,18 +22,21 @@ class LoginCubit extends Cubit<LoginState> {
     emit(TextFieldObscureState());
   }
 
-  // text field validation
+  // Validation related fields
   AutovalidateMode autovalidateMode = AutovalidateMode.disabled;
   GlobalKey<FormState> formKey = GlobalKey();
+
+  /// Enable text field autovalidate mode and emit a validation state
   void noticeTextFormFieldValidation() {
     autovalidateMode = AutovalidateMode.always;
     emit(TextFieldValidationState());
   }
 
+  // Controllers for login fields
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
-  /// يتحقق من صحة بيانات تسجيل الدخول
+  /// Validate login input data, emit failure state with message if not valid
   bool validateLoginData(String email, String password) {
     if (email.isEmpty || password.isEmpty) {
       emit(LoginFailureState(errMessage: 'يرجى ملء جميع الحقول'));
@@ -55,107 +57,89 @@ class LoginCubit extends Cubit<LoginState> {
     return true;
   }
 
-  void loginUser({required String email, required String password}) async {
-    // التحقق من صحة البيانات قبل المحاولة
+  /// Attempt user login using the provided email and password
+  Future<void> loginUser(
+      {required String email, required String password}) async {
+    // Validate before attempting login
     if (!validateLoginData(email, password)) {
       return;
     }
 
-    emit(LoginLoadingState()); // إضافة حالة التحميل
+    emit(LoginLoadingState()); // Emit loading state
 
     try {
-      log('=== محاولة تسجيل الدخول ===');
-      log('البريد الإلكتروني: $email');
-      log('البريد الإلكتروني بعد التنظيف: "${email.trim()}"');
-      log('طول كلمة المرور: ${password.length}');
-      log('كود أحرف كلمة المرور: ${password.codeUnits}');
-
-      // تنظيف البيانات
+      // Clean up input data
       String cleanEmail = email.trim().toLowerCase();
       String cleanPassword = password.trim();
 
-      // التحقق من أن المستخدم غير مسجل دخول بالفعل
+      // Sign out if a user is already signed in
       if (FirebaseAuth.instance.currentUser != null) {
-        log('المستخدم مسجل دخول بالفعل، تسجيل خروج أولاً...');
         await FirebaseAuth.instance.signOut();
       }
 
+      // Attempt Firebase sign-in
       UserCredential userCredential =
           await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: cleanEmail,
         password: cleanPassword,
       );
 
-      log('✅ نجح تسجيل الدخول للمستخدم: ${userCredential.user!.uid}');
-      log('البريد الإلكتروني المؤكد: ${userCredential.user!.email}');
-      log('حالة التحقق: ${userCredential.user!.emailVerified}');
-
-      // تحديث FCM token بعد نجاح تسجيل الدخول
+      // Update the FCM token in Firestore after successful login
       await updateFCMToken(userCredential.user!.uid);
 
+      // Emit success state with UID
       emit(LoginSuccessState(uid: userCredential.user!.uid));
     } on FirebaseAuthException catch (e) {
-      // معالجة أخطاء Firebase Auth بشكل مفصل
+      // Handle Firebase Auth errors and display appropriate messages
       String errorMessage;
-      log('❌ خطأ Firebase Auth: ${e.code}');
-      log('رسالة الخطأ: ${e.message}');
 
       switch (e.code) {
         case 'wrong-password':
-          errorMessage = 'كلمة المرور غير صحيحة';
+          errorMessage = 'Incorrect password';
           break;
         case 'user-not-found':
-          errorMessage = 'لا يوجد مستخدم بهذا البريد الإلكتروني';
+          errorMessage = 'No user found with this email';
           break;
         case 'user-disabled':
-          errorMessage = 'تم تعطيل هذا الحساب من قبل المشرف';
+          errorMessage = 'This account has been disabled by the administrator';
           break;
         case 'invalid-email':
-          errorMessage = 'البريد الإلكتروني غير صحيح';
+          errorMessage = 'Invalid email address';
           break;
         case 'invalid-credential':
-          // هذا الخطأ شائع حتى مع البيانات الصحيحة
-          errorMessage = 'بيانات تسجيل الدخول غير صحيحة. تأكد من:\n'
-              '• البريد الإلكتروني مكتوب بشكل صحيح\n'
-              '• كلمة المرور صحيحة\n'
-              '• الحساب مفعل في Firebase Console';
+          // This error is common even with apparently valid data
+          errorMessage = 'Invalid login credentials. Please make sure:\n'
+              '• The email is typed correctly\n'
+              '• The password is correct\n';
           break;
         case 'too-many-requests':
           errorMessage =
-              'تم تجاوز عدد المحاولات المسموح، انتظر قليلاً وحاول مرة أخرى';
+              'Too many attempts, please wait a moment and try again';
           break;
         case 'network-request-failed':
-          errorMessage = 'خطأ في الاتصال بالإنترنت';
+          errorMessage = 'Network connection error';
           break;
         case 'operation-not-allowed':
           errorMessage =
-              'تسجيل الدخول بالبريد الإلكتروني غير مفعل في Firebase Console';
+              'Email/password login is not enabled in Firebase Console';
           break;
         case 'user-token-expired':
-          errorMessage = 'انتهت صلاحية جلسة المستخدم، سجل دخول مرة أخرى';
+          errorMessage = 'User session expired, please log in again';
           break;
         case 'invalid-user-token':
-          errorMessage = 'رمز المستخدم غير صحيح';
+          errorMessage = 'Invalid user token';
           break;
         default:
-          errorMessage = 'حدث خطأ غير متوقع: ${e.message}';
+          errorMessage = 'An unexpected error occurred: ${e.message}';
       }
       emit(LoginFailureState(errMessage: errorMessage));
-
-      // تسجيل مفصل للخطأ
-      log('🔍 تفاصيل الخطأ:');
-      log('   الكود: ${e.code}');
-      log('   الرسالة: ${e.message}');
-      log('   البريد المستخدم: $email');
-      log('   طول كلمة المرور: ${password.length}');
-      log('   البريد بعد التنظيف: "${email.trim()}"');
     } catch (error) {
-      log('❌ خطأ عام: $error');
-      emit(LoginFailureState(errMessage: 'حدث خطأ غير متوقع: $error'));
+      emit(LoginFailureState(
+          errMessage: 'An unexpected error occurred: $error'));
     }
   }
 
-  /// يحديث FCM token للمستخدم في Firestore
+  /// Update FCM token for the user document in Firestore
   Future<void> updateFCMToken(String uid) async {
     try {
       String? token = await FirebaseMessaging.instance.getToken();
@@ -164,75 +148,24 @@ class LoginCubit extends Cubit<LoginState> {
             .collection(kUsersCollection)
             .doc(uid)
             .update({'fcmToken': token});
-        log('FCM token updated successfully for user: $uid');
       }
     } catch (error) {
-      log('Error updating FCM token: $error');
+      emit(LoginFailureState(
+          errMessage: 'An unexpected error occurred: $error'));
     }
   }
 
-  /// يتحقق من حالة Firebase ووجود المستخدم
-  Future<bool> checkUserExists(String email) async {
-    try {
-      // محاولة الحصول على قائمة المستخدمين (إذا كان لديك صلاحيات)
-      log('Checking if user exists: $email');
-      return true; // افتراضياً، سيعطي Firebase الخطأ المناسب
-    } catch (error) {
-      log('Error checking user existence: $error');
-      return false;
-    }
-  }
-
-  /// إرسال رابط إعادة تعيين كلمة المرور
+  /// Send password reset email using Firebase Auth
   Future<void> sendPasswordResetEmail(String email) async {
+    emit(SendPasswordResetEmailLoading());
     try {
-      log('إرسال رابط إعادة تعيين كلمة المرور إلى: $email');
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email.trim());
-      log('✅ تم إرسال رابط إعادة تعيين كلمة المرور بنجاح');
+      emit(SendPasswordResetEmailSuccess(
+          message: 'Password reset link has been sent successfully.'));
     } on FirebaseAuthException catch (e) {
-      log('❌ خطأ في إرسال رابط إعادة تعيين كلمة المرور: ${e.code} - ${e.message}');
-      throw Exception(
-          'خطأ في إرسال رابط إعادة تعيين كلمة المرور: ${e.message}');
+      emit(SendPasswordResetEmailFailure(errMessage: e.toString()));
     } catch (error) {
-      log('❌ خطأ عام في إرسال رابط إعادة تعيين كلمة المرور: $error');
-      throw Exception('خطأ في إرسال رابط إعادة تعيين كلمة المرور: $error');
-    }
-  }
-
-  /// طريقة لاختبار الاتصال بـ Firebase
-  Future<void> testFirebaseConnection() async {
-    try {
-      log('=== اختبار الاتصال بـ Firebase ===');
-
-      // التحقق من حالة Firebase
-      User? currentUser = FirebaseAuth.instance.currentUser;
-      log('المستخدم الحالي: ${currentUser?.email ?? "لا يوجد"}');
-
-      // اختبار إنشاء مستخدم مؤقت
-      const testEmail = 'test_connection@example.com';
-      const testPassword = 'test123456';
-
-      log('إنشاء مستخدم اختبار مؤقت...');
-      UserCredential testUser =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: testEmail,
-        password: testPassword,
-      );
-
-      log('✅ تم إنشاء مستخدم الاختبار: ${testUser.user!.uid}');
-
-      // تسجيل خروج المستخدم المؤقت
-      await FirebaseAuth.instance.signOut();
-      log('✅ تم تسجيل خروج المستخدم المؤقت');
-
-      // حذف المستخدم المؤقت
-      await testUser.user!.delete();
-      log('✅ تم حذف المستخدم المؤقت');
-
-      log('✅ اختبار Firebase نجح - الاتصال يعمل بشكل صحيح');
-    } catch (error) {
-      log('❌ اختبار Firebase فشل: $error');
-      rethrow;
+      emit(SendPasswordResetEmailFailure(errMessage: error.toString()));
     }
   }
 }

@@ -1,8 +1,5 @@
-import 'dart:developer';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/firebase_options.dart';
@@ -16,7 +13,6 @@ import 'package:social_media_app/modules/user/user_view.dart';
 import 'package:social_media_app/shared/bloc/app_cubit/app_cubit.dart';
 import 'package:social_media_app/shared/bloc/bloc_observer.dart';
 import 'package:social_media_app/shared/bloc/chat_cubit/chat_cubit.dart';
-import 'package:social_media_app/shared/bloc/comments_cubit/comments_cubit.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/dio_helper.dart';
 import 'package:social_media_app/shared/network/local/cache_helper.dart';
@@ -28,17 +24,10 @@ void main() async {
   Bloc.observer = MyBlocObserver();
   await CacheHelper.init();
   DioHelper.init();
-  log('${CacheHelper.getData(key: kUidToken)}');
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
   runApp(const SocialMediaApp());
-}
-
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  print("Handling background message: ${message.messageId}");
 }
 
 class SocialMediaApp extends StatelessWidget {

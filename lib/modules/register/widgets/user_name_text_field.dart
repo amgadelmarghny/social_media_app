@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/shared/bloc/register_cubit/register_cubit.dart';
@@ -20,7 +18,6 @@ class _UserNameTextFieldState extends State<UserNameTextField> {
   String? errorText; // Holds error message if username is taken
   bool isChecking =
       false; // Indicates if username availability is being checked
-  late Timer timer;
   @override
   void initState() {
     super.initState();
@@ -62,7 +59,9 @@ class _UserNameTextFieldState extends State<UserNameTextField> {
   Widget build(BuildContext context) {
     return CustomTextField(
       hintText: 'username',
+      // Optionally, you could pass errorText to CustomTextField if it supports it
       controller: registerCubit.userNameController,
+      errorText: errorText,
       // Show a loading spinner as a suffix icon while checking username
       suffixIcon: isChecking
           ? const SizedBox(
@@ -76,8 +75,6 @@ class _UserNameTextFieldState extends State<UserNameTextField> {
               ),
             )
           : null,
-      // Optionally, you could pass errorText to CustomTextField if it supports it
-      // errorText: errorText,
     );
   }
 }
