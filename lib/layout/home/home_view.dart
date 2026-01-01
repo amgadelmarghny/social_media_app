@@ -76,8 +76,8 @@ class _HomeViewState extends State<HomeView> {
             const Align(
               alignment: Alignment.bottomCenter,
               child: Padding(
-                padding: EdgeInsets.only(left: 8, right: 8),
-                child: CustomBottomNavBat(),
+                padding: EdgeInsets.only(bottom: 8),
+                child: CustomBottomNavBar(),
               ),
             ),
           ],

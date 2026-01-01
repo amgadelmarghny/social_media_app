@@ -156,8 +156,8 @@ class CustomCoverAndImageProfile extends StatelessWidget {
                     onPressed: () async {
                       await context.read<SocialCubit>().logOut();
                     },
-                    child: const Icon(
-                      HugeIcons.strokeRoundedLogout02,
+                    child: const HugeIcon(
+                      icon: HugeIcons.strokeRoundedLogout02,
                       color: Colors.red,
                       size: 30,
                     ),

@@ -99,8 +99,8 @@ class ProfilePostRow extends StatelessWidget {
                         CircleAvatar(
                           backgroundColor: Colors.white.withValues(alpha: 0.3),
                           radius: 15,
-                          child: const Icon(
-                            HugeIcons.strokeRoundedDelete03,
+                          child: const HugeIcon(
+                            icon: HugeIcons.strokeRoundedDelete03,
                             color: Colors.red,
                           ),
                         ),

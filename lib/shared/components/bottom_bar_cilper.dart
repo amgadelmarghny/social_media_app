@@ -6,179 +6,106 @@ class BottomBarClipper extends CustomClipper<Path> {
   final double height;
   @override
   Path getClip(Size size) {
-    Path path = Path();
-    final double xScaling =
-        size.width / (MediaQuery.sizeOf(context).width - 20);
-    final double yScaling = size.height / height;
-    path.lineTo(0 * xScaling, 27.5585 * yScaling);
-    path.cubicTo(
-      0 * xScaling,
-      20.8153 * yScaling,
-      3.39801 * xScaling,
-      14.526 * yScaling,
-      9.03817 * xScaling,
-      10.8301 * yScaling,
+    final path = Path();
+    final width = size.width;
+    final heightValue = size.height;
+
+    // FAB size is 56x56, so we need a curve that accommodates it
+    // The curve should create a smooth notch in the top center for the FAB
+    final fabRadius = 28.0; // Half of FAB size (56/2)
+    final curveHeight =
+        heightValue * 0.5; // Height of the curve notch (50% of height - deeper)
+    final centerX = width / 2;
+
+    // Corner radius values
+    final topCornerRadius = 50.0; // Top corners radius
+    final bottomCornerRadius = 100.0; // Bottom corners radius
+
+    // Start from top left (before rounded corner)
+    path.moveTo(0, topCornerRadius);
+
+    // Top left rounded corner (outward/convex) - control point outside bounds
+    path.quadraticBezierTo(
+      -topCornerRadius, 0, // Control point (outside, creates convex curve)
+      topCornerRadius, 0, // End point
     );
+
+    // Draw flat top edge until curve starts - perfectly symmetrical
+    final curveWidth =
+        fabRadius * 2.8; // Total width of the curve (symmetrical)
+    final curveStartX = centerX - curveWidth;
+    final curveEndX = centerX + curveWidth;
+    path.lineTo(curveStartX, 0);
+
+    // Create smooth left curve downward using cubic bezier with sharper transition
+    final curveBottomLeftX = centerX - fabRadius * 0.9;
     path.cubicTo(
-      9.03817 * xScaling,
-      10.8301 * yScaling,
-      15.5802 * xScaling,
-      6.54326 * yScaling,
-      15.5802 * xScaling,
-      6.54326 * yScaling,
+      centerX -
+          fabRadius * 2.3, // First control point X (wider for smoother start)
+      0, // First control point Y (at top for smooth transition)
+      centerX - fabRadius * 1.5, // Second control point X
+      curveHeight * 0.5, // Second control point Y (mid curve - sharper)
+      curveBottomLeftX, // End point X (left bottom of curve)
+      curveHeight, // End point Y (bottom of left curve - deeper)
     );
+
+    // Create the bottom center curve (the notch bottom) - perfectly centered and deeper
+    final curveBottomRightX = centerX + fabRadius * 0.9;
     path.cubicTo(
-      22.0951 * xScaling,
-      2.27413 * yScaling,
-      29.7147 * xScaling,
-      0 * yScaling,
-      37.5038 * xScaling,
-      0 * yScaling,
+      centerX - fabRadius * 0.4, // First control point X
+      curveHeight * 1.15, // First control point Y (notch bottom - deeper)
+      centerX + fabRadius * 0.4, // Second control point X (symmetrical)
+      curveHeight * 1.15, // Second control point Y (notch bottom - deeper)
+      curveBottomRightX, // End point X (right bottom of curve)
+      curveHeight, // End point Y
     );
+
+    // Create smooth right curve upward using cubic bezier with sharper transition
     path.cubicTo(
-      37.5038 * xScaling,
-      0 * yScaling,
-      62.6607 * xScaling,
-      0 * yScaling,
-      62.6607 * xScaling,
-      0 * yScaling,
+      centerX + fabRadius * 1.5, // First control point X (symmetrical to left)
+      curveHeight * 0.5, // First control point Y (mid curve - sharper)
+      centerX + fabRadius * 2.3, // Second control point X (symmetrical to left)
+      0, // Second control point Y (at top for smooth transition)
+      curveEndX, // End point X
+      0, // End point Y
     );
-    path.cubicTo(
-      62.6607 * xScaling,
-      0 * yScaling,
-      124.988 * xScaling,
-      0 * yScaling,
-      124.988 * xScaling,
-      0 * yScaling,
+
+    // Draw flat top edge to the end (before top right corner)
+    path.lineTo(width - topCornerRadius, 0);
+
+    // Top right rounded corner (outward/convex) - control point outside bounds
+    path.quadraticBezierTo(
+      width + topCornerRadius,
+      0, // Control point (outside, creates convex curve)
+      width, topCornerRadius, // End point
     );
-    path.cubicTo(
-      136.364 * xScaling,
-      0 * yScaling,
-      147.203 * xScaling,
-      4.84444 * yScaling,
-      154.791 * xScaling,
-      13.321 * yScaling,
+
+    // Draw right edge (before bottom right corner)
+    path.lineTo(width, heightValue - bottomCornerRadius);
+
+    // Bottom right rounded corner (outward/convex) - control point outside bounds
+    path.quadraticBezierTo(
+      width,
+      heightValue +
+          bottomCornerRadius, // Control point (outside, creates convex curve)
+      width - bottomCornerRadius, heightValue, // End point
     );
-    path.cubicTo(
-      154.791 * xScaling,
-      13.321 * yScaling,
-      171.832 * xScaling,
-      32.3575 * yScaling,
-      171.832 * xScaling,
-      32.3575 * yScaling,
+
+    // Draw bottom edge (before bottom left corner)
+    path.lineTo(bottomCornerRadius, heightValue);
+
+    // Bottom left rounded corner (outward/convex) - control point outside bounds
+    path.quadraticBezierTo(
+      -bottomCornerRadius,
+      heightValue, // Control point (outside, creates convex curve)
+      0, heightValue - bottomCornerRadius, // End point
     );
-    path.cubicTo(
-      187.683 * xScaling,
-      50.0651 * yScaling,
-      215.386 * xScaling,
-      50.1276 * yScaling,
-      231.318 * xScaling,
-      32.4917 * yScaling,
-    );
-    path.cubicTo(
-      231.318 * xScaling,
-      32.4917 * yScaling,
-      248.756 * xScaling,
-      13.1868 * yScaling,
-      248.756 * xScaling,
-      13.1868 * yScaling,
-    );
-    path.cubicTo(
-      256.34 * xScaling,
-      4.79119 * yScaling,
-      267.125 * xScaling,
-      0 * yScaling,
-      278.439 * xScaling,
-      0 * yScaling,
-    );
-    path.cubicTo(
-      278.439 * xScaling,
-      0 * yScaling,
-      327.59 * xScaling,
-      0 * yScaling,
-      327.59 * xScaling,
-      0 * yScaling,
-    );
-    path.cubicTo(
-      327.59 * xScaling,
-      0 * yScaling,
-      350.9 * xScaling,
-      0 * yScaling,
-      350.9 * xScaling,
-      0 * yScaling,
-    );
-    path.cubicTo(
-      358.117 * xScaling,
-      0 * yScaling,
-      365.2 * xScaling,
-      1.95284 * yScaling,
-      371.398 * xScaling,
-      5.65152 * yScaling,
-    );
-    path.cubicTo(
-      371.398 * xScaling,
-      5.65152 * yScaling,
-      380.249 * xScaling,
-      10.9336 * yScaling,
-      380.249 * xScaling,
-      10.9336 * yScaling,
-    );
-    path.cubicTo(
-      386.296 * xScaling,
-      14.5425 * yScaling,
-      390 * xScaling,
-      21.0657 * yScaling,
-      390 * xScaling,
-      28.1079 * yScaling,
-    );
-    path.cubicTo(
-      390 * xScaling,
-      28.1079 * yScaling,
-      390 * xScaling,
-      36 * yScaling,
-      390 * xScaling,
-      36 * yScaling,
-    );
-    path.cubicTo(
-      390 * xScaling,
-      58.0914 * yScaling,
-      372.091 * xScaling,
-      76 * yScaling,
-      350 * xScaling,
-      76 * yScaling,
-    );
-    path.cubicTo(
-      350 * xScaling,
-      76 * yScaling,
-      40 * xScaling,
-      76 * yScaling,
-      40 * xScaling,
-      76 * yScaling,
-    );
-    path.cubicTo(
-      17.9086 * xScaling,
-      76 * yScaling,
-      0 * xScaling,
-      58.0914 * yScaling,
-      0 * xScaling,
-      36 * yScaling,
-    );
-    path.cubicTo(
-      0 * xScaling,
-      36 * yScaling,
-      0 * xScaling,
-      27.5585 * yScaling,
-      0 * xScaling,
-      27.5585 * yScaling,
-    );
-    path.cubicTo(
-      0 * xScaling,
-      27.5585 * yScaling,
-      0 * xScaling,
-      27.5585 * yScaling,
-      0 * xScaling,
-      27.5585 * yScaling,
-    );
+
+    // Draw left edge (back to start)
+    path.lineTo(0, topCornerRadius);
+
+    path.close();
+
     return path;
   }
 

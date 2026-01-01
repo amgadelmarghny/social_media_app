@@ -5,6 +5,7 @@ import '../fonts/font_style.dart';
 
 abstract class CustomThemeMode {
   static final lightTheme = ThemeData(
+
     indicatorColor: Colors.white,
     primaryColor: defaultTextColor,
     scaffoldBackgroundColor: Colors.transparent,

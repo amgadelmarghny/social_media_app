@@ -32,8 +32,8 @@ class ChatViewInteracrive extends StatelessWidget {
         children: [
           IconButton(
             onPressed: () {},
-            icon: Icon(
-              HugeIcons.strokeRoundedImageAdd02,
+            icon: HugeIcon(
+              icon: HugeIcons.strokeRoundedImageAdd02,
               color: Color(0XFFC4C2CB),
             ),
           ),
@@ -72,8 +72,8 @@ class ChatViewInteracrive extends StatelessWidget {
                     BlocProvider.of<ChatCubit>(context).sendMessages(model);
                     controller.clear();
                   },
-                  icon: const Icon(
-                    HugeIcons.strokeRoundedSent,
+                  icon: const HugeIcon(
+                    icon: HugeIcons.strokeRoundedSent,
                     size: 28,
                     color: Color(0XFFC4C2CB),
                   ),
@@ -96,8 +96,8 @@ class ChatViewInteracrive extends StatelessWidget {
             onPressed: () {
               //TODO: add voice recording functionality
             },
-            icon: const Icon(
-              HugeIcons.strokeRoundedMic01,
+            icon: const HugeIcon(
+              icon: HugeIcons.strokeRoundedMic01,
               color: Color(0XFFC4C2CB),
             ),
           ),

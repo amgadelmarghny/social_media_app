@@ -181,8 +181,8 @@ class _FeedsBodyState extends State<FeedsBody> {
                                         strokeWidth: 2,
                                       ),
                                     )
-                                  : const Icon(
-                                      HugeIcons.strokeRoundedSearch01,
+                                  : const HugeIcon(
+                                      icon: HugeIcons.strokeRoundedSearch01,
                                       size: 32,
                                       color: Colors.white,
                                     ),

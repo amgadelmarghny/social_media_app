@@ -72,7 +72,7 @@ class CustomContainerPageView extends StatelessWidget {
                 ),
                 Padding(
                   padding: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).padding.bottom),
+                      bottom: MediaQuery.of(context).padding.bottom + 10),
                   child: BlocBuilder<AppCubit, AppState>(
                     builder: (context, state) {
                       return CustomButton(
