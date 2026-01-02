@@ -37,7 +37,7 @@ class _ChatItemState extends State<ChatItem> {
   @override
   Widget build(BuildContext context) {
     return Skeletonizer(
-      enabled: userModel == null,
+      enabled: userModel?.firstName.isEmpty ?? true,
       child: InkWell(
           onTap: () => Navigator.pushNamed(
                 context,
@@ -48,7 +48,7 @@ class _ChatItemState extends State<ChatItem> {
             children: [
               ProfilePictureWithStory(
                 size: 70,
-                image: userModel!.photo,
+                image: userModel?.photo,
                 isWithoutStory: true,
               ),
               Expanded(
@@ -56,7 +56,7 @@ class _ChatItemState extends State<ChatItem> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "${userModel!.firstName} ${userModel!.lastName}",
+                      "${userModel?.firstName} ${userModel?.lastName}",
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                       style: FontsStyle.font20Poppins

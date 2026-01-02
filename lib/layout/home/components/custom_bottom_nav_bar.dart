@@ -4,85 +4,114 @@ import 'package:social_media_app/modules/new_post/new_post.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/components/bottom_bar_cilper.dart';
 
-/// Custom bottom navigation bar widget with a floating action button for creating posts.
-/// Uses a custom clipper for a unique shape and integrates with SocialCubit for navigation state.
 class CustomBottomNavBar extends StatelessWidget {
-  const CustomBottomNavBar({
-    super.key,
-  });
+  const CustomBottomNavBar({super.key});
 
   @override
+  @override
   Widget build(BuildContext context) {
-    // BlocBuilder listens to SocialCubit state changes to update the navigation bar.
+    final width = MediaQuery.sizeOf(context).width;
+
     return BlocBuilder<SocialCubit, SocialState>(
       builder: (context, state) {
-        final screenWidth = MediaQuery.sizeOf(context).width;
-        return SizedBox(
-          width: screenWidth, // Ensure full width
+        var cubit = context.read<SocialCubit>();
+
+        return Container(
+          width: width,
+          height: 100,
+          color: Colors.transparent,
           child: Stack(
-            clipBehavior: Clip.none, // Allows the FAB to overflow the stack.
+            clipBehavior: Clip.none,
+            alignment: Alignment.bottomCenter,
             children: [
-              // The custom-shaped bottom navigation bar using a ClipPath and BottomBarClipper.
-              ClipPath(
-                clipper: BottomBarClipper(context, height: 73),
-                child: Container(
-                  width: screenWidth, // Ensure full width
-                  height: 80,
-                  padding: const EdgeInsets.all(1.5),
-                  color: const Color(0xffBA85E8), // Outer border color.
+              /// الـ Bar الأساسي
+              Positioned(
+                bottom: 3, // البعد عن أسفل الشاشة بمقدار 3
+                left: 15, // بادينج من الشمال
+                right: 15, // بادينج من اليمين
+                child: CustomPaint(
+                  // العرض هنا بيقل بسبب الـ Padding (15 من كل ناحية)
+                  size: Size(width - 30, 70),
+                  painter: BottomBarShadowPainter(),
                   child: ClipPath(
-                    clipper: BottomBarClipper(context, height: 73),
-                    child: BottomNavigationBar(
-                      // The current selected index from the SocialCubit.
-                      currentIndex: BlocProvider.of<SocialCubit>(context)
-                          .currentBottomNavBarIndex,
-                      // When a navigation item is tapped, update the index in the cubit.
-                      onTap: (value) {
-                        BlocProvider.of<SocialCubit>(context)
-                            .changeBottomNavBar(value);
-                      },
-                      iconSize: 28,
-                      // The navigation items provided by the SocialCubit.
-                      items: BlocProvider.of<SocialCubit>(context)
-                          .bottomNavigationBarItem,
+                    clipper: BottomBarClipper(),
+                    child: Container(
+                      height: 70,
+                      color: const Color(0xffF5F5F5),
+                      child: BottomNavigationBar(
+                        backgroundColor: Colors.transparent,
+                        elevation: 0,
+                        type: BottomNavigationBarType.fixed,
+                        selectedItemColor: const Color(0xff6A5C93),
+                        unselectedItemColor: Colors.grey,
+                        currentIndex: cubit.currentBottomNavBarIndex,
+                        onTap: cubit.changeBottomNavBar,
+                        items: cubit.bottomNavigationBarItem,
+                      ),
                     ),
                   ),
                 ),
               ),
-              // The floating action button, positioned to overlap the navigation bar.
+
+              /// زر الإضافة (FAB)
               Positioned(
-                top: -17.5, // Raise the FAB above the bar.
-                left: 0,
-                right: 0,
-                // Center the FAB horizontally using Align widget.
-                child: Align(
-                  alignment: Alignment.center,
-                  child: FloatingActionButton(
-                    // When pressed, show the CreatePostSheet in a modal bottom sheet.
-                    onPressed: () {
-                      showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        builder: (context) {
-                          return const FractionallySizedBox(
-                            heightFactor:
-                                1.0, // This makes the bottom sheet take the full height
-                            child: CreatePostSheet(),
-                          );
-                        },
-                      );
-                    },
-                    child: const Icon(
-                      Icons.add,
-                      color: Color(0xffD2C0DD), // Icon color.
+                bottom: 38, // تم رفعه ليتناسب مع الـ bottom: 3 الجديد
+                child: Center(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xff6A5C93).withValues(alpha: 0.3),
+                          blurRadius: 10,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: FloatingActionButton(
+                      elevation: 0,
+                      backgroundColor: const Color(0xff6A5C93),
+                      onPressed: () {
+                        // Logic
+                      },
+                      child: const Icon(Icons.add,
+                          color: Color(0xffD2C0DD), size: 32),
                     ),
                   ),
                 ),
-              )
+              ),
             ],
           ),
         );
       },
     );
   }
+}
+
+class BottomBarShadowPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    // بننادي على الـ Clipper اللي إحنا عملناه عشان نجيب نفس المسار
+    Path path = BottomBarClipper().getClip(size);
+
+    // 1. رسم الظل (Shadow)
+    // نستخدم drawShadow عشان الظل يمشي مع انحناءات الكيرف بالظبط
+    canvas.drawShadow(
+        path,
+        Colors.black.withValues(alpha: 0.3), // قوة الظل
+        8.0, // مدى الانتشار (Blur)
+        false // هل الشكل شفاف؟ (false تعني شكل مصمت)
+        );
+
+    // 2. رسم الحدود (Border) - الخط البنفسجي اللي في الصورة
+    Paint paint = Paint()
+      ..color = const Color(0xffBA85E8) // نفس الدرجة البنفسجي اللي في صورتك
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.0; // سمك الخط
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }

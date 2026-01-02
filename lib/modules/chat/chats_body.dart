@@ -77,9 +77,13 @@ class _ChatsBodyState extends State<ChatsBody> {
                   BlocProvider.of<ChatCubit>(context).chatItemsList.length,
               itemBuilder: (context, index) => Skeletonizer(
                 enabled: state is GetChatsLoadingState,
-                child: ChatItem(
-                  chatItemModel:
-                      BlocProvider.of<ChatCubit>(context).chatItemsList[index],
+                child: Skeletonizer(
+                  enabled: BlocProvider.of<ChatCubit>(context)
+                      .chatItemsList[index].message.isEmpty ,
+                  child: ChatItem(
+                    chatItemModel: BlocProvider.of<ChatCubit>(context)
+                        .chatItemsList[index],
+                  ),
                 ),
               ),
               separatorBuilder: (context, index) => const SizedBox(

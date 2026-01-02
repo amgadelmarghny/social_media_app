@@ -49,7 +49,7 @@ class ChatCubit extends Cubit<ChatState> {
         ChatItemModel chatItemModel = ChatItemModel(
           uid: chatItem.id,
           message: chatItem.data()['message'],
-          dateTime: chatItem.data()[kCreatedAt],
+          dateTime: (chatItem.data()[kCreatedAt] as Timestamp).toDate(),
         );
         chatItemsList.add(chatItemModel);
       }
