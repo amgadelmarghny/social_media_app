@@ -122,17 +122,17 @@ class ChatCubit extends Cubit<ChatState> {
     }
   }
 
-  Future<void> pushMessageNotificationToTheFriend({
-    required String token,
-    required String title,
-    required String content,
-  }) async {
-    try {
-      await DioHelper.post(token: token, title: title, bodyContent: content);
-      emit(PushMessageNotificationToTheFriendSuccess());
-    } on Exception catch (e) {
-      emit(PushMessageNotificationToTheFriendFailure(
-          errMessage: 'Error sending push notification: ${e.toString()}'));
-    }
-  }
+  // Future<void> pushMessageNotificationToTheFriend({
+  //   required String token,
+  //   required String title,
+  //   required String content,
+  // }) async {
+  //   try {
+  //     await DioHelper.post(token: token, title: title, bodyContent: content);
+  //     emit(PushMessageNotificationToTheFriendSuccess());
+  //   } on Exception catch (e) {
+  //     emit(PushMessageNotificationToTheFriendFailure(
+  //         errMessage: 'Error sending push notification: ${e.toString()}'));
+  //   }
+  // }
 }

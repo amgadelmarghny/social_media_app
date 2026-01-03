@@ -31,7 +31,9 @@ class _ChatItemState extends State<ChatItem> {
   Future<void> getChatUserModel() async {
     userModel =
         await socialCubit.getUserData(userUid: widget.chatItemModel.uid);
-    setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override

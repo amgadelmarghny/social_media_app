@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:social_media_app/shared/style/fonts/font_style.dart';
 
 class NotificationsBody extends StatefulWidget {
   const NotificationsBody({super.key});
@@ -24,9 +25,6 @@ class _NotificationsBodyState extends State<NotificationsBody> {
       if (_scrollController.position.atEdge) {
         bool isTop = _scrollController.position.pixels == 0;
         if (!isTop) {
-          // Reached the bottom of the scroll view.
-          debugPrint(
-              "^^^^^^^ Reached the end of the SingleChildScrollView ^^^");
           // Increase the bottom padding to make space for the bottom nav bar.
           setState(() {
             _bodiesBottomPadding = 82;
@@ -53,11 +51,14 @@ class _NotificationsBodyState extends State<NotificationsBody> {
         return true;
       },
       child: Padding(
-        padding: EdgeInsets.only( top: 10,
-          left: 20,
-          right: 20,bottom: _bodiesBottomPadding),
-        child: const Center(
-          child: Text('notifications body'),
+        padding: EdgeInsets.only(
+            top: 10, left: 20, right: 20, bottom: _bodiesBottomPadding),
+        child: Center(
+          child: Text(
+            'This feature will be available soon',
+            style: FontsStyle.font22Bold(color: Colors.white),
+            textAlign: TextAlign.center,
+          ),
         ),
       ),
     );

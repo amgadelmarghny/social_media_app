@@ -3,17 +3,21 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/modules/new_post/new_post.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/components/bottom_bar_cilper.dart';
+import 'package:social_media_app/shared/components/bottom_bar_shadow_painter.dart';
 
+/// Custom bottom navigation bar with a floating action button for adding new posts.
+/// Uses BlocBuilder to reactively update UI based on SocialCubit state.
 class CustomBottomNavBar extends StatelessWidget {
   const CustomBottomNavBar({super.key});
 
   @override
-  @override
   Widget build(BuildContext context) {
+    // Get the width of the device's screen for responsive sizing.
     final width = MediaQuery.sizeOf(context).width;
 
     return BlocBuilder<SocialCubit, SocialState>(
       builder: (context, state) {
+        // Retrieve the SocialCubit instance from the context.
         var cubit = context.read<SocialCubit>();
 
         return Container(
@@ -24,20 +28,22 @@ class CustomBottomNavBar extends StatelessWidget {
             clipBehavior: Clip.none,
             alignment: Alignment.bottomCenter,
             children: [
-              /// الـ Bar الأساسي
+              // Main navigation bar positioned above the bottom edge with side paddings.
               Positioned(
-                bottom: 3, // البعد عن أسفل الشاشة بمقدار 3
-                left: 15, // بادينج من الشمال
-                right: 15, // بادينج من اليمين
+                bottom: 3, // 3 pixels above the screen's bottom edge.
+                left: 15, // Padding from the left.
+                right: 15, // Padding from the right.
                 child: CustomPaint(
-                  // العرض هنا بيقل بسبب الـ Padding (15 من كل ناحية)
+                  // The size is reduced by 30 pixels to account for left/right paddings.
                   size: Size(width - 30, 70),
-                  painter: BottomBarShadowPainter(),
+                  painter:
+                      BottomBarShadowPainter(), // Custom shadow painter for the bar.
                   child: ClipPath(
-                    clipper: BottomBarClipper(),
+                    clipper:
+                        BottomBarClipper(), // Custom clipper for the desired bar shape.
                     child: Container(
                       height: 70,
-                      color: const Color(0xffF5F5F5),
+                      color: const Color(0xffF5F5F5), // Bar background color.
                       child: BottomNavigationBar(
                         backgroundColor: Colors.transparent,
                         elevation: 0,
@@ -53,14 +59,15 @@ class CustomBottomNavBar extends StatelessWidget {
                 ),
               ),
 
-              /// زر الإضافة (FAB)
+              // Floating action button for creating a new post, positioned over the bar.
               Positioned(
-                bottom: 38, // تم رفعه ليتناسب مع الـ bottom: 3 الجديد
+                bottom: 38, // Raised above the bar to visually float over it.
                 child: Center(
                   child: Container(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       boxShadow: [
+                        // Shadow for the FAB to give a floating effect.
                         BoxShadow(
                           color: const Color(0xff6A5C93).withValues(alpha: 0.3),
                           blurRadius: 10,
@@ -72,10 +79,26 @@ class CustomBottomNavBar extends StatelessWidget {
                       elevation: 0,
                       backgroundColor: const Color(0xff6A5C93),
                       onPressed: () {
-                        // Logic
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          enableDrag: false, // Prevents dragging down to close
+                          backgroundColor: Colors.transparent,
+                          builder: (context) => DraggableScrollableSheet(
+                            initialChildSize: 1,
+                            maxChildSize: 1,
+                            minChildSize: 1,
+                            expand: true,
+                            builder: (context, scrollController) =>
+                                const CreatePostSheet(),
+                          ),
+                        );
                       },
-                      child: const Icon(Icons.add,
-                          color: Color(0xffD2C0DD), size: 32),
+                      child: const Icon(
+                        Icons.add,
+                        color: Color(0xffD2C0DD),
+                        size: 32,
+                      ),
                     ),
                   ),
                 ),
@@ -86,32 +109,4 @@ class CustomBottomNavBar extends StatelessWidget {
       },
     );
   }
-}
-
-class BottomBarShadowPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    // بننادي على الـ Clipper اللي إحنا عملناه عشان نجيب نفس المسار
-    Path path = BottomBarClipper().getClip(size);
-
-    // 1. رسم الظل (Shadow)
-    // نستخدم drawShadow عشان الظل يمشي مع انحناءات الكيرف بالظبط
-    canvas.drawShadow(
-        path,
-        Colors.black.withValues(alpha: 0.3), // قوة الظل
-        8.0, // مدى الانتشار (Blur)
-        false // هل الشكل شفاف؟ (false تعني شكل مصمت)
-        );
-
-    // 2. رسم الحدود (Border) - الخط البنفسجي اللي في الصورة
-    Paint paint = Paint()
-      ..color = const Color(0xffBA85E8) // نفس الدرجة البنفسجي اللي في صورتك
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0; // سمك الخط
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
