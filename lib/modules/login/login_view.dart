@@ -13,8 +13,10 @@ class LoginView extends StatelessWidget {
       decoration: themeColor(),
       child: BlocProvider(
         create: (context) => LoginCubit(),
-        child: const Scaffold(
-          body: LoginViewBody(),
+        child: SafeArea(
+          child: const Scaffold(
+            body: LoginViewBody(),
+          ),
         ),
       ),
     );

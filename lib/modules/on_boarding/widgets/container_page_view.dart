@@ -6,10 +6,9 @@ import 'package:social_media_app/modules/on_boarding/widgets/on_boarding_pages.d
 import 'package:social_media_app/shared/bloc/app_cubit/app_cubit.dart';
 import 'package:social_media_app/shared/network/local/cache_helper.dart';
 import 'package:social_media_app/shared/components/constants.dart';
-import 'dart:ui' as ui;
-
 import 'package:social_media_app/shared/components/custom_button.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
+import 'dart:ui' as ui;
 
 class CustomContainerPageView extends StatelessWidget {
   const CustomContainerPageView({
@@ -35,7 +34,7 @@ class CustomContainerPageView extends StatelessWidget {
         child: BackdropFilter(
           filter: ui.ImageFilter.blur(sigmaX: 9, sigmaY: 9),
           child: Padding(
-            padding: const EdgeInsets.only(top: 30, left: 40, right: 40),
+            padding: const EdgeInsets.only(top: 30, left: 30, right: 30),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -51,14 +50,14 @@ class CustomContainerPageView extends StatelessWidget {
                       spacing: 12),
                 ),
                 const SizedBox(
-                  height: 15,
+                  height: 7,
                 ),
                 Text(
                   'Welcome !',
                   style: FontsStyle.font36BoldShadow,
                 ),
                 SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.12,
+                  height: MediaQuery.of(context).size.height * 0.115,
                   child: PageView.builder(
                     controller: pageController,
                     onPageChanged: (value) {
@@ -72,7 +71,7 @@ class CustomContainerPageView extends StatelessWidget {
                 ),
                 Padding(
                   padding: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).padding.bottom + 10),
+                      bottom: MediaQuery.of(context).padding.bottom + 5),
                   child: BlocBuilder<AppCubit, AppState>(
                     builder: (context, state) {
                       return CustomButton(

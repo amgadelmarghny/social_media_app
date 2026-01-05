@@ -18,6 +18,7 @@ class LoginFieldsAndButton extends StatelessWidget {
         LoginCubit loginCubit = BlocProvider.of<LoginCubit>(context);
 
         return Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             CustomTextField(
               hintText: 'Email/phone number',
@@ -46,35 +47,29 @@ class LoginFieldsAndButton extends StatelessWidget {
             SizedBox(
               height: height * 0.02,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                AbsorbPointer(
-                  absorbing: state is SendPasswordResetEmailLoading,
-                  child: TextButton(
-                    onPressed: () async {
-                      String email = loginCubit.emailController.text.trim();
-                      if (email.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Please enter your email first'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                        return;
-                      }
-
-                      await loginCubit.sendPasswordResetEmail(email);
-                    },
-                    child: Text(
-                      'Forgot password?',
-                      style: FontsStyle.font18PopinWithShadowOption(
-                        color: defaultTextColor,
+            AbsorbPointer(
+              absorbing: state is SendPasswordResetEmailLoading,
+              child: TextButton(
+                onPressed: () async {
+                  String email = loginCubit.emailController.text.trim();
+                  if (email.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Please enter your email first'),
+                        backgroundColor: Colors.red,
                       ),
-                    ),
+                    );
+                    return;
+                  }
+                  await loginCubit.sendPasswordResetEmail(email);
+                },
+                child: Text(
+                  'Forgot password?',
+                  style: FontsStyle.font18PopinWithShadowOption(
+                    color: defaultTextColor,
                   ),
                 ),
-              ],
+              ),
             ),
             SizedBox(
               height: height * 0.02,

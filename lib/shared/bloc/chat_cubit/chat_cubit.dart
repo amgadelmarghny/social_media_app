@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/models/chat_item_model.dart';
 import 'package:social_media_app/models/message_model.dart';
 import 'package:social_media_app/shared/components/constants.dart';
-import 'package:social_media_app/shared/dio_helper.dart';
 import 'package:social_media_app/shared/network/local/cache_helper.dart';
 
 part 'chat_state.dart';

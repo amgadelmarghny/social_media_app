@@ -18,7 +18,6 @@ class LoginViewBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.sizeOf(context).height;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: BlocConsumer<LoginCubit, LoginState>(
@@ -39,57 +38,66 @@ class LoginViewBody extends StatelessWidget {
         },
         builder: (context, state) {
           LoginCubit loginCubit = BlocProvider.of<LoginCubit>(context);
-          return SingleChildScrollView(
-            child: Form(
-              key: loginCubit.formKey,
-              autovalidateMode: loginCubit.autovalidateMode,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    height: height * 0.15,
+          return Form(
+            key: loginCubit.formKey,
+            autovalidateMode: loginCubit.autovalidateMode,
+            child: CustomScrollView(
+              slivers: [
+                const SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: 50,
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        'lib/assets/images/Ciao.png',
-                      ),
-                    ],
+                ),
+                const SliverToBoxAdapter(
+                  child: Image(
+                    height: 100,
+                    image: AssetImage(
+                      'lib/assets/images/launch_icon_wthout_bg.png',
+                    ),
                   ),
-                  SizedBox(
-                    height: height * 0.03,
+                ),
+                const SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: 20,
                   ),
-                  Text(
+                ),
+                SliverToBoxAdapter(
+                  child: Text(
                     'Sign in',
                     style: FontsStyle.font32Bold,
                   ),
-                  SizedBox(
-                    height: height * 0.03,
+                ),
+                const SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: 20,
                   ),
-                  const LoginFieldsAndButton(),
-                  SizedBox(
-                    height: height * 0.02,
+                ),
+                const SliverToBoxAdapter(child: LoginFieldsAndButton()),
+                const SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: 15,
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Or sign in with',
-                        style: FontsStyle.font18PopinWithShadowOption(),
-                      ),
-                    ],
+                ),
+                SliverToBoxAdapter(
+                  child: Text(
+                    'Or sign in with',
+                    textAlign: TextAlign.center,
+                    style: FontsStyle.font18PopinWithShadowOption(),
                   ),
-                  SizedBox(
-                    height: height * 0.0125,
+                ),
+                const SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: 10,
                   ),
-                  const AuthIocnList(),
-                  SizedBox(
-                    height: height * 0.0125,
-                  ),
-                  const SignUpNavigatorRow()
-                ],
-              ),
+                ),
+                const SliverToBoxAdapter(child: AuthIocnList()),
+                const SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Align(
+                      alignment: AlignmentGeometry.bottomCenter,
+                      child: SignUpNavigatorRow()),
+                )
+              ],
             ),
           );
         },

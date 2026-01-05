@@ -35,8 +35,8 @@ class OnBoardingPages extends StatelessWidget {
                         width: 8,
                       ),
                       Image.asset(
-                        'lib/assets/images/Ciao.png',
-                        height: 30,
+                        'lib/assets/images/launch_icon_wthout_bg.png',
+                        height: 40,
                       ),
                     ],
                   )

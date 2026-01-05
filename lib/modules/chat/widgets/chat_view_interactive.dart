@@ -46,19 +46,19 @@ class ChatViewInteracrive extends StatelessWidget {
                     uid: CacheHelper.getData(key: kUidToken),
                     friendUid: friendUid,
                     dateTime: DateTime.now());
-                await BlocProvider.of<ChatCubit>(context)
-                    .sendMessages(model)
-                    .then((value) {
-                  if (context.mounted) {
-                    BlocProvider.of<ChatCubit>(context)
-                        .pushMessageNotificationToTheFriend(
-                      token: friendToken,
-                      title: "New message from ${model.uid}",
-                      content: controller.text,
-                    );
-                    controller.clear();
-                  }
-                });
+                await BlocProvider.of<ChatCubit>(context).sendMessages(model)
+                    //  .then((value) {
+                    // if (context.mounted) {
+                    //   BlocProvider.of<ChatCubit>(context)
+                    //       .pushMessageNotificationToTheFriend(
+                    //     token: friendToken,
+                    //     title: "New message from ${model.uid}",
+                    //     content: controller.text,
+                    //   );
+                    // }
+                    //})
+                    ;
+                controller.clear();
               },
               style: FontsStyle.font18PopinWithShadowOption(),
               decoration: InputDecoration(
