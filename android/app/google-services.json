@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:872697067623:android:e531dfdf2c3c9662433cc2",
+        "mobilesdk_app_id": "1:872697067623:android:694fc7ab6a2fbc50433cc2",
         "android_client_info": {
-          "package_name": "com.example.social_media_app"
+          "package_name": "com.marghnycoding.social_media_app"
         }
       },
       "oauth_client": [],

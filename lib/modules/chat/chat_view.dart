@@ -6,6 +6,8 @@ import 'package:social_media_app/shared/components/profile_picture_with_story.da
 import 'package:social_media_app/shared/style/theme/constant.dart';
 import 'package:social_media_app/shared/style/theme/theme.dart';
 
+import '../user/user_view.dart';
+
 class ChatView extends StatelessWidget {
   const ChatView({super.key});
   static const routeName = "./chat_view";
@@ -31,7 +33,10 @@ class ChatView extends StatelessWidget {
               color: Color(0XFFB1ACC7),
             ),
           ),
-          title: Row(
+          title: InkWell(
+            onTap: ()=>Navigator.pushNamed(context, UserView.routName,arguments:  userModel),
+            child: Row(
+
             children: [
               ProfilePictureWithStory(
                 size: 60,
@@ -43,9 +48,10 @@ class ChatView extends StatelessWidget {
               ),
               Text("${userModel.firstName} ${userModel.lastName}"),
             ],
-          ),
+          ),),
         ),
-        body: ChatViewBody(
+        body:
+        ChatViewBody(
           friendUid: userModel.uid,
           friendToken: userModel.fcmToken,
         ),
