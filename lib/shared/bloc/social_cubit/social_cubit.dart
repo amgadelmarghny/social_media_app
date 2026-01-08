@@ -134,8 +134,11 @@ class SocialCubit extends Cubit<SocialState> {
         await _userCollectionRef.doc(userUid).get();
     Map<String, dynamic> userModelData = documentSnapshot.data()!;
     UserModel spacificUserModel = UserModel.fromJson(userModelData);
-    // if the userModel != null that means getUserData used to featch friends data
-    userModel ??= spacificUserModel;
+    // Update userModel if it's null, or if it's for the current user (same UID)
+    // This ensures the current user's data is always up-to-date after login/logout
+    if (userModel == null || userModel!.uid == userUid) {
+      userModel = spacificUserModel;
+    }
 
     emit(GetMyDataSuccessState());
     return spacificUserModel;
@@ -597,6 +600,16 @@ class SocialCubit extends Cubit<SocialState> {
     try {
       await FirebaseAuth.instance.signOut();
       await CacheHelper.deleteCash(key: kUidToken);
+      // Clear user data when logging out to prevent showing old user data after new login
+      userModel = null;
+      uidTokenCache = null;
+      // Clear other user-related data
+      myPostsModelList.clear();
+      myPostsIdList.clear();
+      freindsPostsModelList.clear();
+      freindsPostsIdList.clear();
+      followers.clear();
+      followings.clear();
       emit(LogOutSuccessState());
     } on Exception catch (e) {
       emit(LogOutFailureState(errMessage: e.toString()));

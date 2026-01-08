@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/modules/login/widgets/sign_up_navigator_row.dart';
 import 'package:social_media_app/shared/bloc/login_cubit/login_cubit.dart';
+import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/components/auth_icon_list.dart';
 import 'package:social_media_app/shared/components/navigators.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
@@ -24,6 +25,14 @@ class LoginViewBody extends StatelessWidget {
         listener: (BuildContext context, LoginState state) {
           if (state is LoginSuccessState) {
             CacheHelper.setData(key: kUidToken, value: state.uid);
+            // Update SocialCubit with new user data after login
+            final socialCubit = BlocProvider.of<SocialCubit>(context);
+            socialCubit.uidTokenCache = state.uid;
+            socialCubit.getUserData(userUid: state.uid);
+            socialCubit.getMyUserPosts(state.uid);
+            socialCubit.getTimelinePosts();
+            socialCubit.getFollowers();
+            socialCubit.getFollowing();
             pushAndRemoveView(context, newRouteName: HomeView.routeViewName);
           }
           if (state is LoginFailureState) {

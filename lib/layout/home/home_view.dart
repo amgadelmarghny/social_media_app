@@ -17,8 +17,10 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
+  late SocialCubit socialCubit;
   @override
   void initState() {
+    socialCubit = SocialCubit();
     // request notification permissions when the HomeView is first created.
     requestNotificationPermision();
     super.initState();
