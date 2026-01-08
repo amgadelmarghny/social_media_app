@@ -107,23 +107,24 @@ class _PostItemState extends State<PostItem> {
                     child: CustomReadMoreText(text: widget.postModel.content!),
                   ),
                 // hashtags
-                const Wrap(
-                  children: [
-                    Hashtag(
-                      title: '#Profile',
-                    ),
-                  ],
-                ),
+                // TODO: Add hashtags when it be available
+                // const Wrap(
+                //   children: [
+                //     Hashtag(
+                //       title: '#Profile',
+                //     ),
+                //   ],
+                // ),
                 if (widget.postModel.postImage != null)
                   PostItemImage(postImage: widget.postModel.postImage!),
                 InteractiveRow(
-                      numOfLikes: likesCollection?.docs.length ?? 0,
-                      isLike: isLike,
-                      onLikeButtonTap: toggleLike,
-                      postId: widget.postId,
-                      creatorUid: widget.postModel.creatorUid,
-                      commentsNum: widget.postModel.commentsNum,
-                    ),
+                  numOfLikes: likesCollection?.docs.length ?? 0,
+                  isLike: isLike,
+                  onLikeButtonTap: toggleLike,
+                  postId: widget.postId,
+                  creatorUid: widget.postModel.creatorUid,
+                  commentsNum: widget.postModel.commentsNum,
+                ),
               ],
             ),
           ),

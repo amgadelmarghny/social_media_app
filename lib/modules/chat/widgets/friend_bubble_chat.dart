@@ -35,8 +35,8 @@ class FriendBubbleMessage extends StatelessWidget {
         // Padding inside the bubble
         padding: const EdgeInsets.only(top: 8, left: 12, right: 15),
         // Bubble decoration: color and rounded corners
-        decoration: const BoxDecoration(
-          color: defaultColor,
+        decoration: BoxDecoration(
+          color: defaultColor.withValues(alpha: 0.6),
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),

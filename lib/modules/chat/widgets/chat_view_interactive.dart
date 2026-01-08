@@ -25,7 +25,7 @@ class ChatViewInteracrive extends StatelessWidget {
         left: 10,
         right: 10,
         top: 10,
-        bottom: MediaQuery.viewPaddingOf(context).bottom,
+        bottom: MediaQuery.viewPaddingOf(context).bottom + 6,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

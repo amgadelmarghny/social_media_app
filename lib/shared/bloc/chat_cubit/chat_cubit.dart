@@ -64,22 +64,48 @@ class ChatCubit extends Cubit<ChatState> {
     try {
       // Only send if the message is not empty
       if (messageModel.message.isNotEmpty) {
-        // Reference to the messages collection for the friend
-        final userDoc = FirebaseFirestore.instance
+        final currentUserId = CacheHelper.getData(key: kUidToken);
+        final timestamp = Timestamp.fromDate(messageModel.dateTime);
+
+        // Prepare message data with all required fields
+        final messageData = {
+          'message': messageModel.message,
+          'uid': messageModel.uid,
+          'friendUid': messageModel.friendUid,
+          kCreatedAt: timestamp,
+        };
+
+        // Reference to the sender's chat collection
+        final senderDoc = FirebaseFirestore.instance
             .collection(kUsersCollection)
-            .doc(CacheHelper.getData(key: kUidToken))
+            .doc(currentUserId)
             .collection(kChatCollection)
             .doc(messageModel.friendUid);
 
-        // Add the message to the collection
-        userDoc.collection(kMessageCollection).add({
-          'message': messageModel.message,
-          'friendUid': messageModel.friendUid,
-          kCreatedAt: messageModel.dateTime,
-        });
+        // Reference to the receiver's chat collection
+        final receiverDoc = FirebaseFirestore.instance
+            .collection(kUsersCollection)
+            .doc(messageModel.friendUid)
+            .collection(kChatCollection)
+            .doc(currentUserId);
 
-        // Update the chat preview with the latest message and timestamp
-        await userDoc.set(messageModel.toJson());
+        // Add the message to sender's messages collection
+        await senderDoc.collection(kMessageCollection).add(messageData);
+
+        // Add the message to receiver's messages collection (for real-time updates)
+        await receiverDoc.collection(kMessageCollection).add(messageData);
+
+        // Update the chat preview for sender
+        await senderDoc.set(messageModel.toJson());
+
+        // Update the chat preview for receiver (with reversed uid/friendUid)
+        final receiverChatPreview = {
+          'message': messageModel.message,
+          'uid': messageModel.friendUid,
+          'friendUid': currentUserId,
+          kCreatedAt: timestamp,
+        };
+        await receiverDoc.set(receiverChatPreview);
       }
       emit(SendMessageSuccess());
     } on Exception catch (e) {
@@ -88,37 +114,49 @@ class ChatCubit extends Cubit<ChatState> {
   }
 
   /// Listens to messages in real-time for a specific friend [friendUid]
+  /// Listen to real-time updates in message collection for a specific chat with a given friendUid.
+  /// Emits [GetMessagesLoading] if local messageList is empty (to show loading UI only on initial load).
+  /// Subscribes to Firestore changes, keeping the local messageList in-sync with remote data.
+  /// Emits [GetMessagesSuccess] with a cloned list after every new batch of messages arrives.
+  /// If an error occurs, we're not emitting failure state to preserve existing messages in UI.
   void getMessages({required String friendUid}) {
-    emit(GetMessagesLoading());
-    try {
-      // Cancel existing subscription to avoid memory leaks
-      _messagesSubscription?.cancel();
-
-      // Reference to the messages collection for the friend
-      final messageCollection = FirebaseFirestore.instance
-          .collection(kUsersCollection)
-          .doc(CacheHelper.getData(key: kUidToken))
-          .collection(kChatCollection)
-          .doc(friendUid)
-          .collection(kMessageCollection);
-
-      messageList.clear();
-
-      // Listen to real-time updates from Firestore, ordered by creation date
-      _messagesSubscription = messageCollection
-          .orderBy(kCreatedAt, descending: true)
-          .snapshots()
-          .listen((event) {
-        messageList.clear();
-        // Add each message to the messageList
-        for (var doc in event.docs) {
-          messageList.add(MessageModel.fromJson(doc.data()));
-        }
-        emit(GetMessagesSuccess());
-      });
-    } on Exception catch (e) {
-      emit(GetMessagesFailure(errMessage: e.toString()));
+    // Emit loading state if no cached messages (first load or cleared chat)
+    if (messageList.isEmpty) {
+      emit(GetMessagesLoading());
     }
+
+    // Cancel any previous real-time subscription before listening to a new one
+    _messagesSubscription?.cancel();
+
+    // Retrieve current user's id from cache (required to locate their chat collection)
+    final currentUserId = CacheHelper.getData(key: kUidToken);
+
+    // Set up Firestore real-time listener for the selected chat's messages,
+    // ordered so the newest messages come first in the list
+    _messagesSubscription = FirebaseFirestore.instance
+        .collection(kUsersCollection)
+        .doc(currentUserId)
+        .collection(kChatCollection)
+        .doc(friendUid)
+        .collection(kMessageCollection)
+        .orderBy(kCreatedAt, descending: true) // Most recent first (index 0)
+        .snapshots()
+        .listen((event) {
+          // Clear the local message list before re-filling it (to avoid duplicates)
+          messageList.clear();
+
+          // Populate messageList with fresh snapshot data from Firestore
+          for (var doc in event.docs) {
+            messageList.add(MessageModel.fromJson(doc.data()));
+          }
+
+          // Emit state with the up-to-date messages; clone to avoid accidental mutation
+          emit(GetMessagesSuccess(messages: List.from(messageList)));
+        }, onError: (error) {
+          // Optionally handle errors, e.g. network issues (currently just ignore errors to preserve messages)
+          // emit(GetMessagesFailure(errMessage: error.toString()));
+        }
+    );
   }
 
   // Future<void> pushMessageNotificationToTheFriend({

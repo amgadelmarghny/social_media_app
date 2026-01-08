@@ -102,15 +102,16 @@ class _PostViewBodyState extends State<PostViewBody> {
                   ),
                 ),
               // Display hashtags (currently hardcoded as #Profile).
-              const SliverToBoxAdapter(
-                child: Wrap(
-                  children: [
-                    Hashtag(
-                      title: '#Profile',
-                    ),
-                  ],
-                ),
-              ),
+              // TODO: Add hashtags when it be available
+              // const SliverToBoxAdapter(
+              //   child: Wrap(
+              //     children: [
+              //       Hashtag(
+              //         title: '#Profile',
+              //       ),
+              //     ],
+              //   ),
+              // ),
               // If the post has an image, display it with a border and rounded corners.
               if (widget.postModel.postImage != null)
                 SliverToBoxAdapter(

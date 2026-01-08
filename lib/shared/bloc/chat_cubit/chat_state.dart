@@ -29,7 +29,14 @@ final class PushMessageNotificationToTheFriendFailure extends ChatState {
 
 final class GetMessagesLoading extends ChatState {}
 
-final class GetMessagesSuccess extends ChatState {}
+final class GetMessagesSuccess extends ChatState {
+  final List<MessageModel> messages; // القائمة هنا
+
+  const GetMessagesSuccess({required this.messages});
+
+  @override
+  List<Object> get props => [messages];
+}
 
 final class GetMessagesFailure extends ChatState {
   final String errMessage;
