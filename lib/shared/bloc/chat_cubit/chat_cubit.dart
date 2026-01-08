@@ -106,6 +106,10 @@ class ChatCubit extends Cubit<ChatState> {
           kCreatedAt: timestamp,
         };
         await receiverDoc.set(receiverChatPreview);
+
+        // Update the local chatItemsList to reflect the new message
+        _updateChatItemInList(messageModel.friendUid, messageModel.message,
+            messageModel.dateTime);
       }
       emit(SendMessageSuccess());
     } on Exception catch (e) {
@@ -142,21 +146,51 @@ class ChatCubit extends Cubit<ChatState> {
         .orderBy(kCreatedAt, descending: true) // Most recent first (index 0)
         .snapshots()
         .listen((event) {
-          // Clear the local message list before re-filling it (to avoid duplicates)
-          messageList.clear();
+      // Clear the local message list before re-filling it (to avoid duplicates)
+      messageList.clear();
 
-          // Populate messageList with fresh snapshot data from Firestore
-          for (var doc in event.docs) {
-            messageList.add(MessageModel.fromJson(doc.data()));
-          }
+      // Populate messageList with fresh snapshot data from Firestore
+      for (var doc in event.docs) {
+        messageList.add(MessageModel.fromJson(doc.data()));
+      }
 
-          // Emit state with the up-to-date messages; clone to avoid accidental mutation
-          emit(GetMessagesSuccess(messages: List.from(messageList)));
-        }, onError: (error) {
-          // Optionally handle errors, e.g. network issues (currently just ignore errors to preserve messages)
-          // emit(GetMessagesFailure(errMessage: error.toString()));
-        }
-    );
+      // Emit state with the up-to-date messages; clone to avoid accidental mutation
+      emit(GetMessagesSuccess(messages: List.from(messageList)));
+    }, onError: (error) {
+      // handle errors, e.g. network issues (currently just ignore errors to preserve messages)
+      emit(GetMessagesFailure(errMessage: error.toString()));
+    });
+  }
+
+  /// Updates the chat item in the local chatItemsList after sending a message
+  /// This ensures the chat list shows the latest message without needing to refetch from Firestore
+  void _updateChatItemInList(
+      String friendUid, String message, DateTime dateTime) {
+    // Find the index of the chat item with the matching friendUid
+    final existingIndex =
+        chatItemsList.indexWhere((item) => item.uid == friendUid);
+
+    if (existingIndex != -1) {
+      // Update the existing chat item with the new message and date
+      chatItemsList[existingIndex] = ChatItemModel(
+        uid: friendUid,
+        message: message,
+        dateTime: dateTime,
+      );
+    } else {
+      // If the chat item doesn't exist, add a new one
+      chatItemsList.add(ChatItemModel(
+        uid: friendUid,
+        message: message,
+        dateTime: dateTime,
+      ));
+    }
+
+    // Sort the list by dateTime in descending order (newest first)
+    chatItemsList.sort((a, b) => b.dateTime.compareTo(a.dateTime));
+
+    // Emit success state to trigger UI update in ChatsBody
+    emit(GetChatsSuccessState());
   }
 
   // Future<void> pushMessageNotificationToTheFriend({

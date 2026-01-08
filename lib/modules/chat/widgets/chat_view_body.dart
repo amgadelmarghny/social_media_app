@@ -12,6 +12,8 @@ import 'package:social_media_app/shared/style/theme/constant.dart';
 /// The main body widget for the chat view.
 /// Displays the list of messages and the input area for sending new messages.
 class ChatViewBody extends StatefulWidget {
+  /// [friendUid]: The UID of the friend to chat with.
+  /// [friendToken]: The notification token for the friend, used for FCM/etc.
   const ChatViewBody(
       {super.key, required this.friendUid, required this.friendToken});
   final String friendUid, friendToken;
@@ -24,85 +26,65 @@ class _ChatViewBodyState extends State<ChatViewBody> {
   @override
   void initState() {
     super.initState();
-    // Fetch messages for the current chat with the friend
+    // Fetch messages for the current chat with the friend when widget initializes.
     BlocProvider.of<ChatCubit>(context)
         .getMessages(friendUid: widget.friendUid);
   }
 
   @override
   Widget build(BuildContext context) {
+    // Main Column holds the chat messages above and the chat input below.
     return Column(
       children: [
-        // Expanded widget to make the message list take available space
+        // Expanded widget to allow the chat message list to take all available space,
+        // while the input widget stays at the bottom.
         Expanded(
           child: BlocBuilder<ChatCubit, ChatState>(
+              // Re-build only when messages are loaded or loading anew.
               buildWhen: (previous, current) =>
                   current is GetMessagesSuccess ||
                   current is GetMessagesLoading,
               builder: (context, state) {
-                // Access the ChatCubit to get the list of messages
+                // List to hold messages for chat
                 List<MessageModel> messages = [];
                 if (state is GetMessagesSuccess) {
+                  // Use messages loaded in the successful state
                   messages = state.messages;
                 } else {
-                  // في حالة التحميل المبدئي أو الـ fallback، نأخذها من الكيوبيت
+                  // Otherwise, use messages cached in the cubit
+                  // (e.g., during loading or as a fallback)
                   messages = BlocProvider.of<ChatCubit>(context).messageList;
                 }
                 return ListView.builder(
                   physics:
-                      const BouncingScrollPhysics(), // Adds a bounce effect to the list
-                  reverse: true, // Show newest messages at the bottom
+                      const BouncingScrollPhysics(), // Enables iOS-style bounce
+                  reverse: true, // Shows newest messages at the bottom, old at top
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
                     final message = messages[index];
-                    // Get the current user's UID to distinguish between sent and received messages
+
+                    // Identify the current user id to distinguish own messages from friend's
                     final currentUserId =
                         BlocProvider.of<SocialCubit>(context).userModel!.uid;
 
-                    // Determine if this message should display a date header
-                    // (i.e., it's the first message of a new day)
-                    // Since reverse: true, list is [oldest, ..., newest] displayed bottom-to-top
+                    // Flag to determine whether to show a header label for message date
                     bool showHeader = false;
-                    //!  String? headerLabel;
 
-                    // 1. هل هذه أقدم رسالة (أعلى الشاشة)؟
+                    // If this is the oldest message (at the top), always show header
                     if (index == messages.length - 1) {
                       showHeader = true;
                     } else {
-                      // 2. نقارن الرسالة الحالية بالرسالة "التالية" في الـ List
-                      // (التي هي أقدم منها زمنياً وتظهر فوقها)
+                      // Otherwise, compare to the previous (older) message and show
+                      // the header if the date changes.
                       final prevMessage = messages[index + 1];
                       if (message.dateTime.day != prevMessage.dateTime.day) {
                         showHeader = true;
                       }
                     }
-                    // if (index == 0) {
-                    //   // This is the first message in the list (oldest message) - always show header
-                    //   showHeader = true;
-                    //   headerLabel = getMessageDateLabel(message.dateTime);
-                    // } else {
-                    //   // Compare the date of this message with the previous one (older message)
-                    //   DateTime currentMsgDay = DateTime(
-                    //     message.dateTime.year,
-                    //     message.dateTime.month,
-                    //     message.dateTime.day,
-                    //   );
-                    //   DateTime previousMsgDay = DateTime(
-                    //     messages[index - 1].dateTime.year,
-                    //     messages[index - 1].dateTime.month,
-                    //     messages[index - 1].dateTime.day,
-                    //   );
-
-                    //   // If the day changes between the previous message and this one, show the header
-                    //   if (currentMsgDay != previousMsgDay) {
-                    //     showHeader = true;
-                    //     headerLabel = getMessageDateLabel(message.dateTime);
-                    //   }
-                    // }
-
+                    // Build the message bubble (with possible date header above)
                     return Column(
                       children: [
-                        // Show the date header if needed
+                        // Show a date header label if it's the first message of a new day
                         if (showHeader)
                           Container(
                             decoration: const BoxDecoration(
@@ -116,7 +98,8 @@ class _ChatViewBodyState extends State<ChatViewBody> {
                             margin: const EdgeInsets.symmetric(
                                 vertical: 8.0, horizontal: 8),
                             child: Text(
-                              message.dateTime.toString(),
+                              // Utility method to get human-readable date label
+                              getMessageDateLabel(message.dateTime),
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white54,
@@ -124,18 +107,8 @@ class _ChatViewBodyState extends State<ChatViewBody> {
                             ),
                           ),
 
-                        // Show the message bubble: MyBubbleChat if sent by current user, otherwise FriendBubbleMessage
-                        // لكن داخل الـ Column الترتيب طبيعي، لذا نضع التاريخ "فوق" الرسالة
-                        // if (showHeader)
-                        //   Center(
-                        //     child: Padding(
-                        //       padding: const EdgeInsets.symmetric(vertical: 10),
-                        //       child: MessageDateLabel(
-                        //           date: message
-                        //               .dateTime), // تأكد من استدعاء الويدجت الصحيح
-                        //     ),
-                        //   ),
-
+                        // Display message bubble as "MyBubbleChat" if sent by user,
+                        // otherwise as friend bubble chat component.
                         if (message.uid == currentUserId)
                           MyBubbleChat(
                               message: message.message,
@@ -151,11 +124,11 @@ class _ChatViewBodyState extends State<ChatViewBody> {
               }),
         ),
         // Widget for the chat input area (sending messages, etc.)
+        // Always stays fixed to the bottom of the screen under the message list.
         ChatViewInteracrive(
           friendUid: widget.friendUid,
           friendToken: widget.friendToken,
         ),
-        
       ],
     );
   }

@@ -62,6 +62,10 @@ class _ChatsBodyState extends State<ChatsBody> {
         padding: EdgeInsets.only(
             top: 10, left: 20, right: 20, bottom: _bodiesBottomPadding),
         child: BlocBuilder<ChatCubit, ChatState>(
+          buildWhen: (previous, current) =>
+              current is GetChatsSuccessState ||
+              current is GetChatsLoadingState ||
+              current is GetChatsFailureState,
           builder: (context, state) {
             if (BlocProvider.of<ChatCubit>(context).chatItemsList.isEmpty) {
               return Center(
@@ -79,7 +83,9 @@ class _ChatsBodyState extends State<ChatsBody> {
                 enabled: state is GetChatsLoadingState,
                 child: Skeletonizer(
                   enabled: BlocProvider.of<ChatCubit>(context)
-                      .chatItemsList[index].message.isEmpty ,
+                      .chatItemsList[index]
+                      .message
+                      .isEmpty,
                   child: ChatItem(
                     chatItemModel: BlocProvider.of<ChatCubit>(context)
                         .chatItemsList[index],
