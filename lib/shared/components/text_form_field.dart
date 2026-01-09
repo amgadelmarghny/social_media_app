@@ -36,8 +36,8 @@ class CustomTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(30),
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.all(Radius.circular(30)),
       ),
       child: TextFormField(
         onTap: onTap,
@@ -57,7 +57,6 @@ class CustomTextField extends StatelessWidget {
         controller: controller,
         onChanged: onChange,
         decoration: InputDecoration(
-          
           errorText: errorText,
           contentPadding: EdgeInsets.symmetric(
               horizontal: 20, vertical: contentVerticalPadding),
@@ -85,7 +84,9 @@ class CustomTextField extends StatelessWidget {
 
   OutlineInputBorder outlineBorder(BuildContext context) {
     return OutlineInputBorder(
-      borderRadius: BorderRadius.circular(30),
+      borderRadius: const BorderRadius.all(
+        Radius.circular(30),
+      ),
       borderSide: BorderSide(
         width: 2.2,
         color: outLineBorderColor,

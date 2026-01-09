@@ -68,9 +68,9 @@ class _ChatsBodyState extends State<ChatsBody> {
               current is GetChatsFailureState,
           builder: (context, state) {
             if (BlocProvider.of<ChatCubit>(context).chatItemsList.isEmpty) {
-              return Center(
-                child: Image.asset(
-                  'lib/assets/images/empty_box.png',
+              return const Center(
+                child: Image(
+                  image: AssetImage('lib/assets/images/empty_box.png'),
                   height: 200,
                 ),
               );

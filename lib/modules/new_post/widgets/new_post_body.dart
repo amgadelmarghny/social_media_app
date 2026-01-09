@@ -61,6 +61,7 @@ class CreatePostSheetBody extends StatelessWidget {
                         // Display the picked image.
                         Image.file(
                           socialCubit.postImagePicked!,
+                          fit: BoxFit.scaleDown,
                         ),
                         // Button to remove the picked image.
                         Padding(
@@ -69,9 +70,9 @@ class CreatePostSheetBody extends StatelessWidget {
                             backgroundColor: Colors.redAccent.shade100,
                             child: IconButton(
                               onPressed: () => socialCubit.removePickedFile(),
-                              icon: Icon(
+                              icon: const Icon(
                                 Icons.close,
-                                color: Colors.red[600],
+                                color: Colors.red,
                               ),
                             ),
                           ),

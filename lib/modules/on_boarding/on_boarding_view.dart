@@ -6,7 +6,7 @@ class OnBoardingView extends StatelessWidget {
   static const String routeViewName = "onBoardingView";
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(child: OnBoardingViewBody()),
     );

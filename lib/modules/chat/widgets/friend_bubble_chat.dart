@@ -37,7 +37,7 @@ class FriendBubbleMessage extends StatelessWidget {
         // Bubble decoration: color and rounded corners
         decoration: BoxDecoration(
           color: defaultColor.withValues(alpha: 0.6),
-          borderRadius: BorderRadius.only(
+          borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
             bottomRight: Radius.circular(20),
@@ -52,7 +52,7 @@ class FriendBubbleMessage extends StatelessWidget {
             // The formatted time below the message
             Text(
               date,
-              style: TextStyle(color: Colors.white54),
+              style: const TextStyle(color: Colors.white54),
             ),
           ],
         ),

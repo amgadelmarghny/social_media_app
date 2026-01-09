@@ -36,22 +36,22 @@ class VerifyEmailContainer extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Text('Please verify your email to continue using the app.',
                   style: FontsStyle.font15Popin()),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Text('Click the link in the email to verify your email.',
                   style: FontsStyle.font15Popin()),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Text(
                   'If you did not receive an email, click the button below to resend the email.',
                   style: FontsStyle.font15Popin()),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Container(
                 padding: EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: Colors.blue.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: const BorderRadius.all(Radius.circular(8)),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,14 +59,14 @@ class VerifyEmailContainer extends StatelessWidget {
                     Text(
                         'Email: ${BlocProvider.of<SocialCubit>(context).currentUserEmail ?? 'Not available'}',
                         style: FontsStyle.font15Popin()),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
                         'Verified: ${BlocProvider.of<SocialCubit>(context).userVerification!.emailVerified ? 'Yes' : 'No'}',
                         style: FontsStyle.font15Popin()),
                   ],
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                 AbsorbPointer(
                   absorbing: state is SendEmailVerificationLoadingState,
@@ -80,7 +80,7 @@ class VerifyEmailContainer extends StatelessWidget {
                   ),
                 ),
                 if (state is SendEmailVerificationSuccessState)
-                  SizedBox(
+                  const SizedBox(
                     width: 10,
                   ),
                 if (state is SendEmailVerificationSuccessState)

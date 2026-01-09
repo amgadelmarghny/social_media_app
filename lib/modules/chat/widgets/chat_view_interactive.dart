@@ -32,7 +32,7 @@ class ChatViewInteracrive extends StatelessWidget {
         children: [
           IconButton(
             onPressed: () {},
-            icon: HugeIcon(
+            icon: const HugeIcon(
               icon: HugeIcons.strokeRoundedImageAdd02,
               color: Color(0XFFC4C2CB),
             ),

@@ -23,7 +23,7 @@ class _EditProfileViewBodyState extends State<EditProfileViewBody> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const ProfilePictureSection(),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             const Divider(

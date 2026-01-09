@@ -62,7 +62,9 @@ class SocialCubit extends Cubit<SocialState> {
     BottomNavigationBarItem(icon: Icon(IconBroken.Home), label: ''),
     BottomNavigationBarItem(
         icon: Padding(
-            padding: EdgeInsets.only(right: 10), child: Icon(IconBroken.Chat)),
+          padding: EdgeInsets.only(right: 10),
+          child: Icon(IconBroken.Chat),
+        ),
         label: ''),
     BottomNavigationBarItem(
         icon: SizedBox(

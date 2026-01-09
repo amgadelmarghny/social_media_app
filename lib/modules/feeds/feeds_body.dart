@@ -171,7 +171,7 @@ class _FeedsBodyState extends State<FeedsBody> {
                             onChanged: onSearchChanged,
                             controller: _searchController,
                             leading: Padding(
-                              padding: EdgeInsets.only(left: 5),
+                              padding: const EdgeInsets.only(left: 5),
                               child: state is SearchUsersLoadingState
                                   ? const SizedBox(
                                       height: 22,

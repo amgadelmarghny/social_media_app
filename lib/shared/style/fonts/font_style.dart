@@ -87,7 +87,7 @@ abstract class FontsStyle {
     fontSize: getResponsiveFontSize(fontSize: 24),
     color: Colors.white,
     fontWeight: FontWeight.normal,
-    shadows: [
+    shadows: const [
       Shadow(
         blurRadius: 10,
         offset: Offset(0, 2),
@@ -120,7 +120,7 @@ abstract class FontsStyle {
     fontFamily: 'Poppins',
     fontWeight: FontWeight.bold,
     color: Colors.white,
-    shadows: [
+    shadows: const [
       Shadow(
         blurRadius: 10,
         offset: Offset(0, 2),

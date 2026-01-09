@@ -17,7 +17,7 @@ class AuthIocnList extends StatelessWidget {
         SizedBox(
           // heigh = auth icon height
           height: 36,
-          // width = auth icon width * numbers of auth icon 
+          // width = auth icon width * numbers of auth icon
           //         + the sized box separator width * those number
           width:
               double.parse('${36 * images.length + 20 * (images.length - 1)}'),

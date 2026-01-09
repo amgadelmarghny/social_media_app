@@ -34,24 +34,24 @@ class ChatView extends StatelessWidget {
             ),
           ),
           title: InkWell(
-            onTap: ()=>Navigator.pushNamed(context, UserView.routName,arguments:  userModel),
+            onTap: () => Navigator.pushNamed(context, UserView.routName,
+                arguments: userModel),
             child: Row(
-
-            children: [
-              ProfilePictureWithStory(
-                size: 60,
-                image: userModel.photo,
-                isWithoutStory: true,
-              ),
-              const SizedBox(
-                width: 10,
-              ),
-              Text("${userModel.firstName} ${userModel.lastName}"),
-            ],
-          ),),
+              children: [
+                ProfilePictureWithStory(
+                  size: 60,
+                  image: userModel.photo,
+                  isWithoutStory: true,
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                Text("${userModel.firstName} ${userModel.lastName}"),
+              ],
+            ),
+          ),
         ),
-        body:
-        ChatViewBody(
+        body: ChatViewBody(
           friendUid: userModel.uid,
           friendToken: userModel.fcmToken,
         ),

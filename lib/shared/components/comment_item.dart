@@ -61,9 +61,17 @@ class CommentItem extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       GestureDetector(
-                        onTap: () {
-                          // TODO: Make when press on it navigate to this user profile
-                          // Navigator.pushNamed(context, );
+                        onTap: () async {
+                          UserModel userModel =
+                              await BlocProvider.of<SocialCubit>(context)
+                                  .getUserData(userUid: commentModel.userUid);
+                          if (context.mounted) {
+                            Navigator.pushNamed(
+                              context,
+                              UserView.routName,
+                              arguments: userModel,
+                            );
+                          }
                         },
                         child: Text(
                           commentModel.userName,
@@ -127,24 +135,27 @@ class CommentItem extends StatelessWidget {
                     ),
                     const Spacer(),
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        //TODO: Add Like Comment
+                      },
                       child: Text(
                         'Like',
                         style: FontsStyle.font18PopinWithShadowOption(
                             isShadow: true),
                       ),
                     ),
-                    const Spacer(),
+                    const SizedBox(
+                      width: 15,
+                    ),
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        //TODO: Add reply Comment
+                      },
                       child: Text(
                         'Reply',
                         style: FontsStyle.font18PopinWithShadowOption(
                             isShadow: true),
                       ),
-                    ),
-                    const Spacer(
-                      flex: 5,
                     ),
                   ],
                 )

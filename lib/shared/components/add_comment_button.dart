@@ -83,8 +83,10 @@ class AddCommentButton extends StatelessWidget {
           },
         ),
         hintText: 'Write a comment...',
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
+        border: const OutlineInputBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(30),
+          ),
         ),
       ),
     );
