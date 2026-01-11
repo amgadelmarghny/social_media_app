@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/models/post_model.dart';
 import 'package:social_media_app/modules/post/widgets/post_view_body.dart';
+import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
+import 'package:social_media_app/shared/components/show_toast.dart';
 import 'package:social_media_app/shared/style/theme/theme.dart';
 import '../../shared/bloc/comments_cubit/comments_cubit.dart';
 
@@ -30,9 +32,18 @@ class PostView extends StatelessWidget {
         decoration: themeColor(), // Set the background theme color.
         child: Scaffold(
           appBar: AppBar(),
-          body: PostViewBody(
-            postModel: postModel,
-            postId: postId,
+          body: BlocListener<SocialCubit, SocialState>(
+            listener: (context, state) {
+              if (state is RemovePostState) {
+                showToast(
+                    msg: "Post has been deleted",
+                    toastState: ToastState.worrning);
+              }
+            },
+            child: PostViewBody(
+              postModel: postModel,
+              postId: postId,
+            ),
           ),
         ),
       ),

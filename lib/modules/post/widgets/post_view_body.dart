@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:social_media_app/models/post_model.dart';
-import 'package:social_media_app/modules/feeds/widgets/hashtag.dart';
 import 'package:social_media_app/modules/feeds/widgets/interactive_row.dart';
 import 'package:social_media_app/modules/feeds/widgets/profile_post_row.dart';
 import 'package:social_media_app/modules/post/widgets/display_post_image.dart';
