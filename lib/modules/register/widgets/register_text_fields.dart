@@ -14,6 +14,12 @@ class RegisterTextFields extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    FocusNode lastNameFocus = FocusNode();
+    FocusNode userNameFocus = FocusNode();
+    FocusNode emailFocus = FocusNode();
+    FocusNode passwordFocus = FocusNode();
+    FocusNode birthOfDateFocus = FocusNode();
+
     // Using BlocBuilder to rebuild the widget when RegisterState changes.
     return BlocBuilder<RegisterCubit, RegisterState>(
       builder: (context, state) {
@@ -31,6 +37,8 @@ class RegisterTextFields extends StatelessWidget {
                     hintText: 'First Name',
                     controller: registerCubit.firstNameController,
                     textInputType: TextInputType.name,
+                    onFieldSubmitted: (unnamed) =>
+                        FocusScope.of(context).requestFocus(lastNameFocus),
                   ),
                 ),
                 const Spacer(
@@ -40,6 +48,9 @@ class RegisterTextFields extends StatelessWidget {
                   flex: 6,
                   child: CustomTextField(
                     hintText: 'Last Name',
+                    focusNode: lastNameFocus,
+                    onFieldSubmitted: (unnamed) =>
+                        FocusScope.of(context).requestFocus(emailFocus),
                     textInputType: TextInputType.name,
                     controller: registerCubit.lastNameController,
                   ),
@@ -51,20 +62,31 @@ class RegisterTextFields extends StatelessWidget {
             ),
             // Email or phone number field.
             CustomTextField(
-              hintText: 'Email/phone number',
+              hintText: 'Email',
+              focusNode: emailFocus,
+              onFieldSubmitted: (unnamed) =>
+                  FocusScope.of(context).requestFocus(userNameFocus),
               textInputType: TextInputType.emailAddress,
               controller: registerCubit.emailController,
             ),
             const SizedBox(
               height: 15,
             ),
-            const UserNameTextField(),
+            UserNameTextField(
+              focusNode: userNameFocus,
+              onFieldSubmitted: (unnamed) =>
+                  FocusScope.of(context).requestFocus(passwordFocus),
+            ),
+
             const SizedBox(
               height: 15,
             ),
             // Password field with visibility toggle.
             CustomTextField(
               hintText: 'Password',
+              focusNode: passwordFocus,
+              onFieldSubmitted: (unnamed) =>
+                  FocusScope.of(context).requestFocus(birthOfDateFocus),
               textInputType: TextInputType.visiblePassword,
               obscureText: registerCubit.isObscure,
               controller: registerCubit.passwordController,
@@ -88,7 +110,7 @@ class RegisterTextFields extends StatelessWidget {
               'Birth of date',
               style: FontsStyle.font18PopinWithShadowOption(),
             ),
-            SizedBox(
+            const SizedBox(
               height: 15,
             ),
             // Row for date/month and year fields.
@@ -98,6 +120,7 @@ class RegisterTextFields extends StatelessWidget {
                   flex: 4,
                   child: CustomTextField(
                     hintText: 'Date/month',
+                    focusNode: birthOfDateFocus,
                     textInputType: TextInputType.datetime,
                     controller: registerCubit.dateAndMonthController,
                   ),

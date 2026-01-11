@@ -11,28 +11,40 @@ class LoginFieldsAndButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.sizeOf(context).height;
+    FocusNode passwordFocus = FocusNode();
 
     return BlocBuilder<LoginCubit, LoginState>(
       builder: (context, state) {
         LoginCubit loginCubit = BlocProvider.of<LoginCubit>(context);
-
         return Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             CustomTextField(
-              hintText: 'Email/phone number',
+              hintText: 'Email',
               textInputType: TextInputType.emailAddress,
               controller: loginCubit.emailController,
+              onFieldSubmitted: (v) {
+                FocusScope.of(context).requestFocus(passwordFocus);
+              },
             ),
-            SizedBox(
-              height: height * 0.02,
+            const SizedBox(
+              height: 15,
             ),
             CustomTextField(
               hintText: 'Password',
+              focusNode: passwordFocus,
               obscureText: loginCubit.isObscure,
               controller: loginCubit.passwordController,
               textInputType: TextInputType.visiblePassword,
+              onFieldSubmitted: (v) async {
+                if (loginCubit.formKey.currentState!.validate()) {
+                  await loginCubit.loginUser(
+                      email: loginCubit.emailController.text,
+                      password: loginCubit.passwordController.text);
+                } else {
+                  loginCubit.noticeTextFormFieldValidation();
+                }
+              },
               suffixIcon: IconButton(
                 onPressed: () {
                   loginCubit.changeTextFieldObscure();
@@ -44,8 +56,8 @@ class LoginFieldsAndButton extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(
-              height: height * 0.02,
+            const SizedBox(
+              height: 15,
             ),
             AbsorbPointer(
               absorbing: state is SendPasswordResetEmailLoading,
@@ -71,8 +83,8 @@ class LoginFieldsAndButton extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(
-              height: height * 0.02,
+            const SizedBox(
+              height: 15,
             ),
             CustomButton(
               text: 'Sign in',

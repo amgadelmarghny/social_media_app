@@ -44,6 +44,30 @@ final class GetMessagesFailure extends ChatState {
   const GetMessagesFailure({required this.errMessage});
 }
 
+final class RecordingNowState extends ChatState {}
+
+final class RecordingStoped extends ChatState {}
+
+final class UploadRecordLoading extends ChatState {}
+
+final class UploadRecordFailure extends ChatState {
+  final String errMessage;
+
+  const UploadRecordFailure({required this.errMessage});
+  @override
+  List<Object> get props => [errMessage];
+}
+
+final class RecordAndUploadAVoiceSuccessState extends ChatState {}
+
+final class RecordAndUploadAVoiceFailureState extends ChatState {
+  final String errMessage;
+
+  const RecordAndUploadAVoiceFailureState({required this.errMessage});
+  @override
+  List<Object> get props => [errMessage];
+}
+
 final class GetChatsSuccessState extends ChatState {}
 
 final class GetChatsLoadingState extends ChatState {}

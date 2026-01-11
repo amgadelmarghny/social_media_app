@@ -15,10 +15,12 @@ class ProfilePostRow extends StatelessWidget {
     this.timePosted,
     this.userUid,
     this.postId,
+    this.isItDeletedThroughPostView = false,
   });
   final String? image;
   final String userName;
   final String? timePosted, userUid, postId;
+  final bool isItDeletedThroughPostView;
 
   @override
   Widget build(BuildContext context) {
@@ -88,7 +90,13 @@ class ProfilePostRow extends StatelessWidget {
                   onTap: () async {
                     if (context.mounted) Navigator.pop(context);
                     await BlocProvider.of<SocialCubit>(context)
-                        .deletePost(postId!);
+                        .deletePost(postId!)
+                        .then((value) {
+                      // If we're in PostView (detail view), pop back to feed after deletion
+                      if (context.mounted && isItDeletedThroughPostView) {
+                        Navigator.pop(context);
+                      }
+                    });
                   },
                   child: Container(
                     height: 50,

@@ -1,7 +1,12 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
+import 'package:record/record.dart';
 import 'package:social_media_app/models/chat_item_model.dart';
 import 'package:social_media_app/models/message_model.dart';
 import 'package:social_media_app/shared/components/constants.dart';
@@ -18,13 +23,6 @@ class ChatCubit extends Cubit<ChatState> {
 
   /// Subscription to Firestore messages stream
   StreamSubscription<QuerySnapshot>? _messagesSubscription;
-
-  /// Override close to cancel the Firestore subscription when cubit is disposed
-  @override
-  Future<void> close() {
-    _messagesSubscription?.cancel();
-    return super.close();
-  }
 
   /// List to store chat items (chat previews)
   List<ChatItemModel> chatItemsList = [];
@@ -117,6 +115,61 @@ class ChatCubit extends Cubit<ChatState> {
     }
   }
 
+  final record = AudioRecorder();
+
+  bool isRecording = false;
+  Future<String?> recordAndUploadAVoice(
+      {required String myUid, required String friendUid}) async {
+    String? recordUrl;
+    try {
+      if (isRecording) {
+        // Stop recording...
+        final theRecordedFilePath = await record.stop();
+        isRecording = false;
+        emit(RecordingStoped());
+        if (theRecordedFilePath != null) {
+          recordUrl =
+              await _uploadAndGetRecordFromFirebase(theRecordedFilePath);
+        }
+      } else {
+        // Check and request permission if needed
+        if (await record.hasPermission()) {
+          Directory appDocumentsDir = await getApplicationDocumentsDirectory();
+          final String recordFilePath = p.join(appDocumentsDir.path,
+              'voice_record_${DateTime.now().millisecondsSinceEpoch}.m4a');
+          // Start recording to file
+          await record.start(const RecordConfig(), path: recordFilePath);
+          isRecording = true;
+          emit(RecordingNowState());
+        }
+      }
+      emit(RecordAndUploadAVoiceSuccessState());
+    } on Exception catch (e) {
+      isRecording = false;
+      emit(RecordAndUploadAVoiceFailureState(errMessage: e.toString()));
+    } 
+    return recordUrl;
+  }
+
+  Future<String?> _uploadAndGetRecordFromFirebase(
+      String theRecordedFilePath) async {
+    String? recordUrl;
+    emit(UploadRecordLoading());
+    try {
+      final task = await FirebaseStorage.instance
+          .ref()
+          .child(
+              '$kChatCollection/records/${Uri.file(theRecordedFilePath).pathSegments.last}')
+          .putFile(File(theRecordedFilePath));
+      recordUrl = await task.ref.getDownloadURL();
+    } on Exception catch (e) {
+      emit(UploadRecordFailure(
+          errMessage: 'Upload record failur, please try again'));
+    }
+
+    return recordUrl;
+  }
+
   /// Listens to messages in real-time for a specific friend [friendUid]
   /// Listen to real-time updates in message collection for a specific chat with a given friendUid.
   /// Emits [GetMessagesLoading] if local messageList is empty (to show loading UI only on initial load).
@@ -206,4 +259,12 @@ class ChatCubit extends Cubit<ChatState> {
   //         errMessage: 'Error sending push notification: ${e.toString()}'));
   //   }
   // }
+
+  /// Override close to cancel the Firestore subscription when cubit is disposed
+  @override
+  Future<void> close() {
+    record.dispose();
+    _messagesSubscription?.cancel();
+    return super.close();
+  }
 }

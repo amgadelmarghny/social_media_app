@@ -17,6 +17,8 @@ class CustomTextField extends StatelessWidget {
     this.outLineBorderColor = Colors.white,
     this.contentVerticalPadding = 16,
     this.errorText,
+    this.onFieldSubmitted,
+    this.focusNode,
   });
 
   final TextEditingController? controller;
@@ -32,6 +34,8 @@ class CustomTextField extends StatelessWidget {
   final Color outLineBorderColor;
   final double contentVerticalPadding;
   final String? errorText;
+  final void Function(String)? onFieldSubmitted;
+  final FocusNode? focusNode;
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +44,9 @@ class CustomTextField extends StatelessWidget {
         borderRadius: BorderRadius.all(Radius.circular(30)),
       ),
       child: TextFormField(
+        focusNode: focusNode,
         onTap: onTap,
+        onFieldSubmitted: onFieldSubmitted,
         maxLines: 1,
         keyboardType: textInputType,
         obscureText: obscureText,

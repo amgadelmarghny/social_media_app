@@ -6,7 +6,9 @@ import 'package:social_media_app/shared/components/text_form_field.dart';
 /// A custom text field widget for entering a username during registration.
 /// It checks username availability as the user types and shows a loading indicator.
 class UserNameTextField extends StatefulWidget {
-  const UserNameTextField({super.key});
+  const UserNameTextField({super.key, this.focusNode, this.onFieldSubmitted});
+  final FocusNode? focusNode;
+  final void Function(String)? onFieldSubmitted;
 
   @override
   State<UserNameTextField> createState() => _UserNameTextFieldState();
@@ -59,8 +61,10 @@ class _UserNameTextFieldState extends State<UserNameTextField> {
   Widget build(BuildContext context) {
     return CustomTextField(
       hintText: 'username',
+      focusNode: widget.focusNode,
       // Optionally, you could pass errorText to CustomTextField if it supports it
       controller: registerCubit.userNameController,
+      onFieldSubmitted: widget.onFieldSubmitted,
       errorText: errorText,
       // Show a loading spinner as a suffix icon while checking username
       suffixIcon: isChecking

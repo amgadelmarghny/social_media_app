@@ -59,15 +59,15 @@ class UploadPostDemo extends StatelessWidget {
                         socialCubit.postContentController.text,
                         style: FontsStyle.font15Popin(),
                       ),
-
+                     // TODO: if there is hashtags
                     // hashtags
-                    const Wrap(
-                      children: [
-                        Hashtag(
-                          title: '#Profile',
-                        ),
-                      ],
-                    ),
+                    // const Wrap(
+                    //   children: [
+                    //     Hashtag(
+                    //       title: '#Profile',
+                    //     ),
+                    //   ],
+                    //),
                     if (socialCubit.postImagePicked != null)
                       Padding(
                         padding: const EdgeInsets.only(top: 15),

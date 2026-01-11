@@ -340,11 +340,11 @@ class SocialCubit extends Cubit<SocialState> {
       required DateTime dateTime,
       required int commentsNum}) async {
     if (postImagePicked != null) {
-      String? postUrl = await _uploadPostImage(file: postImagePicked!);
-      if (postUrl != null) {
+      String? postImageUrl = await _uploadPostImage(file: postImagePicked!);
+      if (postImageUrl != null) {
         CreatePostImplModel createPostImplModel = CreatePostImplModel(
           content: postContent,
-          postImage: postUrl,
+          postImage: postImageUrl,
           dateTime: dateTime,
           commentsNum: commentsNum,
         );
@@ -537,35 +537,45 @@ class SocialCubit extends Cubit<SocialState> {
   // List of post IDs
   List<String> freindsPostsIdList = [];
 
-  /// Fetch all posts from Firestore and update [freindsPostsModelList] and [freindsPostsIdList]
+  /// Fetch all timeline posts (your own and those of followed users) from Firestore.
+  /// Updates [freindsPostsModelList] and [freindsPostsIdList] with latest timeline data.
   Future<void> getTimelinePosts() async {
+    // Emit loading state so UI can show progress indicator.
     emit(GetFeedsPostsLoadingState());
 
     try {
-      // 1. هات الناس اللي متابعهم
+      // Step 1: Get the list of users the current user is following.
+      // (This also refreshes the followings list in memory.)
       final followingSnapshot = await getFollowing();
-      // 2. كون ليست من UIDs
+
+      // Step 2: Build a list of UIDs for the followed users.
       List<String> uids = followingSnapshot.docs.map((doc) => doc.id).toList();
 
-      // ضيف الـ uid بتاع اليوزر نفسه
+      // Step 3: Add the current user's own UID so their posts show up in the timeline as well.
       uids.add(currentUserUid);
 
-      // 3. هات البوستات
+      // Step 4: Fetch all posts by the user and their followings, ordered by creation date (newest first).
       final postsSnapshot = await FirebaseFirestore.instance
           .collection(kPostsCollection)
           .where('uid', whereIn: uids)
           .orderBy(kCreatedAt, descending: true)
           .get();
 
+      // Step 5: Clear previous cached timeline data.
       freindsPostsModelList.clear();
       freindsPostsIdList.clear();
 
+      // Step 6: Populate lists with the posts' models and IDs.
       for (var postDoc in postsSnapshot.docs) {
+        // Parse each Firestore document to a PostModel and store it.
         freindsPostsModelList.add(PostModel.fromJson(postDoc.data()));
         freindsPostsIdList.add(postDoc.id);
       }
+
+      // Step 7: Notify listeners that the posts have successfully loaded.
       emit(GetFeedsPostsSuccessState());
     } catch (error) {
+      // If an error occurs (network, parsing, Firestore), emit failure state with error details.
       emit(GetFeedsPostsFailureState(errMessage: error.toString()));
     }
   }

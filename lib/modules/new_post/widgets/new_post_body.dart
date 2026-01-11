@@ -48,7 +48,8 @@ class CreatePostSheetBody extends StatelessWidget {
                       style: FontsStyle.font18PopinWithShadowOption(),
                       decoration: InputDecoration(
                         hintText: 'What is on your mind?',
-                        hintStyle: FontsStyle.font18PopinWithShadowOption(),
+                        hintStyle: FontsStyle.font18PopinWithShadowOption(
+                            color: Colors.white38),
                         border: InputBorder.none,
                       ),
                     ),

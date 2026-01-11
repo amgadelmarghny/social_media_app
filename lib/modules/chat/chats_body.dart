@@ -82,10 +82,7 @@ class _ChatsBodyState extends State<ChatsBody> {
               itemBuilder: (context, index) => Skeletonizer(
                 enabled: state is GetChatsLoadingState,
                 child: Skeletonizer(
-                  enabled: BlocProvider.of<ChatCubit>(context)
-                      .chatItemsList[index]
-                      .message
-                      .isEmpty,
+                  enabled: state is GetChatsLoadingState,
                   child: ChatItem(
                     chatItemModel: BlocProvider.of<ChatCubit>(context)
                         .chatItemsList[index],

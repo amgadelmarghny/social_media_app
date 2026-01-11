@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:social_media_app/models/message_model.dart';
+import 'package:social_media_app/modules/chat/widgets/voice_record_widget.dart';
 import 'package:social_media_app/shared/bloc/chat_cubit/chat_cubit.dart';
 import 'package:social_media_app/shared/components/constants.dart';
 import 'package:social_media_app/shared/network/local/cache_helper.dart';
@@ -92,14 +93,8 @@ class ChatViewInteracrive extends StatelessWidget {
               ),
             ),
           ),
-          IconButton(
-            onPressed: () {
-              //TODO: add voice recording functionality
-            },
-            icon: const HugeIcon(
-              icon: HugeIcons.strokeRoundedMic01,
-              color: Color(0XFFC4C2CB),
-            ),
+          VoiceRecordWidget(
+            friendUid: friendUid,
           ),
         ],
       ),

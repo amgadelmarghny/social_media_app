@@ -88,6 +88,7 @@ class _PostViewBodyState extends State<PostViewBody> {
                       .format(widget.postModel.dateTime),
                   userUid: widget.postModel.creatorUid,
                   postId: widget.postId,
+                  isItDeletedThroughPostView: true,
                 ),
               ),
               // If the post has text content, display it.
