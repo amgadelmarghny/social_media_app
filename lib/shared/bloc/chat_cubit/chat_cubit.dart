@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:record/record.dart';
 import 'package:social_media_app/models/chat_item_model.dart';
 import 'package:social_media_app/models/message_model.dart';
 import 'package:social_media_app/shared/components/constants.dart';
@@ -16,7 +17,11 @@ part 'chat_state.dart';
 
 /// Cubit class to manage chat-related state and logic
 class ChatCubit extends Cubit<ChatState> {
-  ChatCubit() : super(ChatInitial());
+  ChatCubit() : super(ChatInitial()) {
+    _initRecorder();
+  }
+
+  late final RecorderController recorderController;
 
   /// List to store messages for the current chat
   List<MessageModel> messageList = [];
@@ -24,44 +29,12 @@ class ChatCubit extends Cubit<ChatState> {
   /// Subscription to Firestore messages stream
   StreamSubscription<QuerySnapshot>? _messagesSubscription;
 
-  /// List to store chat items (chat previews)
-  List<ChatItemModel> chatItemsList = [];
-
-  /// Fetches the list of chat previews for the current user
-  Future<void> getChats() async {
-    emit(GetChatsLoadingState());
-    try {
-      // Get the chat collection for the current user, ordered by creation date
-      final messageCollection = await FirebaseFirestore.instance
-          .collection(kUsersCollection)
-          .doc(CacheHelper.getData(key: kUidToken))
-          .collection(kChatCollection)
-          .orderBy(kCreatedAt, descending: true)
-          .get();
-
-      chatItemsList.clear();
-
-      // Iterate through each chat document and add to the chatItemsList
-      for (var chatItem in messageCollection.docs) {
-        ChatItemModel chatItemModel = ChatItemModel(
-          uid: chatItem.id,
-          message: chatItem.data()['message'],
-          dateTime: (chatItem.data()[kCreatedAt] as Timestamp).toDate(),
-        );
-        chatItemsList.add(chatItemModel);
-      }
-      emit(GetChatsSuccessState());
-    } on Exception catch (e) {
-      emit(GetChatsFailureState(errMessage: e.toString()));
-    }
-  }
-
   /// Sends a message to Firestore for the given [messageModel]
   Future<void> sendMessages(final MessageModel messageModel) async {
     emit(SendMessageLoading());
     try {
       // Only send if the message is not empty
-      if (messageModel.message.isNotEmpty) {
+      if (messageModel.message?.isNotEmpty ?? false) {
         final currentUserId = CacheHelper.getData(key: kUidToken);
         final timestamp = Timestamp.fromDate(messageModel.dateTime);
 
@@ -100,14 +73,85 @@ class ChatCubit extends Cubit<ChatState> {
         final receiverChatPreview = {
           'message': messageModel.message,
           'uid': messageModel.friendUid,
+          'voiceRecord': messageModel.voiceRecord,
+          'image': messageModel.image,
           'friendUid': currentUserId,
           kCreatedAt: timestamp,
         };
         await receiverDoc.set(receiverChatPreview);
 
         // Update the local chatItemsList to reflect the new message
-        _updateChatItemInList(messageModel.friendUid, messageModel.message,
-            messageModel.dateTime);
+
+        _updateChatItemInList(
+            friendUid: messageModel.friendUid,
+            dateTime: messageModel.dateTime,
+            message: messageModel.message,
+            voiceMessage: messageModel.voiceRecord,
+            image: messageModel.image);
+        emit(SendMessageSuccess());
+      }
+    } on Exception catch (e) {
+      emit(SendMessageFailure(errMessage: e.toString()));
+    }
+  }
+
+  Future<void> sendRecord(final MessageModel messageModel) async {
+    emit(SendMessageLoading());
+    try {
+      // Only send if the message is not empty
+      if (messageModel.voiceRecord?.isNotEmpty ?? false) {
+        final currentUserId = CacheHelper.getData(key: kUidToken);
+        final timestamp = Timestamp.fromDate(messageModel.dateTime);
+
+        // Prepare message data with all required fields
+        final messageData = {
+          'voiceRecord': messageModel.voiceRecord,
+          'uid': messageModel.uid,
+          'friendUid': messageModel.friendUid,
+          kCreatedAt: timestamp,
+        };
+
+        // Reference to the sender's chat collection
+        final senderDoc = FirebaseFirestore.instance
+            .collection(kUsersCollection)
+            .doc(currentUserId)
+            .collection(kChatCollection)
+            .doc(messageModel.friendUid);
+
+        // Reference to the receiver's chat collection
+        final receiverDoc = FirebaseFirestore.instance
+            .collection(kUsersCollection)
+            .doc(messageModel.friendUid)
+            .collection(kChatCollection)
+            .doc(currentUserId);
+
+        // Add the message to sender's messages collection
+        await senderDoc.collection(kMessageCollection).add(messageData);
+
+        // Add the message to receiver's messages collection (for real-time updates)
+        await receiverDoc.collection(kMessageCollection).add(messageData);
+
+        // Update the chat preview for sender
+        await senderDoc.set(messageModel.toJson());
+
+        // Update the chat preview for receiver (with reversed uid/friendUid)
+        final receiverChatPreview = {
+          'voiceRecord': messageModel.message,
+          'uid': messageModel.friendUid,
+          'friendUid': currentUserId,
+          kCreatedAt: timestamp,
+        };
+        await receiverDoc.set(receiverChatPreview);
+
+        // Update the local chatItemsList to reflect the new message
+
+        _updateChatItemInList(
+          friendUid: messageModel.friendUid,
+          dateTime: messageModel.dateTime,
+          message: messageModel.message,
+          voiceMessage: messageModel.voiceRecord,
+          image: messageModel.image,
+        );
       }
       emit(SendMessageSuccess());
     } on Exception catch (e) {
@@ -115,39 +159,67 @@ class ChatCubit extends Cubit<ChatState> {
     }
   }
 
-  final record = AudioRecorder();
-
   bool isRecording = false;
-  Future<String?> recordAndUploadAVoice(
+
+  void _initRecorder() {
+    recorderController = RecorderController();
+  }
+
+  Future<void> recordAVoiceThenSendIt(
+      {required String myUid, required String friendUid}) async {
+    final voiecUrl =
+        await _recordAndUploadAVoice(myUid: myUid, friendUid: friendUid);
+    if (voiecUrl != null) {
+      MessageModel messageModel = MessageModel(
+          voiceRecord: voiecUrl,
+          uid: myUid,
+          friendUid: friendUid,
+          dateTime: DateTime.now());
+      await sendRecord(messageModel);
+    }
+  }
+
+  Future<void> cancelRecording() async {
+    try {
+      await recorderController.stop();
+      isRecording = false;
+      emit(RecordingCancelled());
+    } catch (e) {
+      debugPrint("Error cancelling recording: $e");
+    }
+  }
+
+  Future<String?> _recordAndUploadAVoice(
       {required String myUid, required String friendUid}) async {
     String? recordUrl;
+    await recorderController.checkPermission();
     try {
       if (isRecording) {
         // Stop recording...
-        final theRecordedFilePath = await record.stop();
+        final theRecordedFilePath = await recorderController.stop(false);
         isRecording = false;
         emit(RecordingStoped());
         if (theRecordedFilePath != null) {
           recordUrl =
               await _uploadAndGetRecordFromFirebase(theRecordedFilePath);
+          emit(RecordAndUploadAVoiceSuccessState());
         }
       } else {
         // Check and request permission if needed
-        if (await record.hasPermission()) {
+        if (recorderController.hasPermission) {
           Directory appDocumentsDir = await getApplicationDocumentsDirectory();
           final String recordFilePath = p.join(appDocumentsDir.path,
               'voice_record_${DateTime.now().millisecondsSinceEpoch}.m4a');
           // Start recording to file
-          await record.start(const RecordConfig(), path: recordFilePath);
+          await recorderController.record(path: recordFilePath);
           isRecording = true;
           emit(RecordingNowState());
         }
       }
-      emit(RecordAndUploadAVoiceSuccessState());
     } on Exception catch (e) {
       isRecording = false;
       emit(RecordAndUploadAVoiceFailureState(errMessage: e.toString()));
-    } 
+    }
     return recordUrl;
   }
 
@@ -215,10 +287,48 @@ class ChatCubit extends Cubit<ChatState> {
     });
   }
 
+  /// List to store chat items (chat previews)
+  List<ChatItemModel> chatItemsList = [];
+
+  /// Fetches the list of chat previews for the current user
+  Future<void> getChats() async {
+    emit(GetChatsLoadingState());
+    try {
+      // Get the chat collection for the current user, ordered by creation date
+      final messageCollection = await FirebaseFirestore.instance
+          .collection(kUsersCollection)
+          .doc(CacheHelper.getData(key: kUidToken))
+          .collection(kChatCollection)
+          .orderBy(kCreatedAt, descending: true)
+          .get();
+
+      chatItemsList.clear();
+
+      // Iterate through each chat document and add to the chatItemsList
+      for (var chatItem in messageCollection.docs) {
+        ChatItemModel chatItemModel = ChatItemModel(
+          uid: chatItem.id,
+          message: chatItem.data()['message'],
+          voiceRecord: chatItem.data()['voiceRecord'],
+          image: chatItem.data()['image'],
+          dateTime: (chatItem.data()[kCreatedAt] as Timestamp).toDate(),
+        );
+        chatItemsList.add(chatItemModel);
+      }
+      emit(GetChatsSuccessState());
+    } on Exception catch (e) {
+      emit(GetChatsFailureState(errMessage: e.toString()));
+    }
+  }
+
   /// Updates the chat item in the local chatItemsList after sending a message
   /// This ensures the chat list shows the latest message without needing to refetch from Firestore
   void _updateChatItemInList(
-      String friendUid, String message, DateTime dateTime) {
+      {required String friendUid,
+      String? message,
+      String? voiceMessage,
+      String? image,
+      required DateTime dateTime}) {
     // Find the index of the chat item with the matching friendUid
     final existingIndex =
         chatItemsList.indexWhere((item) => item.uid == friendUid);
@@ -228,15 +338,18 @@ class ChatCubit extends Cubit<ChatState> {
       chatItemsList[existingIndex] = ChatItemModel(
         uid: friendUid,
         message: message,
+        voiceRecord: voiceMessage,
+        image: image,
         dateTime: dateTime,
       );
     } else {
       // If the chat item doesn't exist, add a new one
       chatItemsList.add(ChatItemModel(
-        uid: friendUid,
-        message: message,
-        dateTime: dateTime,
-      ));
+          uid: friendUid,
+          message: message,
+          dateTime: dateTime,
+          voiceRecord: voiceMessage,
+          image: image));
     }
 
     // Sort the list by dateTime in descending order (newest first)
@@ -263,7 +376,7 @@ class ChatCubit extends Cubit<ChatState> {
   /// Override close to cancel the Firestore subscription when cubit is disposed
   @override
   Future<void> close() {
-    record.dispose();
+    recorderController.dispose();
     _messagesSubscription?.cancel();
     return super.close();
   }

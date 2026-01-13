@@ -5,7 +5,6 @@ import 'package:social_media_app/shared/style/theme/constant.dart';
 import '../../../shared/bloc/social_cubit/social_cubit.dart';
 import '../../../shared/components/error_widget.dart';
 import '../../../shared/style/fonts/font_style.dart';
-import 'hashtag.dart';
 
 class UploadPostDemo extends StatelessWidget {
   const UploadPostDemo({super.key});

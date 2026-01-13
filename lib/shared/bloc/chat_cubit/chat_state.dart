@@ -46,7 +46,15 @@ final class GetMessagesFailure extends ChatState {
 
 final class RecordingNowState extends ChatState {}
 
+final class RecordingTimerUpdate extends ChatState {
+  final int recordingDuration;
+
+  const RecordingTimerUpdate(this.recordingDuration);
+}
+
 final class RecordingStoped extends ChatState {}
+
+final class RecordingCancelled extends ChatState {}
 
 final class UploadRecordLoading extends ChatState {}
 

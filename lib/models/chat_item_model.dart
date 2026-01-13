@@ -1,15 +1,18 @@
 import 'package:equatable/equatable.dart';
 
 class ChatItemModel extends Equatable {
-  final String uid, message;
+  final String uid;
   final DateTime dateTime;
+  final String? message, voiceRecord, image;
 
   const ChatItemModel({
     required this.uid,
-    required this.message,
+    this.message,
     required this.dateTime,
+    this.voiceRecord,
+    this.image,
   });
-  
+
   @override
-  List<Object?> get props => [uid, message, dateTime];
+  List<Object?> get props => [uid, message, voiceRecord, image, dateTime];
 }

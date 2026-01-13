@@ -6,8 +6,8 @@ import 'package:social_media_app/shared/components/constants.dart';
 import 'package:social_media_app/shared/components/show_toast.dart';
 import 'package:social_media_app/shared/network/local/cache_helper.dart';
 
-class VoiceRecordWidget extends StatelessWidget {
-  const VoiceRecordWidget({
+class CustomVoiceRecordIcon extends StatelessWidget {
+  const CustomVoiceRecordIcon({
     super.key,
     required this.friendUid,
   });
@@ -16,7 +16,7 @@ class VoiceRecordWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       onPressed: () async {
-        await BlocProvider.of<ChatCubit>(context).recordAndUploadAVoice(
+        await BlocProvider.of<ChatCubit>(context).recordAVoiceThenSendIt(
             myUid: CacheHelper.getData(key: kUidToken), friendUid: friendUid);
       },
       icon: BlocConsumer<ChatCubit, ChatState>(
@@ -40,7 +40,7 @@ class VoiceRecordWidget extends StatelessWidget {
               crossFadeState: BlocProvider.of<ChatCubit>(context).isRecording
                   ? CrossFadeState.showSecond
                   : CrossFadeState.showFirst,
-              duration: const Duration(milliseconds: 300));
+              duration: const Duration(milliseconds: 260));
         },
       ),
     );

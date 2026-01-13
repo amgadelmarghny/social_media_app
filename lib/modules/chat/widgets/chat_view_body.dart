@@ -1,9 +1,12 @@
+import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/models/message_model.dart';
 import 'package:social_media_app/modules/chat/widgets/chat_view_interactive.dart';
 import 'package:social_media_app/modules/chat/widgets/friend_bubble_chat.dart';
+import 'package:social_media_app/modules/chat/widgets/friend_voice_message.dart';
 import 'package:social_media_app/modules/chat/widgets/my_bubble_chat.dart';
+import 'package:social_media_app/modules/chat/widgets/my_voice_message_widget.dart';
 import 'package:social_media_app/shared/bloc/chat_cubit/chat_cubit.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/components/message_date_lable.dart';
@@ -58,7 +61,8 @@ class _ChatViewBodyState extends State<ChatViewBody> {
                 return ListView.builder(
                   physics:
                       const BouncingScrollPhysics(), // Enables iOS-style bounce
-                  reverse: true, // Shows newest messages at the bottom, old at top
+                  reverse:
+                      true, // Shows newest messages at the bottom, old at top
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
                     final message = messages[index];
@@ -107,16 +111,36 @@ class _ChatViewBodyState extends State<ChatViewBody> {
                             ),
                           ),
 
-                        // Display message bubble as "MyBubbleChat" if sent by user,
-                        // otherwise as friend bubble chat component.
-                        if (message.uid == currentUserId)
-                          MyBubbleChat(
-                              message: message.message,
-                              dateTime: message.dateTime)
-                        else
-                          FriendBubbleMessage(
-                              message: message.message,
-                              dateTime: message.dateTime),
+                        Builder(builder: (context) {
+                          // Display message bubble as "MyBubbleChat" if sent by user,
+                          // otherwise as friend bubble chat component.
+                          if (message.uid == currentUserId) {
+                            if (message.message != null) {
+                              return MyBubbleChat(
+                                  message: message.message!,
+                                  dateTime: message.dateTime);
+                            } else if (message.voiceRecord != null) {
+                              return MyVoiceMessageWidget(
+                                key: ValueKey(message.voiceRecord),
+                                audioUrl: message.voiceRecord!,
+                                dateTime: message.dateTime,
+                              );
+                            }
+                          } else {
+                            if (message.message != null) {
+                              return FriendBubbleMessage(
+                                  message: message.message!,
+                                  dateTime: message.dateTime);
+                            } else {
+                              return FriendVoiceMessageWidget(
+                                key: ValueKey(message.voiceRecord),
+                                audioUrl: message.voiceRecord!,
+                                dateTime: message.dateTime,
+                              );
+                            }
+                          }
+                          return SizedBox();
+                        })
                       ],
                     );
                   },

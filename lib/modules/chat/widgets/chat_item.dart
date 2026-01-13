@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:social_media_app/models/chat_item_model.dart';
 import 'package:social_media_app/models/user_model.dart';
@@ -64,17 +65,53 @@ class _ChatItemState extends State<ChatItem> {
                       style: FontsStyle.font20Poppins
                           .copyWith(color: Colors.white),
                     ),
+                    SizedBox(
+                      height: 5,
+                    ),
                     Row(
                       children: [
-                        Expanded(
-                          child: Text(
-                            widget.chatItemModel.message,
-                            overflow: TextOverflow.ellipsis,
+                        if (widget.chatItemModel.message != null)
+                          Expanded(
+                            child: Text(
+                              widget.chatItemModel.message!,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: FontsStyle.font18PopinWithShadowOption(
+                                  color: Colors.white60),
+                            ),
+                          ),
+                        if (widget.chatItemModel.voiceRecord != null) ...[
+                          const HugeIcon(
+                            icon: HugeIcons.strokeRoundedMic01,
+                            color: Color(0XFFC4C2CB),
+                          ),
+                          const SizedBox(
+                            width: 7,
+                          ),
+                          Text(
+                            'Voice message',
                             maxLines: 1,
                             style: FontsStyle.font18PopinWithShadowOption(
-                                color: Colors.white60),
+                                color: const Color(0XFFC4C2CB)),
                           ),
-                        ),
+                          const Spacer(),
+                        ],
+                        if (widget.chatItemModel.image != null) ...[
+                          const HugeIcon(
+                            icon: HugeIcons.strokeRoundedImage02,
+                            color: Color(0XFFC4C2CB),
+                          ),
+                          const SizedBox(
+                            width: 7,
+                          ),
+                          Text(
+                            'Photo',
+                            maxLines: 1,
+                            style: FontsStyle.font18PopinWithShadowOption(
+                                color: const Color(0XFFC4C2CB)),
+                          ),
+                          const Spacer(),
+                        ],
                         Text(
                           getMessageDateLabel(widget.chatItemModel.dateTime),
                           style: FontsStyle.font18PopinWithShadowOption(

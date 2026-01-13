@@ -25,6 +25,7 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  audio_waveforms: ^2.0.2
   cached_network_image: ^3.3.1
   cloud_firestore: ^6.1.1
   conditional_builder_null_safety: ^0.0.6

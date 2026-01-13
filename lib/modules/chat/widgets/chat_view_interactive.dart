@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:social_media_app/models/message_model.dart';
-import 'package:social_media_app/modules/chat/widgets/voice_record_widget.dart';
+import 'package:social_media_app/modules/chat/widgets/custom_chat_text_field.dart';
+import 'package:social_media_app/modules/chat/widgets/stream_voice_record_widget.dart';
+import 'package:social_media_app/modules/chat/widgets/custom_voice_record_icon.dart';
 import 'package:social_media_app/shared/bloc/chat_cubit/chat_cubit.dart';
-import 'package:social_media_app/shared/components/constants.dart';
-import 'package:social_media_app/shared/network/local/cache_helper.dart';
-import 'package:social_media_app/shared/style/fonts/font_style.dart';
 import 'package:social_media_app/shared/style/theme/constant.dart';
 
 class ChatViewInteracrive extends StatelessWidget {
@@ -19,7 +17,6 @@ class ChatViewInteracrive extends StatelessWidget {
   final String friendToken;
   @override
   Widget build(BuildContext context) {
-    TextEditingController controller = TextEditingController();
     return Container(
       color: defaultColor,
       padding: EdgeInsets.only(
@@ -28,75 +25,51 @@ class ChatViewInteracrive extends StatelessWidget {
         top: 10,
         bottom: MediaQuery.viewPaddingOf(context).bottom + 6,
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          IconButton(
-            onPressed: () {},
-            icon: const HugeIcon(
-              icon: HugeIcons.strokeRoundedImageAdd02,
-              color: Color(0XFFC4C2CB),
-            ),
-          ),
-          Expanded(
-            child: TextFormField(
-              controller: controller,
-              onFieldSubmitted: (value) async {
-                MessageModel model = MessageModel(
-                    message: controller.text,
-                    uid: CacheHelper.getData(key: kUidToken),
-                    friendUid: friendUid,
-                    dateTime: DateTime.now());
-                await BlocProvider.of<ChatCubit>(context).sendMessages(model)
-                    //  .then((value) {
-                    // if (context.mounted) {
-                    //   BlocProvider.of<ChatCubit>(context)
-                    //       .pushMessageNotificationToTheFriend(
-                    //     token: friendToken,
-                    //     title: "New message from ${model.uid}",
-                    //     content: controller.text,
-                    //   );
-                    // }
-                    //})
-                    ;
-                controller.clear();
-              },
-              style: FontsStyle.font18PopinWithShadowOption(),
-              decoration: InputDecoration(
-                suffixIcon: IconButton(
-                  onPressed: () {
-                    MessageModel model = MessageModel(
-                        message: controller.text,
-                        uid: CacheHelper.getData(key: kUidToken),
-                        friendUid: friendUid,
-                        dateTime: DateTime.now());
-                    BlocProvider.of<ChatCubit>(context).sendMessages(model);
-                    controller.clear();
-                  },
-                  icon: const HugeIcon(
-                    icon: HugeIcons.strokeRoundedSent,
-                    size: 28,
+      child: BlocBuilder<ChatCubit, ChatState>(
+        builder: (context, state) {
+          ChatCubit chatCubit = BlocProvider.of<ChatCubit>(context);
+          return Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                onPressed: () async {
+                  if (chatCubit.isRecording) {
+                    await chatCubit.cancelRecording();
+                  } else {}
+                },
+                icon: AnimatedCrossFade(
+                  firstChild: const HugeIcon(
+                    icon: HugeIcons.strokeRoundedImageAdd02,
                     color: Color(0XFFC4C2CB),
                   ),
-                ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-                filled: true,
-                fillColor: const Color(0XFF938DA2),
-                enabledBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(color: Color(0XFF938DA2)),
-                  borderRadius: BorderRadius.all(Radius.circular(30)),
-                ),
-                focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(color: Color(0XFF938DA2)),
-                  borderRadius: BorderRadius.all(Radius.circular(30)),
+                  secondChild: const HugeIcon(
+                    icon: HugeIcons.strokeRoundedDelete02,
+                    color: Color(0XFFC4C2CB),
+                  ),
+                  crossFadeState:
+                      BlocProvider.of<ChatCubit>(context).isRecording
+                          ? CrossFadeState.showSecond
+                          : CrossFadeState.showFirst,
+                  duration: const Duration(milliseconds: 260),
                 ),
               ),
-            ),
-          ),
-          VoiceRecordWidget(
-            friendUid: friendUid,
-          ),
-        ],
+              Expanded(
+                child: AnimatedCrossFade(
+                  firstChild: CustomChatTextField(friendUid: friendUid),
+                  secondChild: const StreamVoiceWidget(),
+                  crossFadeState:
+                      BlocProvider.of<ChatCubit>(context).isRecording
+                          ? CrossFadeState.showSecond
+                          : CrossFadeState.showFirst,
+                  duration: const Duration(milliseconds: 260),
+                ),
+              ),
+              CustomVoiceRecordIcon(
+                friendUid: friendUid,
+              ),
+            ],
+          );
+        },
       ),
     );
   }
