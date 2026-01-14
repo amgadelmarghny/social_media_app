@@ -17,7 +17,7 @@ class SliverListfeedItems extends StatelessWidget {
         return SliverList.builder(
           itemBuilder: (context, index) {
             return Skeletonizer(
-              enabled: state is GetFeedsPostsLoadingState || state is GetMyDataLoadingState || state is GetMyDataLoadingState,
+              enabled: state is GetFeedsPostsLoadingState,
               child: PostItem(
                 postModel: socialCubit.freindsPostsModelList[index],
                 postId: socialCubit.freindsPostsIdList[index],

@@ -167,11 +167,11 @@ class ChatCubit extends Cubit<ChatState> {
 
   Future<void> recordAVoiceThenSendIt(
       {required String myUid, required String friendUid}) async {
-    final voiecUrl =
+    final voiceUrl =
         await _recordAndUploadAVoice(myUid: myUid, friendUid: friendUid);
-    if (voiecUrl != null) {
+    if (voiceUrl != null) {
       MessageModel messageModel = MessageModel(
-          voiceRecord: voiecUrl,
+          voiceRecord: voiceUrl,
           uid: myUid,
           friendUid: friendUid,
           dateTime: DateTime.now());
@@ -189,34 +189,106 @@ class ChatCubit extends Cubit<ChatState> {
     }
   }
 
+  String? currentlyPlayingUrl;
+
+  void notifyVoicePlaying(String url) {
+    currentlyPlayingUrl = url;
+    emit(VoicePlayingStarted(url));
+  }
+
   Future<String?> _recordAndUploadAVoice(
       {required String myUid, required String friendUid}) async {
     String? recordUrl;
-    await recorderController.checkPermission();
+
+    // 1. التحقق من الأذونات مرة أخرى قبل أي شيء
+    final hasPermission = await recorderController.checkPermission();
+    if (!hasPermission) {
+      debugPrint("❌ Permission denied");
+      return null;
+    }
+
     try {
       if (isRecording) {
-        // Stop recording...
-        final theRecordedFilePath = await recorderController.stop(false);
+        debugPrint("🔴 1. Stopping Recorder...");
+
         isRecording = false;
-        emit(RecordingStoped());
+        emit(RecordingStoped()); // تحديث الواجهة فوراً
+        // تعديل هام: إزالة 'false' لأن بعض الإصدارات تعلق بسببها
+        // واستخدام await لضمان أن الأمر وصل للمسجل
+        final theRecordedFilePath = await recorderController
+            .stop()
+            .timeout(const Duration(seconds: 5), onTimeout: () {
+          debugPrint("❌ Stopping recorder timed out!");
+          return null; // إرجاع null في حالة انتهاء المهلة
+        });
+
+        debugPrint("🔴 2. Recorder Stopped. Path: $theRecordedFilePath");
+
         if (theRecordedFilePath != null) {
-          recordUrl =
-              await _uploadAndGetRecordFromFirebase(theRecordedFilePath);
-          emit(RecordAndUploadAVoiceSuccessState());
+          // خطوة حاسمة للجهاز الحقيقي: انتظار النظام لإنهاء كتابة الملف
+          debugPrint("⏳ Waiting for file finalization...");
+          await Future.delayed(const Duration(milliseconds: 500));
+
+          final file = File(theRecordedFilePath);
+
+          // التأكد أن الملف موجود وحجمه أكبر من 0
+          if (await file.exists() && await file.length() > 0) {
+            debugPrint(
+                "🚀 3. File is valid (${await file.length()} bytes). Starting Upload...");
+
+            // إضافة Timeout حتى لا يعلق التطبيق للأبد
+            recordUrl =
+                await _uploadAndGetRecordFromFirebase(theRecordedFilePath)
+                    .timeout(const Duration(seconds: 45), onTimeout: () {
+              debugPrint("❌ Upload timed out!");
+              return null;
+            });
+
+            if (recordUrl != null) {
+              debugPrint("✅ Upload Success: $recordUrl");
+              emit(RecordAndUploadAVoiceSuccessState());
+            } else {
+              debugPrint("❌ Upload failed or timed out, recordUrl is null.");
+              emit(RecordAndUploadAVoiceFailureState(
+                  errMessage: "Upload failed. Please try again."));
+            }
+          } else {
+            debugPrint("❌ File is empty or does not exist.");
+            emit(RecordAndUploadAVoiceFailureState(
+                errMessage: "File recording failed"));
+          }
+        } else {
+          // تمت إضافة هذا الجزء
+          debugPrint(
+              "❌ Recording path is null. Recording might have failed or timed out.");
+          emit(RecordAndUploadAVoiceFailureState(
+              errMessage: "Failed to get recording file path."));
         }
       } else {
-        // Check and request permission if needed
-        if (recorderController.hasPermission) {
-          Directory appDocumentsDir = await getApplicationDocumentsDirectory();
-          final String recordFilePath = p.join(appDocumentsDir.path,
-              'voice_record_${DateTime.now().millisecondsSinceEpoch}.m4a');
-          // Start recording to file
-          await recorderController.record(path: recordFilePath);
-          isRecording = true;
-          emit(RecordingNowState());
-        }
+        // --- بدء التسجيل ---
+        // استخدام getTemporaryDirectory بدلاً من Documents لأنه أضمن في الأجهزة الحديثة
+        Directory tempDir = await getTemporaryDirectory();
+        final String recordFilePath = p.join(tempDir.path,
+            'voice_record_${DateTime.now().millisecondsSinceEpoch}.m4a');
+
+        debugPrint("🟢 Starting recording at: $recordFilePath");
+
+        await recorderController.record(
+          path: recordFilePath,
+          recorderSettings: const RecorderSettings(
+            sampleRate: 44100,
+            bitRate: 64000,
+            androidEncoderSettings: AndroidEncoderSettings(
+              androidEncoder: AndroidEncoder.aacLc,
+            ),
+          ),
+        );
+
+        isRecording = true;
+        emit(RecordingNowState());
       }
-    } on Exception catch (e) {
+    } catch (e) {
+      debugPrint("❌ CRITICAL ERROR: $e");
       isRecording = false;
       emit(RecordAndUploadAVoiceFailureState(errMessage: e.toString()));
     }
@@ -236,7 +308,8 @@ class ChatCubit extends Cubit<ChatState> {
       recordUrl = await task.ref.getDownloadURL();
     } on Exception catch (e) {
       emit(UploadRecordFailure(
-          errMessage: 'Upload record failur, please try again'));
+          errMessage:
+              'Upload record failure: ${e.toString()}, please try again'));
     }
 
     return recordUrl;

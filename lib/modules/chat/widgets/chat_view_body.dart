@@ -1,4 +1,3 @@
-import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/models/message_model.dart';
@@ -131,7 +130,7 @@ class _ChatViewBodyState extends State<ChatViewBody> {
                               return FriendBubbleMessage(
                                   message: message.message!,
                                   dateTime: message.dateTime);
-                            } else {
+                            } else if (message.voiceRecord != null) {
                               return FriendVoiceMessageWidget(
                                 key: ValueKey(message.voiceRecord),
                                 audioUrl: message.voiceRecord!,
