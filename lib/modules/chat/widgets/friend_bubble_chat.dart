@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:social_media_app/shared/components/custom_read_more_text.dart';
-import 'package:social_media_app/shared/style/theme/constant.dart';
 
 /// A chat bubble widget for displaying messages from a friend.
 /// Aligns the bubble to the left and uses the app's default color.
@@ -35,9 +34,9 @@ class FriendBubbleMessage extends StatelessWidget {
         // Padding inside the bubble
         padding: const EdgeInsets.only(top: 8, left: 12, right: 15),
         // Bubble decoration: color and rounded corners
-        decoration: BoxDecoration(
-          color: defaultColor.withValues(alpha: 0.6),
-          borderRadius: const BorderRadius.only(
+        decoration: const BoxDecoration(
+          color: Color.fromARGB(255, 101, 87, 148),
+          borderRadius: BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
             bottomRight: Radius.circular(20),
@@ -52,7 +51,7 @@ class FriendBubbleMessage extends StatelessWidget {
             // The formatted time below the message
             Text(
               date,
-              style: const TextStyle(color: Colors.white54),
+              style: const TextStyle(color: Colors.white54, fontSize: 12),
             ),
           ],
         ),

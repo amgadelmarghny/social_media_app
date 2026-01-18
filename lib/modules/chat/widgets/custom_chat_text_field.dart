@@ -23,11 +23,11 @@ class CustomChatTextField extends StatelessWidget {
       controller: controller,
       onFieldSubmitted: (value) async {
         MessageModel model = MessageModel(
-            message: controller.text,
+            textMessage: controller.text,
             uid: CacheHelper.getData(key: kUidToken),
             friendUid: friendUid,
             dateTime: DateTime.now());
-        await BlocProvider.of<ChatCubit>(context).sendMessages(model)
+        await BlocProvider.of<ChatCubit>(context).sendAMessage(model)
             //  .then((value) {
             // if (context.mounted) {
             //   BlocProvider.of<ChatCubit>(context)
@@ -45,13 +45,15 @@ class CustomChatTextField extends StatelessWidget {
       decoration: InputDecoration(
         suffixIcon: IconButton(
           onPressed: () {
-            MessageModel model = MessageModel(
-                message: controller.text,
-                uid: CacheHelper.getData(key: kUidToken),
-                friendUid: friendUid,
-                dateTime: DateTime.now());
-            BlocProvider.of<ChatCubit>(context).sendMessages(model);
-            controller.clear();
+            if (controller.text.isNotEmpty) {
+              MessageModel model = MessageModel(
+                  textMessage: controller.text,
+                  uid: CacheHelper.getData(key: kUidToken),
+                  friendUid: friendUid,
+                  dateTime: DateTime.now());
+              BlocProvider.of<ChatCubit>(context).sendAMessage(model);
+              controller.clear();
+            }
           },
           icon: const HugeIcon(
             icon: HugeIcons.strokeRoundedSent,

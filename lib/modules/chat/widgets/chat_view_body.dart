@@ -114,9 +114,9 @@ class _ChatViewBodyState extends State<ChatViewBody> {
                           // Display message bubble as "MyBubbleChat" if sent by user,
                           // otherwise as friend bubble chat component.
                           if (message.uid == currentUserId) {
-                            if (message.message != null) {
+                            if (message.textMessage != null) {
                               return MyBubbleChat(
-                                  message: message.message!,
+                                  message: message.textMessage!,
                                   dateTime: message.dateTime);
                             } else if (message.voiceRecord != null) {
                               return MyVoiceMessageWidget(
@@ -126,9 +126,9 @@ class _ChatViewBodyState extends State<ChatViewBody> {
                               );
                             }
                           } else {
-                            if (message.message != null) {
+                            if (message.textMessage != null) {
                               return FriendBubbleMessage(
-                                  message: message.message!,
+                                  message: message.textMessage!,
                                   dateTime: message.dateTime);
                             } else if (message.voiceRecord != null) {
                               return FriendVoiceMessageWidget(

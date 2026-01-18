@@ -1,16 +1,17 @@
-import 'dart:async';
-
-import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:social_media_app/shared/bloc/chat_cubit/chat_cubit.dart';
 import 'package:social_media_app/shared/style/theme/constant.dart';
+import 'package:voice_message_package/voice_message_package.dart';
 
-/// Widget to display a friend's voice message in a chat bubble.
+/// A widget to display a voice message from a friend in chat.
+/// Displays a bubble on the left with color/shape matching friend chat.
 class FriendVoiceMessageWidget extends StatefulWidget {
-  final String audioUrl;   // URL for the friend's audio message
-  final DateTime dateTime; // When the message was sent
+  /// Required audio file URL for the voice message
+  final String audioUrl;
+  /// Date/time when the voice message was sent
+  final DateTime dateTime;
 
   const FriendVoiceMessageWidget({
     super.key,
@@ -19,146 +20,95 @@ class FriendVoiceMessageWidget extends StatefulWidget {
   });
 
   @override
-  State<FriendVoiceMessageWidget> createState() => _FriendVoiceMessageWidgetState();
+  State<FriendVoiceMessageWidget> createState() =>
+      _FriendVoiceMessageWidgetState();
 }
 
 class _FriendVoiceMessageWidgetState extends State<FriendVoiceMessageWidget> {
-  late PlayerController playerController; // Controls audio playback
-  Duration totalDuration = Duration.zero; // Total length of the audio
-  StreamSubscription? _playerStateSubscription; // To update UI on play/pause changes
+  late VoiceController voiceController;
 
   @override
   void initState() {
     super.initState();
-    playerController = PlayerController();
-    _preparePlayer();
-
-    // Listen to player state changes to update the play/pause icon automatically
-    _playerStateSubscription = playerController.onPlayerStateChanged.listen((_) {
-      if (mounted) setState(() {});
-    });
-  }
-
-  /// Prepares the player by loading the audio and extracting the waveform.
-  void _preparePlayer() async {
-    try {
-      await playerController.preparePlayer(
-        path: widget.audioUrl,
-        shouldExtractWaveform: true,
-      );
-      if (!mounted) return;
-      // Get total duration once ready
-      final duration = await playerController.getDuration(DurationType.max);
-      setState(() {
-        totalDuration = Duration(milliseconds: duration);
-      });
-    } catch (e) {
-      debugPrint("Error preparing player: $e");
-    }
+    // Initialize the voice controller, configuring it with the given audio URL.
+    // onPlaying notifies the Cubit so other playing voices (self or friend)
+    // can be paused elsewhere when a new message starts.
+    voiceController = VoiceController(
+      audioSrc: widget.audioUrl,
+      maxDuration: const Duration(minutes: 10),
+      isFile: false,
+      onComplete: () {},
+      onPlaying: () {
+        // Notify the Cubit that this friend's voice message started playing.
+        // This allows the Cubit to pause other voice messages that are playing,
+        // ensuring only one audio plays at a time.
+        context.read<ChatCubit>().notifyVoicePlaying(widget.audioUrl);
+      },
+      onPause: () {},
+    );
   }
 
   @override
   void dispose() {
-    _playerStateSubscription?.cancel();
-    // Stop player then dispose, prevents "Codec Released" error
-    playerController.stopPlayer().then((_) => playerController.dispose());
+    // Dispose the voice controller when the widget is removed from memory
+    voiceController.dispose();
     super.dispose();
-  }
-
-  /// Converts a [Duration] to mm:ss string.
-  String _formatDuration(Duration duration) {
-    String minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
-    String seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
-    return "$minutes:$seconds";
   }
 
   @override
   Widget build(BuildContext context) {
-    // Format the sent time nicely
+    // Format the send time, e.g., "02:15 PM"
     String date = DateFormat('hh:mm a').format(widget.dateTime);
 
     return BlocListener<ChatCubit, ChatState>(
-      // Listen for voice play control: pause this message if another file starts playing
       listener: (context, state) {
+        // If another voice message (mine or friend's) starts playing
+        // with a different URL, pause this controller if it's playing.
         if (state is VoicePlayingStarted && state.audioUrl != widget.audioUrl) {
-          if (playerController.playerState.isPlaying) {
-            playerController.pausePlayer();
+          if (voiceController.isPlaying) {
+            voiceController.pausePlaying();
           }
         }
       },
       child: Align(
-        alignment: Alignment.topLeft,
+        alignment: Alignment.topLeft, // Bubble aligns to the left for friend
         child: Container(
           constraints: BoxConstraints(
-            maxWidth: MediaQuery.sizeOf(context).width * 0.7,
+            maxWidth: MediaQuery.sizeOf(context).width * 0.85,
           ),
+          // Margin around the bubble
           margin: const EdgeInsets.symmetric(vertical: 3, horizontal: 15),
-          padding: const EdgeInsets.only(top: 8, left: 12, right: 15, bottom: 5),
+          // Bubble decoration: color and rounded corners for friend
           decoration: BoxDecoration(
-            color: defaultColor.withValues(alpha: 0.6),
+            color: const Color.fromARGB(255, 101, 87, 148),
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(20),
               topRight: Radius.circular(20),
               bottomRight: Radius.circular(20),
             ),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Stack(
+            alignment: AlignmentGeometry.bottomRight,
             children: [
-              Row(
-                children: [
-                  // Play/Pause button
-                  IconButton(
-                    icon: Icon(
-                      playerController.playerState.isPlaying ? Icons.pause : Icons.play_arrow,
-                      color: Colors.white,
-                    ),
-                    onPressed: () async {
-                      if (playerController.playerState.isPlaying) {
-                        await playerController.pausePlayer();
-                      } else {
-                        // Notify cubit a new voice message has started playing
-                        context.read<ChatCubit>().notifyVoicePlaying(widget.audioUrl);
-                        await playerController.startPlayer();
-                      }
-                    },
-                  ),
-                  // Waveform display (seekable)
-                  Expanded(
-                    child: AudioFileWaveforms(
-                      size: const Size(double.infinity, 35),
-                      playerController: playerController,
-                      enableSeekGesture: true,
-                      waveformType: WaveformType.fitWidth,
-                      playerWaveStyle: const PlayerWaveStyle(
-                        fixedWaveColor: Colors.white38,
-                        liveWaveColor: Colors.white,
-                        spacing: 6,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  // Show elapsed or total duration
-                  StreamBuilder<int>(
-                    stream: playerController.onCurrentDurationChanged,
-                    builder: (context, snapshot) {
-                      Duration currentPos = playerController.playerState.isPlaying
-                          ? Duration(milliseconds: snapshot.data ?? 0)
-                          : totalDuration;
-                      return Text(
-                        _formatDuration(currentPos),
-                        style: const TextStyle(color: Colors.white, fontSize: 11),
-                      );
-                    },
-                  ),
-                ],
+              // Main voice message player widget
+              VoiceMessageView(
+                controller: voiceController,
+                innerPadding: 10,
+                cornerRadius: 20,
+                backgroundColor: const Color.fromARGB(255, 101, 87, 148),
+                activeSliderColor: Colors.white,
+                circlesColor: defaultTextColor,
+                counterTextStyle: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                ),
               ),
-              // Sent time in smaller font
+              // Time label at the bottom right of the bubble
               Padding(
-                padding: const EdgeInsets.only(left: 8.0),
+                padding: const EdgeInsets.only(right: 20, bottom: 10),
                 child: Text(
                   date,
-                  style: const TextStyle(color: Colors.white54, fontSize: 10),
+                  style: const TextStyle(color: Colors.white, fontSize: 12),
                 ),
               ),
             ],

@@ -3,32 +3,34 @@ import 'package:equatable/equatable.dart';
 import 'package:social_media_app/shared/components/constants.dart';
 
 class MessageModel extends Equatable {
-  final String? message, voiceRecord, image;
+  final String? textMessage, voiceRecord;
+  final List<String>? images;
   final String uid, friendUid;
   final DateTime dateTime;
 
   const MessageModel({
-    this.message,
+    this.textMessage,
     this.voiceRecord,
-    this.image,
+    this.images,
     required this.uid,
     required this.friendUid,
     required this.dateTime,
   });
 
   factory MessageModel.fromJson(json) => MessageModel(
-        message: json['message'],
+        textMessage: json['textMessage'],
         voiceRecord: json['voiceRecord'],
-        image: json['image'],
+        images:
+            json['images'] != null ? List<String>.from(json['images']) : null,
         uid: json['uid'],
         friendUid: json['friendUid'],
         dateTime: (json['dateTime'] as Timestamp).toDate(),
       );
 
   Map<String, dynamic> toJson() => {
-        'message': message,
+        'textMessage': textMessage,
         'voiceRecord': voiceRecord,
-        'image': image,
+        'images': images,
         'uid': uid,
         'friendUid': friendUid,
         kCreatedAt: dateTime,
@@ -36,5 +38,5 @@ class MessageModel extends Equatable {
 
   @override
   List<Object?> get props =>
-      [message, uid, friendUid, dateTime, voiceRecord, image];
+      [textMessage, uid, friendUid, dateTime, voiceRecord, images];
 }

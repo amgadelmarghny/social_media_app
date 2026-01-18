@@ -51,7 +51,7 @@ class MyBubbleChat extends StatelessWidget {
             // The formatted time below the message
             Text(
               date,
-              style: const TextStyle(color: Colors.white54),
+              style: const TextStyle(color: Colors.white54, fontSize: 12),
             ),
           ],
         ),

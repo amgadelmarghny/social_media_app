@@ -1,13 +1,14 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:record/record.dart';
 import 'package:social_media_app/models/chat_item_model.dart';
 import 'package:social_media_app/models/message_model.dart';
 import 'package:social_media_app/shared/components/constants.dart';
@@ -21,7 +22,10 @@ class ChatCubit extends Cubit<ChatState> {
     _initRecorder();
   }
 
-  late final RecorderController recorderController;
+  Stream<Amplitude> get amplitudeStream =>
+      audioRecorder.onAmplitudeChanged(const Duration(milliseconds: 100));
+
+  late final AudioRecorder audioRecorder;
 
   /// List to store messages for the current chat
   List<MessageModel> messageList = [];
@@ -30,64 +34,15 @@ class ChatCubit extends Cubit<ChatState> {
   StreamSubscription<QuerySnapshot>? _messagesSubscription;
 
   /// Sends a message to Firestore for the given [messageModel]
-  Future<void> sendMessages(final MessageModel messageModel) async {
+  Future<void> sendAMessage(final MessageModel messageModel) async {
     emit(SendMessageLoading());
     try {
+      bool hasText = messageModel.textMessage?.isNotEmpty ?? false;
+      bool hasVoice = messageModel.voiceRecord?.isNotEmpty ?? false;
+      bool hasImage = messageModel.images?.isNotEmpty ?? false;
       // Only send if the message is not empty
-      if (messageModel.message?.isNotEmpty ?? false) {
-        final currentUserId = CacheHelper.getData(key: kUidToken);
-        final timestamp = Timestamp.fromDate(messageModel.dateTime);
-
-        // Prepare message data with all required fields
-        final messageData = {
-          'message': messageModel.message,
-          'uid': messageModel.uid,
-          'friendUid': messageModel.friendUid,
-          kCreatedAt: timestamp,
-        };
-
-        // Reference to the sender's chat collection
-        final senderDoc = FirebaseFirestore.instance
-            .collection(kUsersCollection)
-            .doc(currentUserId)
-            .collection(kChatCollection)
-            .doc(messageModel.friendUid);
-
-        // Reference to the receiver's chat collection
-        final receiverDoc = FirebaseFirestore.instance
-            .collection(kUsersCollection)
-            .doc(messageModel.friendUid)
-            .collection(kChatCollection)
-            .doc(currentUserId);
-
-        // Add the message to sender's messages collection
-        await senderDoc.collection(kMessageCollection).add(messageData);
-
-        // Add the message to receiver's messages collection (for real-time updates)
-        await receiverDoc.collection(kMessageCollection).add(messageData);
-
-        // Update the chat preview for sender
-        await senderDoc.set(messageModel.toJson());
-
-        // Update the chat preview for receiver (with reversed uid/friendUid)
-        final receiverChatPreview = {
-          'message': messageModel.message,
-          'uid': messageModel.friendUid,
-          'voiceRecord': messageModel.voiceRecord,
-          'image': messageModel.image,
-          'friendUid': currentUserId,
-          kCreatedAt: timestamp,
-        };
-        await receiverDoc.set(receiverChatPreview);
-
-        // Update the local chatItemsList to reflect the new message
-
-        _updateChatItemInList(
-            friendUid: messageModel.friendUid,
-            dateTime: messageModel.dateTime,
-            message: messageModel.message,
-            voiceMessage: messageModel.voiceRecord,
-            image: messageModel.image);
+      if (hasText || hasVoice || hasImage) {
+        await _sendTextImageRecord(messageModel);
         emit(SendMessageSuccess());
       }
     } on Exception catch (e) {
@@ -95,97 +50,89 @@ class ChatCubit extends Cubit<ChatState> {
     }
   }
 
-  Future<void> sendRecord(final MessageModel messageModel) async {
-    emit(SendMessageLoading());
-    try {
-      // Only send if the message is not empty
-      if (messageModel.voiceRecord?.isNotEmpty ?? false) {
-        final currentUserId = CacheHelper.getData(key: kUidToken);
-        final timestamp = Timestamp.fromDate(messageModel.dateTime);
+  /// الدالة الموحدة التي تقوم بعملية الرفع إلى Firestore لكل أنواع الرسائل
+  Future<void> _sendTextImageRecord(MessageModel messageModel) async {
+    final timestamp = Timestamp.fromDate(messageModel.dateTime);
 
-        // Prepare message data with all required fields
-        final messageData = {
-          'voiceRecord': messageModel.voiceRecord,
-          'uid': messageModel.uid,
-          'friendUid': messageModel.friendUid,
-          kCreatedAt: timestamp,
-        };
+    // تجهيز البيانات (تم إصلاح خطأ الصورة هنا)
+    final messageData = {
+      'uid': messageModel.uid,
+      'friendUid': messageModel.friendUid,
+      'textMessage': messageModel.textMessage,
+      'voiceRecord': messageModel.voiceRecord,
+      'images': messageModel.images,
+      kCreatedAt: timestamp,
+    };
 
-        // Reference to the sender's chat collection
-        final senderDoc = FirebaseFirestore.instance
-            .collection(kUsersCollection)
-            .doc(currentUserId)
-            .collection(kChatCollection)
-            .doc(messageModel.friendUid);
+    // مراجع الـ Firestore
+    final senderDoc = FirebaseFirestore.instance
+        .collection(kUsersCollection)
+        .doc(messageModel.uid)
+        .collection(kChatCollection)
+        .doc(messageModel.friendUid);
 
-        // Reference to the receiver's chat collection
-        final receiverDoc = FirebaseFirestore.instance
-            .collection(kUsersCollection)
-            .doc(messageModel.friendUid)
-            .collection(kChatCollection)
-            .doc(currentUserId);
+    final receiverDoc = FirebaseFirestore.instance
+        .collection(kUsersCollection)
+        .doc(messageModel.friendUid)
+        .collection(kChatCollection)
+        .doc(messageModel.uid);
 
-        // Add the message to sender's messages collection
-        await senderDoc.collection(kMessageCollection).add(messageData);
+    // 1. إضافة الرسالة في سجل الرسائل للطرفين
+    await senderDoc.collection(kMessageCollection).add(messageData);
+    await receiverDoc.collection(kMessageCollection).add(messageData);
 
-        // Add the message to receiver's messages collection (for real-time updates)
-        await receiverDoc.collection(kMessageCollection).add(messageData);
+    // 2. تحديث "آخر رسالة" (Preview) عند المرسل
+    await senderDoc.set(messageModel.toJson());
 
-        // Update the chat preview for sender
-        await senderDoc.set(messageModel.toJson());
+    // 3. تحديث "آخر رسالة" (Preview) عند المستقبل
+    final receiverChatPreview = {
+      'uid': messageModel.friendUid,
+      'friendUid': messageModel.uid,
+      'textMessage': messageModel.textMessage,
+      'voiceRecord': messageModel.voiceRecord,
+      'images': messageModel.images,
+      kCreatedAt: timestamp,
+    };
+    await receiverDoc.set(receiverChatPreview);
 
-        // Update the chat preview for receiver (with reversed uid/friendUid)
-        final receiverChatPreview = {
-          'voiceRecord': messageModel.message,
-          'uid': messageModel.friendUid,
-          'friendUid': currentUserId,
-          kCreatedAt: timestamp,
-        };
-        await receiverDoc.set(receiverChatPreview);
-
-        // Update the local chatItemsList to reflect the new message
-
-        _updateChatItemInList(
-          friendUid: messageModel.friendUid,
-          dateTime: messageModel.dateTime,
-          message: messageModel.message,
-          voiceMessage: messageModel.voiceRecord,
-          image: messageModel.image,
-        );
-      }
-      emit(SendMessageSuccess());
-    } on Exception catch (e) {
-      emit(SendMessageFailure(errMessage: e.toString()));
-    }
+    // 4. تحديث القائمة المحلية فوراً لتحسين تجربة المستخدم
+    _updateChatItemInList(
+      friendUid: messageModel.friendUid,
+      dateTime: messageModel.dateTime,
+      textMessage: messageModel.textMessage,
+      voiceMessage: messageModel.voiceRecord,
+      images: messageModel.images,
+    );
   }
 
   bool isRecording = false;
 
   void _initRecorder() {
-    recorderController = RecorderController();
+    audioRecorder = AudioRecorder();
   }
 
-  Future<void> recordAVoiceThenSendIt(
-      {required String myUid, required String friendUid}) async {
-    final voiceUrl =
-        await _recordAndUploadAVoice(myUid: myUid, friendUid: friendUid);
+  Future<void> recordAVoiceThenSendIt({required String friendUid}) async {
+    final currentUserId = CacheHelper.getData(key: kUidToken);
+    final voiceUrl = await _recordAndUploadAVoice(
+        myUid: currentUserId, friendUid: friendUid);
     if (voiceUrl != null) {
       MessageModel messageModel = MessageModel(
-          voiceRecord: voiceUrl,
-          uid: myUid,
+          uid: currentUserId,
           friendUid: friendUid,
-          dateTime: DateTime.now());
-      await sendRecord(messageModel);
+          dateTime: DateTime.now(),
+          voiceRecord: voiceUrl);
+
+      await sendAMessage(messageModel);
     }
   }
 
   Future<void> cancelRecording() async {
     try {
-      await recorderController.stop();
+      await audioRecorder.stop(); // إيقاف المسجل الفعلي
       isRecording = false;
       emit(RecordingCancelled());
     } catch (e) {
-      debugPrint("Error cancelling recording: $e");
+      debugPrint("Error cancelling: $e");
     }
   }
 
@@ -200,95 +147,40 @@ class ChatCubit extends Cubit<ChatState> {
       {required String myUid, required String friendUid}) async {
     String? recordUrl;
 
-    // 1. التحقق من الأذونات مرة أخرى قبل أي شيء
-    final hasPermission = await recorderController.checkPermission();
-    if (!hasPermission) {
-      debugPrint("❌ Permission denied");
-      return null;
-    }
+    if (await audioRecorder.hasPermission() == false) return null;
 
     try {
       if (isRecording) {
-        debugPrint("🔴 1. Stopping Recorder...");
-
         isRecording = false;
-        emit(RecordingStoped()); // تحديث الواجهة فوراً
-        // تعديل هام: إزالة 'false' لأن بعض الإصدارات تعلق بسببها
-        // واستخدام await لضمان أن الأمر وصل للمسجل
-        final theRecordedFilePath = await recorderController
-            .stop()
-            .timeout(const Duration(seconds: 5), onTimeout: () {
-          debugPrint("❌ Stopping recorder timed out!");
-          return null; // إرجاع null في حالة انتهاء المهلة
-        });
+        emit(RecordingStoped());
 
-        debugPrint("🔴 2. Recorder Stopped. Path: $theRecordedFilePath");
+        final path = await audioRecorder.stop();
 
-        if (theRecordedFilePath != null) {
-          // خطوة حاسمة للجهاز الحقيقي: انتظار النظام لإنهاء كتابة الملف
-          debugPrint("⏳ Waiting for file finalization...");
-          await Future.delayed(const Duration(milliseconds: 500));
-
-          final file = File(theRecordedFilePath);
-
-          // التأكد أن الملف موجود وحجمه أكبر من 0
+        if (path != null) {
+          final file = File(path);
           if (await file.exists() && await file.length() > 0) {
-            debugPrint(
-                "🚀 3. File is valid (${await file.length()} bytes). Starting Upload...");
-
-            // إضافة Timeout حتى لا يعلق التطبيق للأبد
-            recordUrl =
-                await _uploadAndGetRecordFromFirebase(theRecordedFilePath)
-                    .timeout(const Duration(seconds: 45), onTimeout: () {
-              debugPrint("❌ Upload timed out!");
-              return null;
-            });
-
-            if (recordUrl != null) {
-              debugPrint("✅ Upload Success: $recordUrl");
-              emit(RecordAndUploadAVoiceSuccessState());
-            } else {
-              debugPrint("❌ Upload failed or timed out, recordUrl is null.");
-              emit(RecordAndUploadAVoiceFailureState(
-                  errMessage: "Upload failed. Please try again."));
-            }
-          } else {
-            debugPrint("❌ File is empty or does not exist.");
-            emit(RecordAndUploadAVoiceFailureState(
-                errMessage: "File recording failed"));
+            recordUrl = await _uploadAndGetRecordFromFirebase(path);
+            if (recordUrl != null) emit(RecordAndUploadAVoiceSuccessState());
           }
-        } else {
-          // تمت إضافة هذا الجزء
-          debugPrint(
-              "❌ Recording path is null. Recording might have failed or timed out.");
-          emit(RecordAndUploadAVoiceFailureState(
-              errMessage: "Failed to get recording file path."));
         }
       } else {
-        // --- بدء التسجيل ---
-        // استخدام getTemporaryDirectory بدلاً من Documents لأنه أضمن في الأجهزة الحديثة
         Directory tempDir = await getTemporaryDirectory();
-        final String recordFilePath = p.join(tempDir.path,
-            'voice_record_${DateTime.now().millisecondsSinceEpoch}.m4a');
+        final String recordFilePath = p.join(
+            tempDir.path, 'rec_${DateTime.now().millisecondsSinceEpoch}.m4a');
 
-        debugPrint("🟢 Starting recording at: $recordFilePath");
-
-        await recorderController.record(
-          path: recordFilePath,
-          recorderSettings: const RecorderSettings(
-            sampleRate: 44100,
-            bitRate: 64000,
-            androidEncoderSettings: AndroidEncoderSettings(
-              androidEncoder: AndroidEncoder.aacLc,
-            ),
-          ),
+        const config = RecordConfig(
+          encoder: AudioEncoder.aacLc,
+          bitRate: 128000,
+          sampleRate: 44100,
         );
+
+        await audioRecorder.start(config, path: recordFilePath);
+        // تم إلغاء recorderController.record() لمنع الصراع على الميكروفون
 
         isRecording = true;
         emit(RecordingNowState());
       }
     } catch (e) {
-      debugPrint("❌ CRITICAL ERROR: $e");
       isRecording = false;
       emit(RecordAndUploadAVoiceFailureState(errMessage: e.toString()));
     }
@@ -313,6 +205,64 @@ class ChatCubit extends Cubit<ChatState> {
     }
 
     return recordUrl;
+  }
+
+  Future<void> pickAndSendImages({required String friendUid}) async {
+    List<File> imagesFiles = await _pickMultipleImages();
+    List<String> imagesUrls = [];
+    if (imagesFiles.isNotEmpty) {
+      imagesUrls = await _uploadMultipleImages(imagesFiles: imagesFiles);
+    }
+    if (imagesUrls.isEmpty) {
+      final currentUserId = CacheHelper.getData(key: kUidToken);
+      MessageModel messageModel = MessageModel(
+          uid: currentUserId,
+          friendUid: friendUid,
+          dateTime: DateTime.now(),
+          images: imagesUrls);
+      await sendAMessage(messageModel);
+    }
+  }
+
+  /// Pick multiple images from the gallery and return [List <File>]
+  Future<List<File>> _pickMultipleImages() async {
+    emit(PickImageLoadingState());
+
+    final ImagePicker picker = ImagePicker();
+    // استخدام pickMultiImage بدلاً من pickImage
+    final List<XFile> selectedImages = await picker.pickMultiImage();
+
+    if (selectedImages.isNotEmpty) {
+      // تحويل قائمة XFile إلى قائمة File
+      return selectedImages.map((xFile) => File(xFile.path)).toList();
+    } else {
+      // إرجاع قائمة فارغة إذا لم يتم اختيار شيء
+      return [];
+    }
+  }
+
+  Future<List<String>> _uploadMultipleImages({
+    required List<File> imagesFiles,
+  }) async {
+    List<String> imagesUrl = [];
+    // 1. اختيار الصور
+
+    for (var imageFile in imagesFiles) {
+      try {
+        // 2. رفع كل صورة على حدة
+        String fileName = p.basename(imageFile.path);
+        final ref = FirebaseStorage.instance
+            .ref()
+            .child('$kChatCollection/images/$fileName');
+
+        final task = await ref.putFile(imageFile);
+        final imageUrl = await task.ref.getDownloadURL();
+        imagesUrl.add(imageUrl);
+      } catch (e) {
+        emit(UploadImageFailure(errMessage: "فشل رفع إحدى الصور: $e"));
+      }
+    }
+    return imagesUrl;
   }
 
   /// Listens to messages in real-time for a specific friend [friendUid]
@@ -381,9 +331,9 @@ class ChatCubit extends Cubit<ChatState> {
       for (var chatItem in messageCollection.docs) {
         ChatItemModel chatItemModel = ChatItemModel(
           uid: chatItem.id,
-          message: chatItem.data()['message'],
+          textMessage: chatItem.data()['textMessage'],
           voiceRecord: chatItem.data()['voiceRecord'],
-          image: chatItem.data()['image'],
+          images: chatItem.data()['images'],
           dateTime: (chatItem.data()[kCreatedAt] as Timestamp).toDate(),
         );
         chatItemsList.add(chatItemModel);
@@ -398,9 +348,9 @@ class ChatCubit extends Cubit<ChatState> {
   /// This ensures the chat list shows the latest message without needing to refetch from Firestore
   void _updateChatItemInList(
       {required String friendUid,
-      String? message,
+      String? textMessage,
       String? voiceMessage,
-      String? image,
+      List<String>? images,
       required DateTime dateTime}) {
     // Find the index of the chat item with the matching friendUid
     final existingIndex =
@@ -410,19 +360,19 @@ class ChatCubit extends Cubit<ChatState> {
       // Update the existing chat item with the new message and date
       chatItemsList[existingIndex] = ChatItemModel(
         uid: friendUid,
-        message: message,
+        textMessage: textMessage,
         voiceRecord: voiceMessage,
-        image: image,
+        images: images,
         dateTime: dateTime,
       );
     } else {
       // If the chat item doesn't exist, add a new one
       chatItemsList.add(ChatItemModel(
           uid: friendUid,
-          message: message,
+          textMessage: textMessage,
           dateTime: dateTime,
           voiceRecord: voiceMessage,
-          image: image));
+          images: images));
     }
 
     // Sort the list by dateTime in descending order (newest first)
@@ -449,7 +399,6 @@ class ChatCubit extends Cubit<ChatState> {
   /// Override close to cancel the Firestore subscription when cubit is disposed
   @override
   Future<void> close() {
-    recorderController.dispose();
     _messagesSubscription?.cancel();
     return super.close();
   }

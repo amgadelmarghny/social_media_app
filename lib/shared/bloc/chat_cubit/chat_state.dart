@@ -76,11 +76,24 @@ final class RecordAndUploadAVoiceFailureState extends ChatState {
   List<Object> get props => [errMessage];
 }
 
-class VoicePlayingStarted extends ChatState {
+final class VoicePlayingStarted extends ChatState {
   final String audioUrl;
   const VoicePlayingStarted(this.audioUrl);
   @override
   List<Object> get props => [audioUrl];
+}
+
+final class PickImageLoadingState extends ChatState {}
+
+final class UploadImageLoading extends ChatState {}
+
+final class UploadImageFailure extends ChatState {
+  final String errMessage;
+
+  const UploadImageFailure({required this.errMessage});
+
+ @override
+  List<Object> get props => [errMessage];
 }
 
 final class GetChatsSuccessState extends ChatState {}

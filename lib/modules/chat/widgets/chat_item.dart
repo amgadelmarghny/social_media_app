@@ -70,10 +70,10 @@ class _ChatItemState extends State<ChatItem> {
                     ),
                     Row(
                       children: [
-                        if (widget.chatItemModel.message != null)
+                        if (widget.chatItemModel.textMessage != null)
                           Expanded(
                             child: Text(
-                              widget.chatItemModel.message!,
+                              widget.chatItemModel.textMessage!,
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                               style: FontsStyle.font18PopinWithShadowOption(
@@ -96,7 +96,7 @@ class _ChatItemState extends State<ChatItem> {
                           ),
                           const Spacer(),
                         ],
-                        if (widget.chatItemModel.image != null) ...[
+                        if (widget.chatItemModel.images != null) ...[
                           const HugeIcon(
                             icon: HugeIcons.strokeRoundedImage02,
                             color: Color(0XFFC4C2CB),

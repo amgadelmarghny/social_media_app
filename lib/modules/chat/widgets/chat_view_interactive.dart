@@ -7,16 +7,24 @@ import 'package:social_media_app/modules/chat/widgets/custom_voice_record_icon.d
 import 'package:social_media_app/shared/bloc/chat_cubit/chat_cubit.dart';
 import 'package:social_media_app/shared/style/theme/constant.dart';
 
+/// A widget that represents the interactive chat input section at the bottom of the chat view.
+/// Can switch between text input and voice recording mode.
 class ChatViewInteracrive extends StatelessWidget {
+  /// The UID of the friend we're chatting with
+  final String friendUid;
+
+  /// The notification token of the friend (may be used for FCM, not used in this widget)
+  final String friendToken;
+
   const ChatViewInteracrive({
     super.key,
     required this.friendUid,
     required this.friendToken,
   });
-  final String friendUid;
-  final String friendToken;
+
   @override
   Widget build(BuildContext context) {
+    // The container provides background color and padding accommodating system bottom inset
     return Container(
       color: defaultColor,
       padding: EdgeInsets.only(
@@ -27,21 +35,30 @@ class ChatViewInteracrive extends StatelessWidget {
       ),
       child: BlocBuilder<ChatCubit, ChatState>(
         builder: (context, state) {
+          // Get the chat cubit from BlocProvider
           ChatCubit chatCubit = BlocProvider.of<ChatCubit>(context);
           return Row(
             mainAxisSize: MainAxisSize.min,
             children: [
+              /// The leading icon button switches between image-add icon and delete icon when recording
               IconButton(
                 onPressed: () async {
                   if (chatCubit.isRecording) {
+                    // When recording: allow cancelling the voice recording
                     await chatCubit.cancelRecording();
-                  } else {}
+                  } else {
+                    // If not recording:
+                    // TODO: normally would open media picker
+                    // (currently does nothing)
+                  }
                 },
                 icon: AnimatedCrossFade(
+                  // Shows the image-add icon when not recording
                   firstChild: const HugeIcon(
                     icon: HugeIcons.strokeRoundedImageAdd02,
                     color: Color(0XFFC4C2CB),
                   ),
+                  // Shows the delete icon when recording (for cancelling)
                   secondChild: const HugeIcon(
                     icon: HugeIcons.strokeRoundedDelete02,
                     color: Color(0XFFC4C2CB),
@@ -53,9 +70,12 @@ class ChatViewInteracrive extends StatelessWidget {
                   duration: const Duration(milliseconds: 260),
                 ),
               ),
+              // The main expanding child: either a text field or the animated voice recording bar
               Expanded(
                 child: AnimatedCrossFade(
+                  // Text field for typing a chat message (default)
                   firstChild: CustomChatTextField(friendUid: friendUid),
+                  // Voice recording animated waveform (shown while recording)
                   secondChild: const StreamVoiceWidget(),
                   crossFadeState:
                       BlocProvider.of<ChatCubit>(context).isRecording
@@ -64,6 +84,7 @@ class ChatViewInteracrive extends StatelessWidget {
                   duration: const Duration(milliseconds: 260),
                 ),
               ),
+              // The microphone/send voice icon button; handles recording or sending voice
               CustomVoiceRecordIcon(
                 friendUid: friendUid,
               ),
