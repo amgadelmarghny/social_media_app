@@ -10,6 +10,7 @@ import 'package:social_media_app/shared/components/message_date_lable.dart';
 import 'package:social_media_app/shared/components/profile_picture_with_story.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
 
+// This widget represents an item in the chat list, displaying user info and last message.
 class ChatItem extends StatefulWidget {
   const ChatItem({super.key, required this.chatItemModel});
   final ChatItemModel chatItemModel;
@@ -19,32 +20,38 @@ class ChatItem extends StatefulWidget {
 }
 
 class _ChatItemState extends State<ChatItem> {
+  // Stores the user model associated with this chat item.
   UserModel? userModel;
+  // Used for accessing social-related features (e.g., fetching user data).
   late SocialCubit socialCubit;
 
   @override
   void initState() {
+    // Get the current instance of the SocialCubit.
     socialCubit = context.read<SocialCubit>();
+    // Fetch the chat user's information when this widget is initialized.
     getChatUserModel();
     super.initState();
   }
 
+  // Fetches the user data associated with the chat item's user UID.
   Future<void> getChatUserModel() async {
     userModel =
         await socialCubit.getUserData(userUid: widget.chatItemModel.uid);
     if (mounted) {
-      setState(() {});
+      setState(() {}); // Update the widget when user data is received.
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Skeletonizer(
+      // Show skeleton loading while the user model has not been fetched.
       enabled: userModel?.firstName.isEmpty ?? true,
       child: InkWell(
           onTap: () => Navigator.pushNamed(
                 context,
-                ChatView.routeName,
+                ChatView.routeName, // Navigate to the chat view on tap.
                 arguments: userModel,
               ),
           child: Row(
@@ -52,12 +59,13 @@ class _ChatItemState extends State<ChatItem> {
               ProfilePictureWithStory(
                 size: 70,
                 image: userModel?.photo,
-                isWithoutStory: true,
+                isWithoutStory: true, // Always show as without story here.
               ),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Display user's full name.
                     Text(
                       "${userModel?.firstName} ${userModel?.lastName}",
                       overflow: TextOverflow.ellipsis,
@@ -70,6 +78,7 @@ class _ChatItemState extends State<ChatItem> {
                     ),
                     Row(
                       children: [
+                        // Show text message preview if present.
                         if (widget.chatItemModel.textMessage != null)
                           Expanded(
                             child: Text(
@@ -80,6 +89,7 @@ class _ChatItemState extends State<ChatItem> {
                                   color: Colors.white60),
                             ),
                           ),
+                        // Show voice message indicator if there's a voice record.
                         if (widget.chatItemModel.voiceRecord != null) ...[
                           const HugeIcon(
                             icon: HugeIcons.strokeRoundedMic01,
@@ -96,6 +106,7 @@ class _ChatItemState extends State<ChatItem> {
                           ),
                           const Spacer(),
                         ],
+                        // Show image indicator if there are images sent.
                         if (widget.chatItemModel.images != null) ...[
                           const HugeIcon(
                             icon: HugeIcons.strokeRoundedImage02,
@@ -112,6 +123,7 @@ class _ChatItemState extends State<ChatItem> {
                           ),
                           const Spacer(),
                         ],
+                        // Display the label for date/time of the last message.
                         Text(
                           getMessageDateLabel(widget.chatItemModel.dateTime),
                           style: FontsStyle.font18PopinWithShadowOption(

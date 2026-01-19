@@ -47,9 +47,7 @@ class ChatViewInteracrive extends StatelessWidget {
                     // When recording: allow cancelling the voice recording
                     await chatCubit.cancelRecording();
                   } else {
-                    // If not recording:
-                    // TODO: normally would open media picker
-                    // (currently does nothing)
+                   await chatCubit.pickAndSendImages(friendUid: friendUid);
                   }
                 },
                 icon: AnimatedCrossFade(

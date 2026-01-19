@@ -22,6 +22,7 @@ class ChatCubit extends Cubit<ChatState> {
     _initRecorder();
   }
 
+  /// Stream that provides updated amplitude for active audio recording
   Stream<Amplitude> get amplitudeStream =>
       audioRecorder.onAmplitudeChanged(const Duration(milliseconds: 100));
 
@@ -32,6 +33,8 @@ class ChatCubit extends Cubit<ChatState> {
 
   /// Subscription to Firestore messages stream
   StreamSubscription<QuerySnapshot>? _messagesSubscription;
+
+  final currentUserId = CacheHelper.getData(key: kUidToken);
 
   /// Sends a message to Firestore for the given [messageModel]
   Future<void> sendAMessage(final MessageModel messageModel) async {
@@ -50,11 +53,11 @@ class ChatCubit extends Cubit<ChatState> {
     }
   }
 
-  /// الدالة الموحدة التي تقوم بعملية الرفع إلى Firestore لكل أنواع الرسائل
+  /// Unified function that pushes all kinds of messages to Firestore (text, image, audio)
   Future<void> _sendTextImageRecord(MessageModel messageModel) async {
     final timestamp = Timestamp.fromDate(messageModel.dateTime);
 
-    // تجهيز البيانات (تم إصلاح خطأ الصورة هنا)
+    // Prepare message data (bug with images resolved here)
     final messageData = {
       'uid': messageModel.uid,
       'friendUid': messageModel.friendUid,
@@ -64,7 +67,7 @@ class ChatCubit extends Cubit<ChatState> {
       kCreatedAt: timestamp,
     };
 
-    // مراجع الـ Firestore
+    // Firestore references for both sender and receiver
     final senderDoc = FirebaseFirestore.instance
         .collection(kUsersCollection)
         .doc(messageModel.uid)
@@ -77,14 +80,14 @@ class ChatCubit extends Cubit<ChatState> {
         .collection(kChatCollection)
         .doc(messageModel.uid);
 
-    // 1. إضافة الرسالة في سجل الرسائل للطرفين
+    // 1. Add message to both sender's and receiver's message history
     await senderDoc.collection(kMessageCollection).add(messageData);
     await receiverDoc.collection(kMessageCollection).add(messageData);
 
-    // 2. تحديث "آخر رسالة" (Preview) عند المرسل
+    // 2. Update latest message (preview) for the sender
     await senderDoc.set(messageModel.toJson());
 
-    // 3. تحديث "آخر رسالة" (Preview) عند المستقبل
+    // 3. Update latest message (preview) for the receiver
     final receiverChatPreview = {
       'uid': messageModel.friendUid,
       'friendUid': messageModel.uid,
@@ -95,7 +98,7 @@ class ChatCubit extends Cubit<ChatState> {
     };
     await receiverDoc.set(receiverChatPreview);
 
-    // 4. تحديث القائمة المحلية فوراً لتحسين تجربة المستخدم
+    // 4. Update local chat item list for better UX
     _updateChatItemInList(
       friendUid: messageModel.friendUid,
       dateTime: messageModel.dateTime,
@@ -105,14 +108,16 @@ class ChatCubit extends Cubit<ChatState> {
     );
   }
 
+  /// Flag for current recording status
   bool isRecording = false;
 
+  /// Initialize the audio recorder
   void _initRecorder() {
     audioRecorder = AudioRecorder();
   }
 
+  /// Record a voice message and send it to chat with [friendUid]
   Future<void> recordAVoiceThenSendIt({required String friendUid}) async {
-    final currentUserId = CacheHelper.getData(key: kUidToken);
     final voiceUrl = await _recordAndUploadAVoice(
         myUid: currentUserId, friendUid: friendUid);
     if (voiceUrl != null) {
@@ -126,9 +131,10 @@ class ChatCubit extends Cubit<ChatState> {
     }
   }
 
+  /// Cancel an ongoing recording
   Future<void> cancelRecording() async {
     try {
-      await audioRecorder.stop(); // إيقاف المسجل الفعلي
+      await audioRecorder.stop(); // Stop the actual recorder
       isRecording = false;
       emit(RecordingCancelled());
     } catch (e) {
@@ -136,13 +142,16 @@ class ChatCubit extends Cubit<ChatState> {
     }
   }
 
+  /// Currently playing audio url (if any)
   String? currentlyPlayingUrl;
 
+  /// Notify UI that a voice message [url] started playing
   void notifyVoicePlaying(String url) {
     currentlyPlayingUrl = url;
     emit(VoicePlayingStarted(url));
   }
 
+  /// Handle start/stop logic for audio recording and upload result
   Future<String?> _recordAndUploadAVoice(
       {required String myUid, required String friendUid}) async {
     String? recordUrl;
@@ -151,7 +160,6 @@ class ChatCubit extends Cubit<ChatState> {
 
     try {
       if (isRecording) {
-        isRecording = false;
         emit(RecordingStoped());
 
         final path = await audioRecorder.stop();
@@ -162,6 +170,7 @@ class ChatCubit extends Cubit<ChatState> {
             recordUrl = await _uploadAndGetRecordFromFirebase(path);
             if (recordUrl != null) emit(RecordAndUploadAVoiceSuccessState());
           }
+          isRecording = false;
         }
       } else {
         Directory tempDir = await getTemporaryDirectory();
@@ -175,7 +184,7 @@ class ChatCubit extends Cubit<ChatState> {
         );
 
         await audioRecorder.start(config, path: recordFilePath);
-        // تم إلغاء recorderController.record() لمنع الصراع على الميكروفون
+        // recorderController.record() is no longer used to prevent microphone conflict
 
         isRecording = true;
         emit(RecordingNowState());
@@ -187,6 +196,7 @@ class ChatCubit extends Cubit<ChatState> {
     return recordUrl;
   }
 
+  /// Uploads a recorded audio file to Firebase Storage and gets its url
   Future<String?> _uploadAndGetRecordFromFirebase(
       String theRecordedFilePath) async {
     String? recordUrl;
@@ -207,6 +217,7 @@ class ChatCubit extends Cubit<ChatState> {
     return recordUrl;
   }
 
+  /// Pick multiple images from gallery and send them to chat with [friendUid]
   Future<void> pickAndSendImages({required String friendUid}) async {
     List<File> imagesFiles = await _pickMultipleImages();
     List<String> imagesUrls = [];
@@ -214,7 +225,7 @@ class ChatCubit extends Cubit<ChatState> {
       imagesUrls = await _uploadMultipleImages(imagesFiles: imagesFiles);
     }
     if (imagesUrls.isEmpty) {
-      final currentUserId = CacheHelper.getData(key: kUidToken);
+      // Always send a message, even if imagesUrls is empty
       MessageModel messageModel = MessageModel(
           uid: currentUserId,
           friendUid: friendUid,
@@ -224,32 +235,33 @@ class ChatCubit extends Cubit<ChatState> {
     }
   }
 
-  /// Pick multiple images from the gallery and return [List <File>]
+  /// Pick multiple images from the gallery and return [List<File>]
   Future<List<File>> _pickMultipleImages() async {
     emit(PickImageLoadingState());
 
     final ImagePicker picker = ImagePicker();
-    // استخدام pickMultiImage بدلاً من pickImage
+    // Use pickMultiImage instead of pickImage
     final List<XFile> selectedImages = await picker.pickMultiImage();
 
     if (selectedImages.isNotEmpty) {
-      // تحويل قائمة XFile إلى قائمة File
+      // Convert list of XFile to a list of File
       return selectedImages.map((xFile) => File(xFile.path)).toList();
     } else {
-      // إرجاع قائمة فارغة إذا لم يتم اختيار شيء
+      // Return empty list if nothing was picked
       return [];
     }
   }
 
+  /// Upload multiple images and return their Firebase URLs
   Future<List<String>> _uploadMultipleImages({
     required List<File> imagesFiles,
   }) async {
     List<String> imagesUrl = [];
-    // 1. اختيار الصور
+    // 1. Pick images
 
     for (var imageFile in imagesFiles) {
       try {
-        // 2. رفع كل صورة على حدة
+        // 2. Upload each image individually
         String fileName = p.basename(imageFile.path);
         final ref = FirebaseStorage.instance
             .ref()
@@ -259,7 +271,7 @@ class ChatCubit extends Cubit<ChatState> {
         final imageUrl = await task.ref.getDownloadURL();
         imagesUrl.add(imageUrl);
       } catch (e) {
-        emit(UploadImageFailure(errMessage: "فشل رفع إحدى الصور: $e"));
+        emit(UploadImageFailure(errMessage: "Failed uploading an image: $e"));
       }
     }
     return imagesUrl;
@@ -281,7 +293,6 @@ class ChatCubit extends Cubit<ChatState> {
     _messagesSubscription?.cancel();
 
     // Retrieve current user's id from cache (required to locate their chat collection)
-    final currentUserId = CacheHelper.getData(key: kUidToken);
 
     // Set up Firestore real-time listener for the selected chat's messages,
     // ordered so the newest messages come first in the list
@@ -320,7 +331,7 @@ class ChatCubit extends Cubit<ChatState> {
       // Get the chat collection for the current user, ordered by creation date
       final messageCollection = await FirebaseFirestore.instance
           .collection(kUsersCollection)
-          .doc(CacheHelper.getData(key: kUidToken))
+          .doc()
           .collection(kChatCollection)
           .orderBy(kCreatedAt, descending: true)
           .get();
