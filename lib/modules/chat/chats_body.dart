@@ -19,21 +19,12 @@ class _ChatsBodyState extends State<ChatsBody> {
   // used to adjust the body padding at the bottom
   final ScrollController _scrollController = ScrollController();
 
-  // The instance of the ChatCubit, obtained from BlocProvider
-  late ChatCubit chatCubit;
-
   // Dynamic bottom padding, updated when scrolling to bottom or up
   double _bodiesBottomPadding = 36;
 
   @override
   void initState() {
     super.initState();
-    // Access the ChatCubit from the context
-    chatCubit = BlocProvider.of<ChatCubit>(context);
-
-    // Fetch the chats list on widget creation
-    getChats();
-
     // Attach a listener to detect if the user scrolls to an edge (top or bottom)
     _scrollController.addListener(() {
       if (_scrollController.position.atEdge) {
@@ -48,9 +39,6 @@ class _ChatsBodyState extends State<ChatsBody> {
       }
     });
   }
-
-  /// Calls the cubit's getChats method to fetch chat previews
-  Future<void> getChats() async => await chatCubit.getChats();
 
   @override
   Widget build(BuildContext context) {

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -78,17 +80,6 @@ class _ChatItemState extends State<ChatItem> {
                     ),
                     Row(
                       children: [
-                        // Show text message preview if present.
-                        if (widget.chatItemModel.textMessage != null)
-                          Expanded(
-                            child: Text(
-                              widget.chatItemModel.textMessage!,
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style: FontsStyle.font18PopinWithShadowOption(
-                                  color: Colors.white60),
-                            ),
-                          ),
                         // Show voice message indicator if there's a voice record.
                         if (widget.chatItemModel.voiceRecord != null) ...[
                           const HugeIcon(
@@ -107,22 +98,56 @@ class _ChatItemState extends State<ChatItem> {
                           const Spacer(),
                         ],
                         // Show image indicator if there are images sent.
-                        if (widget.chatItemModel.images != null) ...[
-                          const HugeIcon(
-                            icon: HugeIcons.strokeRoundedImage02,
-                            color: Color(0XFFC4C2CB),
+                        if (widget.chatItemModel.images != null)
+                          if (widget.chatItemModel.images!.length > 1) ...[
+                            const HugeIcon(
+                              icon: HugeIcons.strokeRoundedAlbum02,
+                              color: Color(0XFFC4C2CB),
+                            ),
+                            const SizedBox(
+                              width: 7,
+                            ),
+                            Expanded(
+                              child: Text(
+                                widget.chatItemModel.textMessage == null
+                                    ? 'Photos'
+                                    : widget.chatItemModel.textMessage!,
+                                maxLines: 1,
+                                style: FontsStyle.font18PopinWithShadowOption(
+                                    color: const Color(0XFFC4C2CB)),
+                              ),
+                            ),
+                          ] else ...[
+                            const HugeIcon(
+                              icon: HugeIcons.strokeRoundedImage02,
+                              color: Color(0XFFC4C2CB),
+                            ),
+                            const SizedBox(
+                              width: 7,
+                            ),
+                            Expanded(
+                              child: Text(
+                                widget.chatItemModel.textMessage == null
+                                    ? 'Photo'
+                                    : widget.chatItemModel.textMessage!,
+                                maxLines: 1,
+                                style: FontsStyle.font18PopinWithShadowOption(
+                                    color: const Color(0XFFC4C2CB)),
+                              ),
+                            ),
+                          ],
+                        // Show text message preview if present.
+                        if (widget.chatItemModel.textMessage != null &&
+                            widget.chatItemModel.images == null)
+                          Expanded(
+                            child: Text(
+                              widget.chatItemModel.textMessage!,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: FontsStyle.font18PopinWithShadowOption(
+                                  color: Colors.white60),
+                            ),
                           ),
-                          const SizedBox(
-                            width: 7,
-                          ),
-                          Text(
-                            'Photo',
-                            maxLines: 1,
-                            style: FontsStyle.font18PopinWithShadowOption(
-                                color: const Color(0XFFC4C2CB)),
-                          ),
-                          const Spacer(),
-                        ],
                         // Display the label for date/time of the last message.
                         Text(
                           getMessageDateLabel(widget.chatItemModel.dateTime),

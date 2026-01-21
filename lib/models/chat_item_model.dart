@@ -4,7 +4,7 @@ class ChatItemModel extends Equatable {
   final String uid;
   final DateTime dateTime;
   final String? textMessage, voiceRecord;
-  final List<String>? images;
+  final List? images;
 
   const ChatItemModel({
     required this.uid,

@@ -5,6 +5,7 @@ import 'package:social_media_app/modules/chat/widgets/custom_chat_text_field.dar
 import 'package:social_media_app/modules/chat/widgets/stream_voice_record_widget.dart';
 import 'package:social_media_app/modules/chat/widgets/custom_voice_record_icon.dart';
 import 'package:social_media_app/shared/bloc/chat_cubit/chat_cubit.dart';
+import 'package:social_media_app/shared/components/show_toast.dart';
 import 'package:social_media_app/shared/style/theme/constant.dart';
 
 /// A widget that represents the interactive chat input section at the bottom of the chat view.
@@ -33,7 +34,12 @@ class ChatViewInteracrive extends StatelessWidget {
         top: 10,
         bottom: MediaQuery.viewPaddingOf(context).bottom + 6,
       ),
-      child: BlocBuilder<ChatCubit, ChatState>(
+      child: BlocConsumer<ChatCubit, ChatState>(
+        listener: (context, state) {
+          if (state is UploadImageFailure) {
+            showToast(msg: state.errMessage, toastState: ToastState.error);
+          }
+        },
         builder: (context, state) {
           // Get the chat cubit from BlocProvider
           ChatCubit chatCubit = BlocProvider.of<ChatCubit>(context);
@@ -47,7 +53,7 @@ class ChatViewInteracrive extends StatelessWidget {
                     // When recording: allow cancelling the voice recording
                     await chatCubit.cancelRecording();
                   } else {
-                   await chatCubit.pickAndSendImages(friendUid: friendUid);
+                    await chatCubit.pickImagesForPreview(context);
                   }
                 },
                 icon: AnimatedCrossFade(
@@ -61,10 +67,9 @@ class ChatViewInteracrive extends StatelessWidget {
                     icon: HugeIcons.strokeRoundedDelete02,
                     color: Color(0XFFC4C2CB),
                   ),
-                  crossFadeState:
-                      BlocProvider.of<ChatCubit>(context).isRecording
-                          ? CrossFadeState.showSecond
-                          : CrossFadeState.showFirst,
+                  crossFadeState: chatCubit.isRecording
+                      ? CrossFadeState.showSecond
+                      : CrossFadeState.showFirst,
                   duration: const Duration(milliseconds: 260),
                 ),
               ),
@@ -75,17 +80,17 @@ class ChatViewInteracrive extends StatelessWidget {
                   firstChild: CustomChatTextField(friendUid: friendUid),
                   // Voice recording animated waveform (shown while recording)
                   secondChild: const StreamVoiceWidget(),
-                  crossFadeState:
-                      BlocProvider.of<ChatCubit>(context).isRecording
-                          ? CrossFadeState.showSecond
-                          : CrossFadeState.showFirst,
-                  duration: const Duration(milliseconds: 260),
+                  crossFadeState: chatCubit.isRecording
+                      ? CrossFadeState.showSecond
+                      : CrossFadeState.showFirst,
+                  duration: const Duration(milliseconds: 270),
                 ),
               ),
-              // The microphone/send voice icon button; handles recording or sending voice
-              CustomVoiceRecordIcon(
-                friendUid: friendUid,
-              ),
+              if (chatCubit.pickedImages.isEmpty)
+                // The microphone/send voice icon button; handles recording or sending voice
+                CustomVoiceRecordIcon(
+                  friendUid: friendUid,
+                ),
             ],
           );
         },

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:icon_broken/icon_broken.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:social_media_app/models/create_post_impl_model.dart';
 import 'package:social_media_app/models/post_model.dart';
 import 'package:social_media_app/models/user_model.dart';
@@ -173,20 +174,57 @@ class SocialCubit extends Cubit<SocialState> {
     }
   }
 
-  /// Pick an image from the gallery and return a [File]
+  /// Picks an image from the gallery and returns a [File] to be used in the app.
+  /// Handles required permissions for Android 12 and above, or Android 13 and above.
   Future<File?> pickImage() async {
-    emit(PickImageLoadingState());
+    PermissionStatus status;
 
-    final ImagePicker picker = ImagePicker();
-    XFile? returnImage = await picker.pickImage(source: ImageSource.gallery);
-
-    if (returnImage != null) {
-      emit(PickImageSuccessState());
-      return File(returnImage.path);
+    // Check Android version to request proper permission.
+    if (Platform.isAndroid && (await _getAndroidVersion()) >= 13) {
+      // Android 13 and above uses the [photos] permission
+      status = await Permission.photos.request();
     } else {
-      emit(PickImageFailureState(errMessage: 'No image selected'));
-      return null;
+      // Android 12 and below uses the [storage] permission
+      status = await Permission.storage.request();
     }
+
+    // Check the result of the permission request.
+    if (status.isGranted) {
+      // Permission granted -> start picking image.
+      emit(PickImageLoadingState());
+
+      final ImagePicker picker = ImagePicker();
+      XFile? selectedImage = await picker.pickImage(source: ImageSource.gallery);
+
+      if (selectedImage != null) {
+        // User selected an image successfully.
+        emit(PickImageSuccessState());
+        return File(selectedImage.path);
+      } else {
+        // User cancelled image picking or no image was selected.
+        emit(PickImageFailureState(errMessage: 'No image selected'));
+        return null;
+      }
+      // ...other processing code can go here.
+    } else if (status.isPermanentlyDenied) {
+      // User permanently denied permission -> direct to app settings.
+      openAppSettings();
+    } else {
+      // Permission denied (not permanent).
+      emit(PickImageFailureState(errMessage: "Gallery access permission denied"));
+    }
+    return null;
+  }
+
+  /// Helper function to get the Android OS version as an integer.
+  /// Returns the major version. If not Android, returns 0.
+  Future<int> _getAndroidVersion() async {
+    if (Platform.isAndroid) {
+      // Parse the version string to retrieve the SDK major version.
+      return int.parse(Platform.version.split(' ')[0].split('.')[0]);
+      // Note: For more accuracy, consider using device_info_plus to get the exact SDK version.
+    }
+    return 0;
   }
 
   /// Upload a profile image to Firebase Storage and return its URL

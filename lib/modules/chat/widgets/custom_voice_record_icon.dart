@@ -40,26 +40,30 @@ class CustomVoiceRecordIcon extends StatelessWidget {
         }
 
         // Default: show microphone (to start recording) or send icon (to send voice) depending on whether recording or not.
-        return IconButton(
-          onPressed: () async {
-            await cubit.recordAVoiceThenSendIt(friendUid: friendUid);
-          },
-          icon: AnimatedCrossFade(
-            // Shown before user starts recording: mic icon
-            firstChild: const HugeIcon(
-              icon: HugeIcons.strokeRoundedMic01,
-              color: Color(0XFFC4C2CB),
+        return AbsorbPointer(
+          absorbing:
+              state is UploadRecordLoading || state is SendMessageLoading,
+          child: IconButton(
+            onPressed: () async {
+              await cubit.recordAVoiceThenSendIt(friendUid: friendUid);
+            },
+            icon: AnimatedCrossFade(
+              // Shown before user starts recording: mic icon
+              firstChild: const HugeIcon(
+                icon: HugeIcons.strokeRoundedMic01,
+                color: Color(0XFFC4C2CB),
+              ),
+              // Shown while user is recording: send icon (use a highlight color)
+              secondChild: const HugeIcon(
+                icon: HugeIcons
+                    .strokeRoundedSent, // Send icon displayed during recording
+                color: Colors.blue, // Use a blue color to draw user attention
+              ),
+              crossFadeState: cubit.isRecording
+                  ? CrossFadeState.showSecond
+                  : CrossFadeState.showFirst,
+              duration: const Duration(milliseconds: 260),
             ),
-            // Shown while user is recording: send icon (use a highlight color)
-            secondChild: const HugeIcon(
-              icon: HugeIcons
-                  .strokeRoundedSent, // Send icon displayed during recording
-              color: Colors.blue, // Use a blue color to draw user attention
-            ),
-            crossFadeState: cubit.isRecording
-                ? CrossFadeState.showSecond
-                : CrossFadeState.showFirst,
-            duration: const Duration(milliseconds: 260),
           ),
         );
       },

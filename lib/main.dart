@@ -63,7 +63,7 @@ class SocialMediaApp extends StatelessWidget {
             ..getFollowing(),
         ),
         BlocProvider(
-          create: (context) => ChatCubit(),
+          create: (context) => ChatCubit()..getChats(),
         ),
       ],
       child: MaterialApp(

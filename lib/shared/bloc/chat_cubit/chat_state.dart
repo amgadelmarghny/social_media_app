@@ -30,7 +30,7 @@ final class PushMessageNotificationToTheFriendFailure extends ChatState {
 final class GetMessagesLoading extends ChatState {}
 
 final class GetMessagesSuccess extends ChatState {
-  final List<MessageModel> messages; // القائمة هنا
+  final List<MessageModel> messages;
 
   const GetMessagesSuccess({required this.messages});
 
@@ -85,6 +85,8 @@ final class VoicePlayingStarted extends ChatState {
 
 final class PickImageLoadingState extends ChatState {}
 
+final class UpdatePickedImagesState extends ChatState {}
+
 final class UploadImageLoading extends ChatState {}
 
 final class UploadImageFailure extends ChatState {
@@ -92,7 +94,7 @@ final class UploadImageFailure extends ChatState {
 
   const UploadImageFailure({required this.errMessage});
 
- @override
+  @override
   List<Object> get props => [errMessage];
 }
 

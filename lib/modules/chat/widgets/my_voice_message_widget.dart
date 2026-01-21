@@ -5,9 +5,10 @@ import 'package:social_media_app/shared/bloc/chat_cubit/chat_cubit.dart';
 import 'package:social_media_app/shared/style/theme/constant.dart';
 import 'package:voice_message_package/voice_message_package.dart';
 
+/// Widget to display a voice message sent by the user (My message bubble)
 class MyVoiceMessageWidget extends StatefulWidget {
-  final String audioUrl;
-  final DateTime dateTime;
+  final String audioUrl; // The URL of the audio file to play
+  final DateTime dateTime; // The timestamp of the message
 
   const MyVoiceMessageWidget({
     super.key,
@@ -20,39 +21,44 @@ class MyVoiceMessageWidget extends StatefulWidget {
 }
 
 class _MyVoiceMessageWidgetState extends State<MyVoiceMessageWidget> {
-  late VoiceController voiceController;
+  late VoiceController voiceController; // Controller for handling voice message playback
 
   @override
   void initState() {
     super.initState();
-    // تعريف الكنترولر في initState
+    // Initialize the VoiceController in initState
     voiceController = VoiceController(
       audioSrc: widget.audioUrl,
       maxDuration: const Duration(minutes: 10),
       isFile: false,
-      onComplete: () {},
+      onComplete: () {
+        // Called when playback completes
+      },
       onPlaying: () {
-        // إبلاغ البلوك أن هذا الريكورد بدأ العمل ليتم إيقاف الآخرين
+        // Notify the Bloc that this record started playing to pause others
         context.read<ChatCubit>().notifyVoicePlaying(widget.audioUrl);
       },
-      onPause: () {},
+      onPause: () {
+        // Called when playback is paused
+      },
     );
   }
 
   @override
   void dispose() {
-    // الكنترولر الخاص بهذه المكتبة يحتاج عمل dispose يدوي أحياناً لضمان توقف الصوت
+    // The controller needs manual disposal sometimes to ensure the audio is stopped
     voiceController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    // Format the message timestamp to "hour:minute am/pm"
     String date = DateFormat('hh:mm a').format(widget.dateTime);
 
     return BlocListener<ChatCubit, ChatState>(
       listener: (context, state) {
-        // اللوجيك الخاص بك: إذا بدأ ريكورد آخر (URL مختلف) توقف عن العمل
+        // Logic: If a different voice message started playing, pause this one
         if (state is VoicePlayingStarted && state.audioUrl != widget.audioUrl) {
           if (voiceController.isPlaying) {
             voiceController.pausePlaying();
@@ -60,15 +66,14 @@ class _MyVoiceMessageWidgetState extends State<MyVoiceMessageWidget> {
         }
       },
       child: Align(
-        alignment: Alignment.topRight,
+        alignment: Alignment.topRight, // Align this bubble to the right (my messages)
         child: Container(
           constraints: BoxConstraints(
-            maxWidth: MediaQuery.sizeOf(context).width * 0.85,
+            maxWidth: MediaQuery.sizeOf(context).width * 0.85, // Limit bubble width
           ),
-
           // Margin around the bubble
           margin: const EdgeInsets.symmetric(vertical: 3, horizontal: 15),
-          // Bubble decoration: color and rounded corners
+          // Bubble styling (color and rounded corners)
           decoration: const BoxDecoration(
             color: defaultColor,
             borderRadius: BorderRadius.only(
@@ -81,18 +86,19 @@ class _MyVoiceMessageWidgetState extends State<MyVoiceMessageWidget> {
             alignment: AlignmentGeometry.bottomRight,
             children: [
               VoiceMessageView(
-                
+                // Widget for displaying and playing the voice message
                 controller: voiceController,
                 innerPadding: 10,
                 cornerRadius: 20,
                 backgroundColor: defaultColor,
-                activeSliderColor: Colors.white,
-                circlesColor: defaultTextColor,
+                activeSliderColor: Colors.white, // Active slider bar color
+                circlesColor: defaultTextColor, // Color for the sound circles
                 counterTextStyle: const TextStyle(
                   color: Colors.white,
-                  fontSize: 11,
+                  fontSize: 11, // Style for the timer/counter
                 ),
               ),
+              // Message time in bottom-right corner
               Padding(
                 padding: const EdgeInsets.only(right: 20, bottom: 10),
                 child: Text(
