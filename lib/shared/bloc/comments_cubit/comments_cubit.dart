@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -16,53 +17,86 @@ class CommentsCubit extends Cubit<CommentsState> {
   // pike Image
   File? pickedImage;
 
-  /// Picks an image from the gallery and returns a [File] to be used in the app.
-  /// Handles required permissions for Android 12 and above, or Android 13 and above.
-  Future<File?> pickPhoto() async {
+  /// Picks an image from the gallery and returns a File to be used in the app.
+  /// Handles permission requirements for Android 13+ and earlier versions.
+  ///
+  /// Requests the appropriate permissions based on platform and Android version:
+  ///   - Android 13+ uses [Permission.photos]
+  ///   - Android 12 and below use [Permission.storage]
+  ///   - Other platforms use [Permission.photos]
+  ///
+  /// If permission is denied, it attempts to request again.
+  /// If permission is permanently denied, sends the user to the app settings.
+  /// Emits a failure state if unable to proceed.
+  Future<File?> pickImage() async {
     PermissionStatus status;
 
-    // Check Android version to request proper permission.
-    if (Platform.isAndroid && (await _getAndroidVersion()) >= 13) {
-      // Android 13 and above uses the [photos] permission
-      status = await Permission.photos.request();
+    // Check platform and request the correct permission
+    if (Platform.isAndroid) {
+      final androidVersion = await _getAndroidVersion();
+
+      if (androidVersion >= 33) {
+        // Android 13+ (API 33) requires photo permission
+        status = await Permission.photos.request();
+      } else {
+        // Android 12- (API 32 or lower) uses storage permission
+        status = await Permission.storage.request();
+      }
     } else {
-      // Android 12 and below uses the [storage] permission
-      status = await Permission.storage.request();
+      // Non-Android platforms use photo permission
+      status = await Permission.photos.request();
     }
 
-    // Check the result of the permission request.
+    // Permission granted on the first try
     if (status.isGranted) {
-      // Permission granted -> start picking image.
-      emit(PickCommentImageLoadingState());
-
-      final ImagePicker picker = ImagePicker();
-      XFile? selectedImage =
-          await picker.pickImage(source: ImageSource.gallery);
-
-      if (selectedImage != null) {
-        // User selected an image successfully.
-        emit(PickCommentImageSuccessState());
-        return File(selectedImage.path);
+      return await _openGallery();
+    }
+    // If permission denied, try requesting again depending on platform/version
+    else if (status.isDenied) {
+      // Retry logic for Android, using correct permission depending on version
+      if (Platform.isAndroid && (await _getAndroidVersion()) < 33) {
+        // Retry storage permission for Android < 33
+        status = await Permission.storage.request();
       } else {
-        // User cancelled image picking or no image was selected.
-        emit(PickCommentImageFailureState(errMessage: 'No image selected'));
-        return null;
+        // Retry photo permission for Android 33+ or other platforms
+        status = await Permission.photos.request();
       }
-      // ...other processing code can go here.
-    } else if (status.isPermanentlyDenied) {
-      // User permanently denied permission -> direct to app settings.
+
+      // If granted on retry, open gallery
+      if (status.isGranted) return await _openGallery();
+    }
+    // If permission permanently denied, prompt user to go to app settings
+    else if (status.isPermanentlyDenied) {
       openAppSettings();
     }
+
+    // Permission still denied or failed, emit failure state and return null
+    emit(PickCommentImageFailureState(
+        errMessage: "Gallery access permission denied"));
     return null;
   }
 
-  /// Helper function to get the Android OS version as an integer.
-  /// Returns the major version. If not Android, returns 0.
+  // Helper function to open device gallery and allow user to pick an image
+  Future<File?> _openGallery() async {
+    emit(PickCommentImageLoadingState());
+    final ImagePicker picker = ImagePicker();
+    final XFile? selectedImage =
+        await picker.pickImage(source: ImageSource.gallery);
+
+    if (selectedImage != null) {
+      emit(PickCommentImageSuccessState());
+      return File(selectedImage.path);
+    }
+    // User cancelled picker or no image selected
+    return null;
+  }
+
+  // Helper function to get Android SDK version as an integer (returns 0 if not Android)
   Future<int> _getAndroidVersion() async {
     if (Platform.isAndroid) {
-      // Parse the version string to retrieve the SDK major version.
-      return int.parse(Platform.version.split(' ')[0].split('.')[0]);
-      // Note: For more accuracy, consider using device_info_plus to get the exact SDK version.
+      final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+      final AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      return androidInfo.version.sdkInt;
     }
     return 0;
   }

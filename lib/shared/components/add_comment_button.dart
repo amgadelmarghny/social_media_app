@@ -39,7 +39,7 @@ class AddCommentButton extends StatelessWidget {
                 child: IconButton(
                   onPressed: () async {
                     // Open image picker and set the picked image in the cubit
-                    commentsCubit.pickedImage = await commentsCubit.pickPhoto();
+                    commentsCubit.pickedImage = await commentsCubit.pickImage();
                   },
                   icon: const Icon(
                     Icons.photo_outlined,

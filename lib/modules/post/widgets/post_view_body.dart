@@ -12,6 +12,7 @@ import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/components/comment_item.dart';
 import 'package:social_media_app/shared/components/constants.dart';
 import 'package:social_media_app/shared/components/add_comment_button.dart';
+import 'package:social_media_app/shared/components/image_viewer_screen.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -116,9 +117,20 @@ class _PostViewBodyState extends State<PostViewBody> {
               if (widget.postModel.postImage != null)
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.only(top: 15),
-                    child: DisplayPostImage(
-                        postImage: widget.postModel.postImage!),
+                    padding: const EdgeInsets.only(top: 10),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ImageViewerScreen(
+                                imageUrl: widget.postModel.postImage!),
+                          ),
+                        );
+                      },
+                      child: DisplayPostImage(
+                          postImage: widget.postModel.postImage!),
+                    ),
                   ),
                 ),
               // Display the interactive row (likes, comments, etc.).

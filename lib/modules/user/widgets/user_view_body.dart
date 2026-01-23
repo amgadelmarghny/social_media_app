@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/models/user_model.dart';
 import 'package:social_media_app/modules/user/widgets/user_followers_followings_bio_and_follow_and_message_button.dart';
-import 'package:social_media_app/modules/user/widgets/user_profile_and_cover_image_section.dart';
+import 'package:social_media_app/modules/user/widgets/user_profile_image_and_cover_image_section.dart';
 import 'package:social_media_app/modules/user/widgets/user_sliver_posts_list_builder.dart';
 import 'package:social_media_app/shared/bloc/user_cubit/user_cubit.dart';
 import 'package:social_media_app/shared/components/show_toast.dart';
@@ -37,7 +37,7 @@ class UserViewBody extends StatelessWidget {
           child: CustomScrollView(
             slivers: [
               // Cover and profile image section
-              UserProfileAndCoverImageSection(
+              UserProfileImageAndCoverImageSection(
                 profileCover: userModel.cover,
                 profileImage: userModel.photo,
                 uid: userModel.uid,
@@ -67,7 +67,7 @@ class UserViewBody extends StatelessWidget {
               UserFollowersFollowingsBioAndFollowAndMessageButton(
                   userModel: userModel),
               //user's posts
-             const UserSliverPostsListBuilder()
+              const UserSliverPostsListBuilder()
             ],
           ),
         );

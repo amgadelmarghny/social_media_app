@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -22,34 +23,35 @@ import '../../../models/update_user_impl_model.dart';
 part 'social_state.dart';
 
 class SocialCubit extends Cubit<SocialState> {
-  // Cached user UID token from local storage
+  // Cached UID token for the logged-in user from local storage
   String? uidTokenCache;
 
   SocialCubit() : super(SocialInitial()) {
     _initializeUidToken();
   }
 
+  // Initialize the cached UID token
   void _initializeUidToken() {
     uidTokenCache = CacheHelper.getData(key: kUidToken);
   }
 
-  // Get the current user UID with fallback to Firebase Auth
+  // Get the current user UID, preferring the cached token if available
   String get currentUserUid =>
       uidTokenCache ?? FirebaseAuth.instance.currentUser!.uid;
 
-  // Get current user email for debugging
+  // Get current user email for optional debugging
   String? get currentUserEmail => FirebaseAuth.instance.currentUser?.email;
 
-  // Current index for bottom navigation bar
+  // Current index for bottom navbar selection
   int currentBottomNavBarIndex = 0;
 
-  /// Change the current index of the bottom navigation bar
+  // Change current index of the bottom navbar and emit state
   void changeBottomNavBar(int value) {
     currentBottomNavBarIndex = value;
     emit(BottomNavBarState());
   }
 
-  // List of widgets for each tab in the bottom navigation bar
+  // List of widgets shown in the body based on the current navbar index
   final List<Widget> currentBody = const [
     FeedsBody(),
     ChatsBody(),
@@ -58,7 +60,7 @@ class SocialCubit extends Cubit<SocialState> {
     NotificationsBody(),
   ];
 
-  // List of items for the bottom navigation bar
+  // Bottom navigation bar items
   final List<BottomNavigationBarItem> bottomNavigationBarItem = const [
     BottomNavigationBarItem(icon: Icon(IconBroken.Home), label: ''),
     BottomNavigationBarItem(
@@ -75,7 +77,11 @@ class SocialCubit extends Cubit<SocialState> {
     BottomNavigationBarItem(icon: Icon(IconBroken.Profile), label: ''),
     BottomNavigationBarItem(icon: Icon(IconBroken.Notification), label: ''),
   ];
+
+  // Current Firebase User for email verification
   User? userVerification = FirebaseAuth.instance.currentUser;
+
+  // Send a verification email to the current user
   Future<void> sendEmailVerification() async {
     emit(SendEmailVerificationLoadingState());
     try {
@@ -93,65 +99,53 @@ class SocialCubit extends Cubit<SocialState> {
     }
   }
 
-  /// Checks the current user's email verification status.
+  // Checks the current user's email verification status
   Future<void> checkEmailStatus() async {
-    emit(CheckEmailLoadingState()); // Show loading indicator state
-
+    emit(CheckEmailLoadingState());
     try {
-      // Reload user's data to get latest email verification status
+      // Reload to ensure the latest verification status
       await FirebaseAuth.instance.currentUser?.reload();
       userVerification = FirebaseAuth.instance.currentUser;
 
-      // Email is verified
       if (userVerification != null && userVerification!.emailVerified) {
-        emit(CheckEmailSuccessState()); // Success state
-      }
-      // Email is not verified
-      else {
+        emit(CheckEmailSuccessState());
+      } else {
         emit(
           SendEmailVerificationFailureState(
             errMessage: 'You didn\'t verify your account',
           ),
-        ); // Failure state
+        );
       }
     } catch (e) {
-      // Emit error state with error message
       emit(CheckEmailErrorState(e.toString()));
     }
   }
 
-  // User model for the currently logged-in user
+  // UserModel for the currently logged-in user
   UserModel? userModel;
 
-  // Firestore references for posts and users collections
+  // Firestore collection references
   final _postCollectionRef =
       FirebaseFirestore.instance.collection(kPostsCollection);
   final _userCollectionRef =
       FirebaseFirestore.instance.collection(kUsersCollection);
 
-  /// Fetch user data from Firestore and update [userModel]
+  // Fetch user data from Firestore and update [userModel]
   Future<UserModel> getUserData({required String userUid}) async {
     emit(GetMyDataLoadingState());
-    // try {
     DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
         await _userCollectionRef.doc(userUid).get();
     Map<String, dynamic> userModelData = documentSnapshot.data()!;
     UserModel spacificUserModel = UserModel.fromJson(userModelData);
-    // Update userModel if it's null, or if it's for the current user (same UID)
-    // This ensures the current user's data is always up-to-date after login/logout
+    // Only update userModel if it's the first time or the current user's data is required
     if (userModel == null || userModel!.uid == userUid) {
       userModel = spacificUserModel;
     }
-
     emit(GetMyDataSuccessState());
     return spacificUserModel;
-    // } catch (error) {
-    //   emit(GetMyDataFailureState(errMessage: error.toString()));
-    //   rethrow;
-    // }
   }
 
-  // Controllers for editing user profile fields
+  // TextEditingControllers for user profile editing
   TextEditingController firstNameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
   TextEditingController bioController = TextEditingController();
@@ -159,7 +153,7 @@ class SocialCubit extends Cubit<SocialState> {
   String? updatedYear;
   String? updatedDayAndMonth;
 
-  /// Update user information in Firestore
+  // Update user information in Firestore
   Future<void> updateUserInfo(
       {required UpdateUserImplModel updateUserImplModel}) async {
     emit(UpdateUserInfoLoadingState());
@@ -174,60 +168,90 @@ class SocialCubit extends Cubit<SocialState> {
     }
   }
 
-  /// Picks an image from the gallery and returns a [File] to be used in the app.
-  /// Handles required permissions for Android 12 and above, or Android 13 and above.
+  /// Picks an image from the gallery and returns a File to be used in the app.
+  /// Handles permission requirements for Android 13+ and earlier versions.
+  ///
+  /// Requests the appropriate permissions based on platform and Android version:
+  ///   - Android 13+ uses [Permission.photos]
+  ///   - Android 12 and below use [Permission.storage]
+  ///   - Other platforms use [Permission.photos]
+  ///
+  /// If permission is denied, it attempts to request again.
+  /// If permission is permanently denied, sends the user to the app settings.
+  /// Emits a failure state if unable to proceed.
   Future<File?> pickImage() async {
     PermissionStatus status;
 
-    // Check Android version to request proper permission.
-    if (Platform.isAndroid && (await _getAndroidVersion()) >= 13) {
-      // Android 13 and above uses the [photos] permission
-      status = await Permission.photos.request();
-    } else {
-      // Android 12 and below uses the [storage] permission
-      status = await Permission.storage.request();
-    }
+    // Check platform and request the correct permission
+    if (Platform.isAndroid) {
+      final androidVersion = await _getAndroidVersion();
 
-    // Check the result of the permission request.
-    if (status.isGranted) {
-      // Permission granted -> start picking image.
-      emit(PickImageLoadingState());
-
-      final ImagePicker picker = ImagePicker();
-      XFile? selectedImage = await picker.pickImage(source: ImageSource.gallery);
-
-      if (selectedImage != null) {
-        // User selected an image successfully.
-        emit(PickImageSuccessState());
-        return File(selectedImage.path);
+      if (androidVersion >= 33) {
+        // Android 13+ (API 33) requires photo permission
+        status = await Permission.photos.request();
       } else {
-        // User cancelled image picking or no image was selected.
-        emit(PickImageFailureState(errMessage: 'No image selected'));
-        return null;
+        // Android 12- (API 32 or lower) uses storage permission
+        status = await Permission.storage.request();
       }
-      // ...other processing code can go here.
-    } else if (status.isPermanentlyDenied) {
-      // User permanently denied permission -> direct to app settings.
-      openAppSettings();
     } else {
-      // Permission denied (not permanent).
-      emit(PickImageFailureState(errMessage: "Gallery access permission denied"));
+      // Non-Android platforms use photo permission
+      status = await Permission.photos.request();
     }
+
+    // Permission granted on the first try
+    if (status.isGranted) {
+      return await _openGallery();
+    } 
+    // If permission denied, try requesting again depending on platform/version
+    else if (status.isDenied) {
+      // Retry logic for Android, using correct permission depending on version
+      if (Platform.isAndroid && (await _getAndroidVersion()) < 33) {
+        // Retry storage permission for Android < 33
+        status = await Permission.storage.request();
+      } else {
+        // Retry photo permission for Android 33+ or other platforms
+        status = await Permission.photos.request();
+      }
+
+      // If granted on retry, open gallery
+      if (status.isGranted) return await _openGallery();
+    } 
+    // If permission permanently denied, prompt user to go to app settings
+    else if (status.isPermanentlyDenied) {
+      openAppSettings();
+    }
+
+    // Permission still denied or failed, emit failure state and return null
+    emit(PickImageFailureState(errMessage: "Gallery access permission denied"));
     return null;
   }
 
-  /// Helper function to get the Android OS version as an integer.
-  /// Returns the major version. If not Android, returns 0.
+  // Helper function to open device gallery and allow user to pick an image
+  Future<File?> _openGallery() async {
+    emit(PickImageLoadingState());
+    final ImagePicker picker = ImagePicker();
+    final XFile? selectedImage =
+        await picker.pickImage(source: ImageSource.gallery);
+
+    if (selectedImage != null) {
+      emit(PickImageSuccessState());
+      return File(selectedImage.path);
+    }
+    // User cancelled picker or no image selected
+    return null;
+  }
+
+  // Helper function to get Android SDK version as an integer (returns 0 if not Android)
   Future<int> _getAndroidVersion() async {
     if (Platform.isAndroid) {
-      // Parse the version string to retrieve the SDK major version.
-      return int.parse(Platform.version.split(' ')[0].split('.')[0]);
-      // Note: For more accuracy, consider using device_info_plus to get the exact SDK version.
+      final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+      final AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      return androidInfo.version.sdkInt;
     }
     return 0;
   }
 
-  /// Upload a profile image to Firebase Storage and return its URL
+  // Upload a profile image to Firebase Storage and return its URL
   Future<String?> _uploadProfileImage({required File file}) async {
     emit(UploadProfileImageLoadingState());
     String? pictureUrl;
@@ -247,7 +271,7 @@ class SocialCubit extends Cubit<SocialState> {
     return pictureUrl;
   }
 
-  /// Pick and upload a profile image, then update the user's profile photo
+  // Pick and upload a profile image, then update user's profile photo in Firestore
   Future<String?> pickAndUploadProfileImage() async {
     File? returnedProfileImage = await pickImage();
     if (returnedProfileImage != null) {
@@ -262,7 +286,7 @@ class SocialCubit extends Cubit<SocialState> {
     return null;
   }
 
-  /// Upload a cover image to Firebase Storage and return its URL
+  // Upload a cover image to Firebase Storage and return its URL
   Future<String?> uploadCoverImage({required File file}) async {
     emit(UploadCoverImageLoadingState());
     String? coverUrl;
@@ -282,7 +306,7 @@ class SocialCubit extends Cubit<SocialState> {
     return coverUrl;
   }
 
-  /// Pick and upload a cover image, then update the user's cover photo
+  // Pick and upload a cover image, then update user's cover photo in Firestore
   Future<String?> pickAndUploadCoverImage() async {
     File? returnedCoverImage = await pickImage();
     if (returnedCoverImage != null) {
@@ -296,7 +320,7 @@ class SocialCubit extends Cubit<SocialState> {
     return null;
   }
 
-  /// Upload a post image to Firebase Storage and return its URL
+  // Upload a post image to Firebase Storage and return its URL
   Future<String?> _uploadPostImage({required File file}) async {
     emit(CreatePostLoadingState());
     String? postUrl;
@@ -316,6 +340,7 @@ class SocialCubit extends Cubit<SocialState> {
     return postUrl;
   }
 
+  // Search for users by username substring query, case-insensitive, limited to 20 users
   Future<List<UserModel>?> searchUsers(String query) async {
     emit(SearchUsersLoadingState());
     if (query.trim().isEmpty) return [];
@@ -341,7 +366,7 @@ class SocialCubit extends Cubit<SocialState> {
     }
   }
 
-  /// Create a new post in Firestore
+  // Create a new post in Firestore
   Future<void> _createPost(CreatePostImplModel createPostImplModel) async {
     emit(CreatePostLoadingState());
     PostModel postModel = PostModel(
@@ -359,7 +384,7 @@ class SocialCubit extends Cubit<SocialState> {
       postImagePicked = null;
       emit(CreatePostSuccessState());
 
-      // Refresh posts after successfully adding a new post
+      // Refresh posts after successfully creating a new post
       getMyUserPosts(userModel!.uid);
       await getTimelinePosts();
     } catch (err) {
@@ -367,12 +392,13 @@ class SocialCubit extends Cubit<SocialState> {
     }
   }
 
-  // File for the picked post image
+  // Picked post image file
   File? postImagePicked;
-  // Controller for the post content text field
+
+  // Controller for the post content field
   TextEditingController postContentController = TextEditingController();
 
-  /// Create a post with a photo (and optional content)
+  // Create a post with photo (and optional content)
   Future<void> createPostWithPhoto(
       {required String? postContent,
       required DateTime dateTime,
@@ -391,13 +417,13 @@ class SocialCubit extends Cubit<SocialState> {
     }
   }
 
-  /// Remove the picked post image file
+  // Remove the picked post image file
   void removePickedFile() {
     postImagePicked = null;
     emit(RemovePickedFile());
   }
 
-  /// Create a post with only content (no image)
+  // Create a post with only content (without image)
   Future<void> createPostWithContentOnly(
       {required String? postContent,
       required DateTime dateTime,
@@ -411,13 +437,14 @@ class SocialCubit extends Cubit<SocialState> {
     await _createPost(createPostImplModel);
   }
 
-  /// Remove the post image and clear the post content
+  // Remove the post image and clear the post content text field during post creation
   void cancelPostDuringCreating() {
     postImagePicked = null;
     postContentController.text = '';
     emit(RemovePostState());
   }
 
+  // Delete a post from Firestore, then refresh post lists
   Future<void> deletePost(String postId) async {
     try {
       await _postCollectionRef.doc(postId).delete();
@@ -429,10 +456,9 @@ class SocialCubit extends Cubit<SocialState> {
     }
   }
 
-  //!
+  // Get UIDs of all users who liked a specific post
   Future<List<String>> _getUsersLikesUidInPost({required String postId}) async {
     List<String> usersLikesUid = [];
-    // Access the document(post) from Firestore
     DocumentReference postDocRef = _postCollectionRef.doc(postId);
     var likeCollectionInThePostCollection =
         await postDocRef.collection(kLikesCollection).get();
@@ -443,7 +469,10 @@ class SocialCubit extends Cubit<SocialState> {
     return usersLikesUid;
   }
 
+  // List of user models for users who liked a post
   List<UserModel> userModelList = [];
+
+  // Get the user models of all users who liked a specific post
   Future<void> getUsersLikesInPost({required String postId}) async {
     userModelList.clear();
     emit(GetUsersLikesPostLoadingState());
@@ -461,6 +490,7 @@ class SocialCubit extends Cubit<SocialState> {
     }
   }
 
+  // Update the number of comments in a post document in Firestore
   Future<void> updatePostCommentsNum(
       {required int commentsNum, required String postId}) async {
     try {
@@ -471,21 +501,16 @@ class SocialCubit extends Cubit<SocialState> {
     }
   }
 
-  /// Toggle like/unlike for a post.
-  /// If [isLike] is true, add a like; otherwise, remove the like.
+  // Toggle like/unlike for a post (if [isLike] is true, add; else, remove)
   Future<QuerySnapshot<Map<String, dynamic>>> toggleLike(
       {required String postId, required bool isLike}) async {
     emit(ToggleLikeLoadingState());
-    // Access the document(post) from Firestore
     DocumentReference postDocRef = _postCollectionRef.doc(postId);
-    // If the user likes the post, add the user's like model
-    // to the likes collection in the user's UID doc
     if (isLike) {
       LikeUserModel likeUserModel = LikeUserModel(
         profilePhoto: userModel!.photo,
         userName: '${userModel!.firstName} ${userModel!.lastName}',
         like: isLike,
-        // NOTE: This should be a String UID, not FirebaseAuth.instance
         userUid: userModel!.uid,
       );
       try {
@@ -497,9 +522,7 @@ class SocialCubit extends Cubit<SocialState> {
         emit(LikePostFailureState(
             errMessage: 'Like error: ${errMessage.toString()}'));
       }
-    }
-    // If the user unlikes the post, delete the user's like from the collection
-    else {
+    } else {
       try {
         await postDocRef
             .collection(kLikesCollection)
@@ -510,13 +533,13 @@ class SocialCubit extends Cubit<SocialState> {
             errMessage: 'Like error: ${errMessage.toString()}'));
       }
     }
-    // Get the updated likes collection for the post
+    // Refresh likes collection and emit success state
     final likesCollection = await getPostLikes(postId);
     emit(ToggleLikeSuccessState());
     return likesCollection;
   }
 
-  // Get all likes for a given post
+  // Get all like documents for a given post
   Future<QuerySnapshot<Map<String, dynamic>>> getPostLikes(
       String postId) async {
     late QuerySnapshot<Map<String, dynamic>> postLikes;
@@ -533,9 +556,11 @@ class SocialCubit extends Cubit<SocialState> {
     return postLikes;
   }
 
+  // List of user models the current user is following
   List<UserModel> followings = [];
   late int numberOfFollowing;
 
+  // Get the users the current user is following
   Future<QuerySnapshot<Map<String, dynamic>>> getFollowing() async {
     final followingSnapshot = await FirebaseFirestore.instance
         .collection(kUsersCollection)
@@ -552,9 +577,11 @@ class SocialCubit extends Cubit<SocialState> {
     return followingSnapshot;
   }
 
+  // List of user models following the current user
   List<UserModel> followers = [];
   late int numberOfFollowers;
 
+  // Get the users following the current user
   Future<void> getFollowers() async {
     final followersSnapshot = await FirebaseFirestore.instance
         .collection(kUsersCollection)
@@ -570,59 +597,51 @@ class SocialCubit extends Cubit<SocialState> {
     emit(GetFollowersSuccessState());
   }
 
-  // List of all posts fetched from Firestore
+  // Timeline post models and their Firestore IDs
   List<PostModel> freindsPostsModelList = [];
-  // List of post IDs
   List<String> freindsPostsIdList = [];
 
-  /// Fetch all timeline posts (your own and those of followed users) from Firestore.
-  /// Updates [freindsPostsModelList] and [freindsPostsIdList] with latest timeline data.
+  // Fetch timeline posts (user + followings) and update lists
   Future<void> getTimelinePosts() async {
-    // Emit loading state so UI can show progress indicator.
     emit(GetFeedsPostsLoadingState());
 
     try {
-      // Step 1: Get the list of users the current user is following.
-      // (This also refreshes the followings list in memory.)
+      // Step 1: Get the list of followings and their UIDs
       final followingSnapshot = await getFollowing();
 
-      // Step 2: Build a list of UIDs for the followed users.
       List<String> uids = followingSnapshot.docs.map((doc) => doc.id).toList();
 
-      // Step 3: Add the current user's own UID so their posts show up in the timeline as well.
+      // Step 2: Add current user UID
       uids.add(currentUserUid);
 
-      // Step 4: Fetch all posts by the user and their followings, ordered by creation date (newest first).
+      // Step 3: Query posts by all those UIDs
       final postsSnapshot = await FirebaseFirestore.instance
           .collection(kPostsCollection)
           .where('uid', whereIn: uids)
           .orderBy(kCreatedAt, descending: true)
           .get();
 
-      // Step 5: Clear previous cached timeline data.
+      // Step 4: Clear old timeline posts
       freindsPostsModelList.clear();
       freindsPostsIdList.clear();
 
-      // Step 6: Populate lists with the posts' models and IDs.
+      // Step 5: Deserialize all timeline posts
       for (var postDoc in postsSnapshot.docs) {
-        // Parse each Firestore document to a PostModel and store it.
         freindsPostsModelList.add(PostModel.fromJson(postDoc.data()));
         freindsPostsIdList.add(postDoc.id);
       }
 
-      // Step 7: Notify listeners that the posts have successfully loaded.
       emit(GetFeedsPostsSuccessState());
     } catch (error) {
-      // If an error occurs (network, parsing, Firestore), emit failure state with error details.
       emit(GetFeedsPostsFailureState(errMessage: error.toString()));
     }
   }
 
-  // List of all posts fetched from Firestore
+  // User's own post models and their Firestore IDs
   List<PostModel> myPostsModelList = [];
-  // List of post IDs
   List<String> myPostsIdList = [];
 
+  // Fetch all posts by a specific user UID
   Future<void> getMyUserPosts(String uid) async {
     emit(GetMyPostsLoading());
     try {
@@ -645,15 +664,15 @@ class SocialCubit extends Cubit<SocialState> {
     }
   }
 
+  // Log out the user and clear all cached user data
   Future<void> logOut() async {
     emit(LogOutLoadingState());
     try {
       await FirebaseAuth.instance.signOut();
       await CacheHelper.deleteCash(key: kUidToken);
-      // Clear user data when logging out to prevent showing old user data after new login
+      // Clear all local and model user data to prevent data bleed between sessions
       userModel = null;
       uidTokenCache = null;
-      // Clear other user-related data
       myPostsModelList.clear();
       myPostsIdList.clear();
       freindsPostsModelList.clear();
@@ -662,7 +681,7 @@ class SocialCubit extends Cubit<SocialState> {
       followings.clear();
       emit(LogOutSuccessState());
     } on Exception catch (e) {
-      emit(LogOutFailureState(errMessage: e.toString()));
+      emit(LogOutFailureState(errMessage:'error during logout :  ${e.toString()}'));
     }
   }
 }

@@ -52,22 +52,23 @@ class NewPostBottomActionButtons extends StatelessWidget {
           ),
         ),
         // Expanded widget for the "#tags" button.
-        Expanded(
-          child: InkWell(
-            // Currently, tapping this button does nothing.
-            onTap: () {},
-            child: SizedBox(
-              height: 50,
-              child: Center(
-                child: Text(
-                  '#tags',
-                  style: FontsStyle.font18PopinWithShadowOption(
-                      color: defaultColorButton),
-                ),
-              ),
-            ),
-          ),
-        ),
+        // TODO: Add Tages
+        // Expanded(
+        //   child: InkWell(
+        //     // Currently, tapping this button does nothing.
+        //     onTap: () {},
+        //     child: SizedBox(
+        //       height: 50,
+        //       child: Center(
+        //         child: Text(
+        //           '#tags',
+        //           style: FontsStyle.font18PopinWithShadowOption(
+        //               color: defaultColorButton),
+        //         ),
+        //       ),
+        //     ),
+        //   ),
+        // ),
       ],
     );
   }

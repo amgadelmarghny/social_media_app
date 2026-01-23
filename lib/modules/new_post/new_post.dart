@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/modules/new_post/widgets/new_post_body.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
+import 'package:social_media_app/shared/components/show_toast.dart';
 import 'package:social_media_app/shared/style/theme/constant.dart';
 import 'package:social_media_app/shared/style/theme/theme.dart';
 import '../../shared/style/fonts/font_style.dart';
@@ -17,7 +18,12 @@ class CreatePostSheet extends StatelessWidget {
     return Container(
       decoration: themeColor(),
       padding: const EdgeInsets.only(top: 40),
-      child: BlocBuilder<SocialCubit, SocialState>(
+      child: BlocConsumer<SocialCubit, SocialState>(
+        listener: (context, state) {
+          if (state is PickImageFailureState) {
+            showToast(msg: state.errMessage, toastState: ToastState.worrning);
+          }
+        },
         builder: (BuildContext context, SocialState state) {
           return Scaffold(
             appBar: AppBar(

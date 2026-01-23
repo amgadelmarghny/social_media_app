@@ -4,8 +4,8 @@ import 'package:skeletonizer/skeletonizer.dart';
 import 'package:social_media_app/modules/my_account/widgets/custom_cover_and_image_profile.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 
-class UserProfileAndCoverImageSection extends StatelessWidget {
-  const UserProfileAndCoverImageSection({
+class UserProfileImageAndCoverImageSection extends StatelessWidget {
+  const UserProfileImageAndCoverImageSection({
     super.key,
     required this.profileImage,
     required this.profileCover,
@@ -23,7 +23,7 @@ class UserProfileAndCoverImageSection extends StatelessWidget {
           children: [
             CustomCoverAndImageProfile(
               profileImage: profileImage,
-              profileCover: profileImage,
+              profileCover: profileCover,
               isUsedInMyAccount:
                   context.read<SocialCubit>().userModel?.uid == uid,
             ),

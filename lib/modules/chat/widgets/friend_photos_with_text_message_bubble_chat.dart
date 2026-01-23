@@ -1,8 +1,6 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:hugeicons/hugeicons.dart';
-import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:intl/intl.dart';
+import 'package:social_media_app/modules/chat/widgets/custom_gradle_images_message.dart';
 import 'package:social_media_app/shared/components/custom_read_more_text.dart';
 
 /// A chat bubble widget for displaying the current user's photos (optionally with text).
@@ -55,39 +53,7 @@ class FriendPhotosWithText extends StatelessWidget {
               Container(
                 // Cap the grid width to prevent overflow.
                 constraints: const BoxConstraints(maxWidth: 250),
-                child: GridView.builder(
-                  shrinkWrap: true, // Enables GridView inside Column.
-                  physics:
-                      const NeverScrollableScrollPhysics(), // Disable inner scroll.
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    // Use 2 columns for 2+ images, or just 1.
-                    crossAxisCount: images.length >= 2 ? 2 : 1,
-                    crossAxisSpacing:
-                        5, // Space horizontally between grid tiles.
-                    mainAxisSpacing: 5, // Space vertically between grid tiles.
-                  ),
-                  itemCount: images.length,
-                  itemBuilder: (context, index) {
-                    return ClipRRect(
-                      borderRadius: BorderRadius.circular(
-                          15), // Round corners for images.
-                      child: CachedNetworkImage(
-                        imageUrl: images[index], // The image URL for display.
-                        fit: BoxFit.cover, // Clip and zoom to fill box.
-                        placeholder: (context, url) => Center(
-                          child: CircularProgressIndicator(
-                            backgroundColor: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        ),
-                        errorWidget: (context, url, error) => const HugeIcon(
-                          icon: HugeIconsStrokeRounded
-                              .alert02, // Error icon if image fails.
-                        ),
-                      ),
-                    );
-                  },
-                ),
+                child: CustomGradleImagesMessage(images: images),
               ),
             // Show text message if not null.
             if (message != null)

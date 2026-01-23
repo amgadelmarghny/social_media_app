@@ -38,7 +38,7 @@ class EditProfileView extends StatelessWidget {
               ),
               actions: [
                 IconButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (socialCubit.firstNameController.text.isNotEmpty ||
                         socialCubit.lastNameController.text.isNotEmpty ||
                         socialCubit.bioController.text.isNotEmpty ||
@@ -46,13 +46,20 @@ class EditProfileView extends StatelessWidget {
                         socialCubit.updatedDayAndMonth != null) {
                       UpdateUserImplModel updateUserImplModel =
                           UpdateUserImplModel(
-                        firstName: socialCubit.firstNameController.text,
-                        lastName: socialCubit.lastNameController.text,
-                        bio: socialCubit.bioController.text,
+                        firstName:
+                            socialCubit.firstNameController.text.isNotEmpty
+                                ? socialCubit.firstNameController.text
+                                : null,
+                        lastName: socialCubit.lastNameController.text.isNotEmpty
+                            ? socialCubit.lastNameController.text
+                            : null,
+                        bio: socialCubit.bioController.text.isNotEmpty
+                            ? socialCubit.bioController.text
+                            : null,
                         year: socialCubit.updatedYear,
                         dateAndMonth: socialCubit.updatedDayAndMonth,
                       );
-                      socialCubit.updateUserInfo(
+                      await socialCubit.updateUserInfo(
                           updateUserImplModel: updateUserImplModel);
                     }
                   },

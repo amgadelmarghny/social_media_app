@@ -7,6 +7,7 @@ import 'package:social_media_app/models/post_model.dart';
 import 'package:social_media_app/modules/post/post_view.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/components/custom_read_more_text.dart';
+import 'package:social_media_app/shared/components/image_viewer_screen.dart';
 import 'package:social_media_app/shared/components/post_item_image.dart';
 import '../../modules/feeds/widgets/interactive_row.dart';
 import '../../modules/feeds/widgets/profile_post_row.dart';
@@ -115,7 +116,18 @@ class _PostItemState extends State<PostItem> {
                 //   ],
                 // ),
                 if (widget.postModel.postImage != null)
-                  PostItemImage(postImage: widget.postModel.postImage!),
+                  GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ImageViewerScreen(
+                                imageUrl: widget.postModel.postImage!),
+                          ),
+                        );
+                      },
+                      child: PostItemImage(
+                          postImage: widget.postModel.postImage!)),
                 InteractiveRow(
                   numOfLikes: likesCollection?.docs.length ?? 0,
                   isLike: isLike,

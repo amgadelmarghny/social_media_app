@@ -1,84 +1,95 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
+import 'package:social_media_app/shared/components/image_viewer_screen.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
 
 class ProfileImageMenuItem extends StatelessWidget {
-  const ProfileImageMenuItem({super.key, required this.isUsedInMyAccount});
+  const ProfileImageMenuItem(
+      {super.key, required this.isUsedInMyAccount, required this.imageUrl});
   final bool isUsedInMyAccount;
+  final String? imageUrl;
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        GestureDetector(
-          onTap: () {
-            if (isUsedInMyAccount) {
+        if (isUsedInMyAccount)
+          GestureDetector(
+            onTap: () {
               BlocProvider.of<SocialCubit>(context).pickAndUploadProfileImage();
               Navigator.pop(context);
-            }
-          },
-          child: Container(
-            height: 50,
-            color: const Color(0xff8862D9),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircleAvatar(
-                  backgroundColor: Colors.white.withValues(alpha: 0.3),
-                  radius: 15,
-                  child: const Icon(Icons.file_upload_sharp),
-                ),
-                const SizedBox(
-                  width: 5,
-                ),
-                Text(
-                  'Upload photo',
-                  style: FontsStyle.font18PopinWithShadowOption(),
-                )
-              ],
-            ),
-          ),
-        ),
-        GestureDetector(
-          onTap: () {},
-          child: Container(
-            height: 50,
-            color: const Color(0xffA879E2),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircleAvatar(
-                  backgroundColor: Colors.white.withValues(alpha: 0.3),
-                  radius: 15,
-                  child: const Icon(
-                    Icons.photo_outlined,
-                    size: 22.5,
+            },
+            child: Container(
+              height: 50,
+              color: const Color(0xff8862D9),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircleAvatar(
+                    backgroundColor: Colors.white.withValues(alpha: 0.3),
+                    radius: 15,
+                    child: const Icon(Icons.file_upload_sharp),
                   ),
-                ),
-                const SizedBox(
-                  width: 5,
-                ),
-                Text(
-                  'See profile photo',
-                  style: FontsStyle.font18PopinWithShadowOption(),
-                )
-              ],
-            ),
-          ),
-        ),
-        GestureDetector(
-          onTap: () {},
-          child: Container(
-            height: 50,
-            color: const Color(0xffD197ED),
-            child: Center(
-              child: Text(
-                'View story',
-                style: FontsStyle.font18PopinWithShadowOption(),
+                  const SizedBox(
+                    width: 5,
+                  ),
+                  Text(
+                    'Upload photo',
+                    style: FontsStyle.font18PopinWithShadowOption(),
+                  )
+                ],
               ),
             ),
           ),
-        ),
+        if (imageUrl != null)
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ImageViewerScreen(imageUrl: imageUrl!),
+                ),
+              );
+            },
+            child: Container(
+              height: 50,
+              color: const Color(0xffA879E2),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircleAvatar(
+                    backgroundColor: Colors.white.withValues(alpha: 0.3),
+                    radius: 15,
+                    child: const Icon(
+                      Icons.photo_outlined,
+                      size: 22.5,
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 5,
+                  ),
+                  Text(
+                    'See profile photo',
+                    style: FontsStyle.font18PopinWithShadowOption(),
+                  )
+                ],
+              ),
+            ),
+          ),
+        // TODO: add store feature
+        // GestureDetector(
+        //   onTap: () {},
+        //   child: Container(
+        //     height: 50,
+        //     color: const Color(0xffD197ED),
+        //     child: Center(
+        //       child: Text(
+        //         'View story',
+        //         style: FontsStyle.font18PopinWithShadowOption(),
+        //       ),
+        //     ),
+        //   ),
+        // ),
       ],
     );
   }

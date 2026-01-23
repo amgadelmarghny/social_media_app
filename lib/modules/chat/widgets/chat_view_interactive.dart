@@ -39,6 +39,9 @@ class ChatViewInteracrive extends StatelessWidget {
           if (state is UploadImageFailure) {
             showToast(msg: state.errMessage, toastState: ToastState.error);
           }
+          if (state is PickImageFailureState) {
+            showToast(msg: state.errMessage, toastState: ToastState.worrning);
+          }
         },
         builder: (context, state) {
           // Get the chat cubit from BlocProvider

@@ -23,15 +23,14 @@ class UpdateUserImplModel {
 
   Map<Object, Object?> toMap(UserModel userModel) {
     return {
-      'firstName': firstName!.isNotEmpty ? firstName : userModel.firstName,
-      'lastName': lastName!.isNotEmpty ? lastName : userModel.lastName,
-      'dateAndMonth':
-          dateAndMonth ?? userModel.dateAndMonth,
+      'firstName': firstName ?? userModel.firstName,
+      'lastName': lastName ?? userModel.lastName,
+      'dateAndMonth': dateAndMonth ?? userModel.dateAndMonth,
       'year': year ?? userModel.year,
       'gender': gender ?? userModel.gender,
       'photo': photo ?? userModel.photo,
       'cover': cover ?? userModel.cover,
-      'bio': bio!.isNotEmpty ? bio : userModel.bio,
+      'bio': bio ?? userModel.bio,
     };
   }
 }

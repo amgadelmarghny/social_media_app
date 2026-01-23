@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -283,11 +284,23 @@ class ChatCubit extends Cubit<ChatState> {
   /// Opens gallery picker dialog for user to select images; saves the results for preview and upload
   Future<void> pickImagesForPreview(BuildContext context) async {
     PermissionStatus status;
-    // Different permission on Android 13+ (photos) vs <= Android 12 (storage)
-    if (Platform.isAndroid && (await _getAndroidVersion()) >= 13) {
-      status = await Permission.photos.request(); // Android 13+
+
+    // Logic to handle different permissions based on Android API levels
+    if (Platform.isAndroid) {
+      final androidVersion = await _getAndroidVersion();
+
+      if (androidVersion >= 33) {
+        // Android 13 (API 33) and above uses [Permission.photos]
+        // This maps to READ_MEDIA_IMAGES in the Manifest
+        status = await Permission.photos.request();
+      } else {
+        // Android 12 (API 32) and below uses [Permission.storage]
+        // This maps to READ_EXTERNAL_STORAGE in the Manifest
+        status = await Permission.storage.request();
+      }
     } else {
-      status = await Permission.storage.request(); // Android 12 and below
+      // For iOS and other platforms
+      status = await Permission.photos.request();
     }
 
     // After checking permission status...
@@ -319,16 +332,24 @@ class ChatCubit extends Cubit<ChatState> {
     } else if (status.isPermanentlyDenied) {
       // If user blocked permission, direct to settings
       openAppSettings();
+    } else {
+      // Permission denied (not permanent).
+      emit(PickImageFailureState(
+          errMessage: "Gallery access permission denied"));
     }
   }
 
-  /// Helper for Android: read OS major version; used for correct permission request
+  /// Helper function to get the correct SDK version
   Future<int> _getAndroidVersion() async {
     if (Platform.isAndroid) {
-      return int.parse(Platform.version.split(' ')[0].split('.')[0]);
-      // Note: device_info_plus is more robust for SDK version if you need exact information
+      // Create an instance of DeviceInfoPlugin
+      final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+      // Get android specific information
+      final AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      // return the actual SDK integer (e.g., 33, 34, 31)
+      return androidInfo.version.sdkInt;
     }
-    return 0; // Not android
+    return 0;
   }
 
   /// Remove a single image from local preview (before sending), update UI

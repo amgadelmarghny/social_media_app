@@ -85,6 +85,14 @@ final class VoicePlayingStarted extends ChatState {
 
 final class PickImageLoadingState extends ChatState {}
 
+final class PickImageFailureState extends ChatState {
+  final String errMessage;
+
+  const PickImageFailureState({required this.errMessage});
+  @override
+  List<Object> get props => [errMessage];
+}
+
 final class UpdatePickedImagesState extends ChatState {}
 
 final class UploadImageLoading extends ChatState {}
