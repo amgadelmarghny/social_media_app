@@ -82,7 +82,7 @@ class CommentsSheetBody extends StatelessWidget {
                 top: 5,
                 right: 15,
                 left: 15,
-                bottom: MediaQuery.paddingOf(context).bottom,
+                bottom: MediaQuery.paddingOf(context).bottom + 5,
               ),
               child: AddCommentButton(
                 postId: postId,

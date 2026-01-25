@@ -6,6 +6,7 @@ import 'package:social_media_app/models/comment_model.dart';
 import 'package:social_media_app/models/user_model.dart';
 import 'package:social_media_app/modules/user/user_view.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
+import 'package:social_media_app/shared/components/image_viewer_screen.dart';
 import 'package:social_media_app/shared/components/profile_picture_with_story.dart';
 import '../style/fonts/font_style.dart';
 import 'custom_time_ago.dart';
@@ -99,25 +100,38 @@ class CommentItem extends StatelessWidget {
                               color: Colors.grey.shade600),
                         ),
                       if (commentModel.commentPhoto != null)
-                        Container(
-                          clipBehavior: Clip.hardEdge,
-                          margin: const EdgeInsets.symmetric(vertical: 5),
-                          decoration: const BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
-                          ),
-                          child: CachedNetworkImage(
-                            fit: BoxFit.cover,
-                            imageUrl: commentModel.commentPhoto!,
-                            placeholder: (context, url) => const Center(
-                              child: CircularProgressIndicator(),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ImageViewerScreen(
+                                    imageUrl: commentModel.commentPhoto!),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            clipBehavior: Clip.hardEdge,
+                            margin: const EdgeInsets.symmetric(vertical: 5),
+                            decoration: const BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
                             ),
-                            errorWidget: (context, url, error) => const Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Center(
-                                child: Icon(
-                                  Icons.error_outline,
-                                  size: 30,
-                                  color: Colors.red,
+                            child: CachedNetworkImage(
+                              fit: BoxFit.cover,
+                              imageUrl: commentModel.commentPhoto!,
+                              placeholder: (context, url) => const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                              errorWidget: (context, url, error) =>
+                                  const Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Center(
+                                  child: Icon(
+                                    Icons.error_outline,
+                                    size: 30,
+                                    color: Colors.red,
+                                  ),
                                 ),
                               ),
                             ),
@@ -126,39 +140,39 @@ class CommentItem extends StatelessWidget {
                     ],
                   ),
                 ),
-                Row(
-                  children: [
-                    Text(
-                      timeAgo(commentModel.dateTime),
-                      style: FontsStyle.font18PopinWithShadowOption(
-                          isShadow: true),
-                    ),
-                    const Spacer(),
-                    TextButton(
-                      onPressed: () {
+                // Row(
+                //   children: [
+                //     Text(
+                //       timeAgo(commentModel.dateTime),
+                //       style: FontsStyle.font18PopinWithShadowOption(
+                //           isShadow: true),
+                //     ),
+                //     const Spacer(),
+                //     TextButton(
+                //       onPressed: () {
                         //TODO: Add Like Comment
-                      },
-                      child: Text(
-                        'Like',
-                        style: FontsStyle.font18PopinWithShadowOption(
-                            isShadow: true),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 15,
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        //TODO: Add reply Comment
-                      },
-                      child: Text(
-                        'Reply',
-                        style: FontsStyle.font18PopinWithShadowOption(
-                            isShadow: true),
-                      ),
-                    ),
-                  ],
-                )
+                //       },
+                //       child: Text(
+                //         'Like',
+                //         style: FontsStyle.font18PopinWithShadowOption(
+                //             isShadow: true),
+                //       ),
+                //     ),
+                //     const SizedBox(
+                //       width: 15,
+                //     ),
+                //     TextButton(
+                //       onPressed: () {
+                         //TODO: Add reply Comment
+                //       },
+                //       child: Text(
+                //         'Reply',
+                //         style: FontsStyle.font18PopinWithShadowOption(
+                //             isShadow: true),
+                //       ),
+                //     ),
+                 // ],
+              //   )
               ],
             ),
           )

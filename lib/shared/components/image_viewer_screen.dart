@@ -13,10 +13,13 @@ class ImageViewerScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black, // Professional solid black background for focus on image
+      backgroundColor: Colors
+          .black, // Professional solid black background for focus on image
       appBar: AppBar(
-        backgroundColor: Colors.black, // App bar matches background for seamless look
-        iconTheme: const IconThemeData(color: Colors.white), // White icons for contrast
+        backgroundColor:
+            Colors.black, // App bar matches background for seamless look
+        iconTheme: const IconThemeData(
+            color: Colors.white), // White icons for contrast
       ),
       body: Center(
         // Center the image and allow zoom/pan with InteractiveViewer

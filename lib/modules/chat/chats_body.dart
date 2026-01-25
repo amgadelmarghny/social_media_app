@@ -42,64 +42,66 @@ class _ChatsBodyState extends State<ChatsBody> {
 
   @override
   Widget build(BuildContext context) {
-    return NotificationListener<ScrollNotification>(
-      // Listen for user scroll updates to reset bottom padding as the user scrolls up
-      onNotification: (scrollNotification) {
-        if (scrollNotification is ScrollUpdateNotification) {
-          // When the user scrolls up, i.e., reveals more earlier items,
-          // restore the bottom padding to the default
-          if (_scrollController.position.userScrollDirection ==
-              ScrollDirection.forward) {
-            setState(() {
-              _bodiesBottomPadding = 36;
-            });
-          }
-        }
-        return true;
-      },
-      child: Padding(
-        // Apply dynamic padding to create smooth UX when navigating list edge
-        padding: EdgeInsets.only(
-            top: 10, left: 20, right: 20, bottom: _bodiesBottomPadding),
-        child: BlocBuilder<ChatCubit, ChatState>(
-          // Only rebuild the list for chat-related loading/success/failure
-          buildWhen: (previous, current) =>
-              current is GetChatsSuccessState ||
-              current is GetChatsLoadingState ||
-              current is GetChatsFailureState,
-          builder: (context, state) {
-            // If chat item list is empty, show a placeholder image
-            if (BlocProvider.of<ChatCubit>(context).chatItemsList.isEmpty) {
-              return const Center(
-                child: Image(
-                  image: AssetImage('lib/assets/images/empty_box.png'),
-                  height: 200,
-                ),
-              );
+    return SafeArea(
+      child: NotificationListener<ScrollNotification>(
+        // Listen for user scroll updates to reset bottom padding as the user scrolls up
+        onNotification: (scrollNotification) {
+          if (scrollNotification is ScrollUpdateNotification) {
+            // When the user scrolls up, i.e., reveals more earlier items,
+            // restore the bottom padding to the default
+            if (_scrollController.position.userScrollDirection ==
+                ScrollDirection.forward) {
+              setState(() {
+                _bodiesBottomPadding = 36;
+              });
             }
-            // Otherwise, display the list of chat previews,
-            // optionally skeletonized if still loading (shimmer effect)
-            return ListView.separated(
-              controller: _scrollController,
-              itemCount:
-                  BlocProvider.of<ChatCubit>(context).chatItemsList.length,
-              // Each row is wrapped in two Skeletonizer widgets to emulate loading states
-              itemBuilder: (context, index) => Skeletonizer(
-                enabled: state is GetChatsLoadingState,
-                child: Skeletonizer(
+          }
+          return true;
+        },
+        child: Padding(
+          // Apply dynamic padding to create smooth UX when navigating list edge
+          padding: EdgeInsets.only(
+              top: 10, left: 20, right: 20, bottom: _bodiesBottomPadding),
+          child: BlocBuilder<ChatCubit, ChatState>(
+            // Only rebuild the list for chat-related loading/success/failure
+            buildWhen: (previous, current) =>
+                current is GetChatsSuccessState ||
+                current is GetChatsLoadingState ||
+                current is GetChatsFailureState,
+            builder: (context, state) {
+              // If chat item list is empty, show a placeholder image
+              if (BlocProvider.of<ChatCubit>(context).chatItemsList.isEmpty) {
+                return const Center(
+                  child: Image(
+                    image: AssetImage('lib/assets/images/empty_box.png'),
+                    height: 200,
+                  ),
+                );
+              }
+              // Otherwise, display the list of chat previews,
+              // optionally skeletonized if still loading (shimmer effect)
+              return ListView.separated(
+                controller: _scrollController,
+                itemCount:
+                    BlocProvider.of<ChatCubit>(context).chatItemsList.length,
+                // Each row is wrapped in two Skeletonizer widgets to emulate loading states
+                itemBuilder: (context, index) => Skeletonizer(
                   enabled: state is GetChatsLoadingState,
-                  child: ChatItem(
-                    chatItemModel: BlocProvider.of<ChatCubit>(context)
-                        .chatItemsList[index],
+                  child: Skeletonizer(
+                    enabled: state is GetChatsLoadingState,
+                    child: ChatItem(
+                      chatItemModel: BlocProvider.of<ChatCubit>(context)
+                          .chatItemsList[index],
+                    ),
                   ),
                 ),
-              ),
-              // Add a gap between chat preview items
-              separatorBuilder: (context, index) => const SizedBox(
-                height: 5,
-              ),
-            );
-          },
+                // Add a gap between chat preview items
+                separatorBuilder: (context, index) => const SizedBox(
+                  height: 5,
+                ),
+              );
+            },
+          ),
         ),
       ),
     );

@@ -36,28 +36,30 @@ class _NotificationsBodyState extends State<NotificationsBody> {
 
   @override
   Widget build(BuildContext context) {
-    return NotificationListener<ScrollNotification>(
-      // Listen for scroll updates to adjust bottom padding
-      onNotification: (scrollNotification) {
-        if (scrollNotification is ScrollUpdateNotification) {
-          // If the user scrolls up (forward), reset the bottom padding.
-          if (_scrollController.position.userScrollDirection ==
-              ScrollDirection.forward) {
-            setState(() {
-              _bodiesBottomPadding = 36;
-            });
+    return SafeArea(
+      child: NotificationListener<ScrollNotification>(
+        // Listen for scroll updates to adjust bottom padding
+        onNotification: (scrollNotification) {
+          if (scrollNotification is ScrollUpdateNotification) {
+            // If the user scrolls up (forward), reset the bottom padding.
+            if (_scrollController.position.userScrollDirection ==
+                ScrollDirection.forward) {
+              setState(() {
+                _bodiesBottomPadding = 36;
+              });
+            }
           }
-        }
-        return true;
-      },
-      child: Padding(
-        padding: EdgeInsets.only(
-            top: 10, left: 20, right: 20, bottom: _bodiesBottomPadding),
-        child: Center(
-          child: Text(
-            'This feature will be available soon',
-            style: FontsStyle.font22Bold(color: Colors.white),
-            textAlign: TextAlign.center,
+          return true;
+        },
+        child: Padding(
+          padding: EdgeInsets.only(
+              top: 10, left: 20, right: 20, bottom: _bodiesBottomPadding),
+          child: Center(
+            child: Text(
+              'This feature will be available soon',
+              style: FontsStyle.font22Bold(color: Colors.white),
+              textAlign: TextAlign.center,
+            ),
           ),
         ),
       ),

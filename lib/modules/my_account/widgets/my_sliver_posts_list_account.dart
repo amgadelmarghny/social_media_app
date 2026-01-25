@@ -23,7 +23,7 @@ class MySliverPostsListAccount extends StatelessWidget {
               enabled:
                   state is GetMyDataLoadingState || state is GetMyPostsLoading,
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: socialCubit.myPostsModelList.isNotEmpty
                     ? PostItem(
                         postModel: socialCubit.myPostsModelList[index],

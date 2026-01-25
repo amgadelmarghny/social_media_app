@@ -175,7 +175,7 @@ class _PostViewBodyState extends State<PostViewBody> {
             padding: EdgeInsets.only(
               right: 15,
               left: 15,
-              bottom: MediaQuery.paddingOf(context).bottom,
+              bottom: MediaQuery.paddingOf(context).bottom + 5,
             ),
             child: AddCommentButton(
               postId: widget.postId,

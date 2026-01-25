@@ -94,199 +94,205 @@ class _FeedsBodyState extends State<FeedsBody> {
     }
 
     // NotificationListener is used to dynamically change feed padding when scrolling up
-    return NotificationListener<ScrollNotification>(
-      onNotification: (scrollNotification) {
-        // If user scrolls UP, reduce padding to show more feed
-        if (scrollNotification is ScrollUpdateNotification) {
-          if (_scrollController.position.userScrollDirection ==
-              ScrollDirection.forward) {
-            setState(() {
-              _bodiesBottomPadding = 36;
-            });
+    return SafeArea(
+      child: NotificationListener<ScrollNotification>(
+        onNotification: (scrollNotification) {
+          // If user scrolls UP, reduce padding to show more feed
+          if (scrollNotification is ScrollUpdateNotification) {
+            if (_scrollController.position.userScrollDirection ==
+                ScrollDirection.forward) {
+              setState(() {
+                _bodiesBottomPadding = 36;
+              });
+            }
           }
-        }
-        return true;
-      },
-      child: Padding(
-        // Main screen padding; bottom is dynamic for better UX
-        padding: EdgeInsets.only(
-          top: 10,
-          left: 20,
-          right: 20,
-          bottom: _bodiesBottomPadding,
-        ),
-        child: BlocConsumer<SocialCubit, SocialState>(
-          // Listen for side effects to show toasts, reset create post, etc.
-          listener: (BuildContext context, SocialState state) {
-            if (state is CreatePostSuccessState) {
-              BlocProvider.of<SocialCubit>(context).cancelPostDuringCreating();
-              showToast(
-                  msg: 'Post added successfully',
-                  toastState: ToastState.success);
-            }
-            if (state is UploadPostImageFailureState) {
-              showToast(msg: state.errMessage, toastState: ToastState.error);
-            }
-            if (state is LikePostFailureState) {
-              showToast(msg: state.errMessage, toastState: ToastState.error);
-            }
-            if (state is CreatePostFailureState) {
-              showToast(msg: state.errMessage, toastState: ToastState.error);
-            }
-            if (state is SearchUsersFailureState) {
-              showToast(msg: state.errMessage, toastState: ToastState.error);
-            }
-          },
-          builder: (BuildContext context, SocialState state) {
-            // Get the current SocialCubit
-            SocialCubit socialCubit = BlocProvider.of<SocialCubit>(context);
+          return true;
+        },
+        child: Padding(
+          // Main screen padding; bottom is dynamic for better UX
+          padding: EdgeInsets.only(
+            top: 10,
+            left: 20,
+            right: 20,
+            bottom: _bodiesBottomPadding,
+          ),
+          child: BlocConsumer<SocialCubit, SocialState>(
+            // Listen for side effects to show toasts, reset create post, etc.
+            listener: (BuildContext context, SocialState state) {
+              if (state is CreatePostSuccessState) {
+                BlocProvider.of<SocialCubit>(context)
+                    .cancelPostDuringCreating();
+                showToast(
+                    msg: 'Post added successfully',
+                    toastState: ToastState.success);
+              }
+              if (state is UploadPostImageFailureState) {
+                showToast(msg: state.errMessage, toastState: ToastState.error);
+              }
+              if (state is LikePostFailureState) {
+                showToast(msg: state.errMessage, toastState: ToastState.error);
+              }
+              if (state is CreatePostFailureState) {
+                showToast(msg: state.errMessage, toastState: ToastState.error);
+              }
+              if (state is SearchUsersFailureState) {
+                showToast(msg: state.errMessage, toastState: ToastState.error);
+              }
+            },
+            builder: (BuildContext context, SocialState state) {
+              // Get the current SocialCubit
+              SocialCubit socialCubit = BlocProvider.of<SocialCubit>(context);
 
-            return Stack(
-              children: [
-                /// Skeletonizer will show a loading skeleton if user data is null.
-                /// Acts as a shimmer loading effect on initial feed load.
-                Skeletonizer(
-                  enabled: socialCubit.userModel == null,
-                  child: CustomRefreshIndicator(
-                    onRefresh: handleRefresh,
-                    child: CustomScrollView(
-                      controller: _scrollController,
-                      slivers: [
-                        // Show email verification banner if user is not verified
-                        if (BlocProvider.of<SocialCubit>(context)
-                                .userVerification
-                                ?.emailVerified ==
-                            false)
-                          const SliverToBoxAdapter(
-                              child: VerifyEmailContainer()),
+              return Stack(
+                children: [
+                  /// Skeletonizer will show a loading skeleton if user data is null.
+                  /// Acts as a shimmer loading effect on initial feed load.
+                  Skeletonizer(
+                    enabled: socialCubit.userModel == null,
+                    child: CustomRefreshIndicator(
+                      onRefresh: handleRefresh,
+                      child: CustomScrollView(
+                        controller: _scrollController,
+                        slivers: [
+                          // Show email verification banner if user is not verified
+                          if (BlocProvider.of<SocialCubit>(context)
+                                  .userVerification
+                                  ?.emailVerified ==
+                              false)
+                            const SliverToBoxAdapter(
+                                child: VerifyEmailContainer()),
 
-                        /// Search bar for exploring users; triggers onSearchChanged
-                        SliverToBoxAdapter(
-                          child: SearchBar(
-                            textStyle: WidgetStateProperty.all(
-                              const TextStyle(color: Colors.white),
-                            ),
-                            textInputAction: TextInputAction.search,
-                            hintText: 'Explore',
-                            onChanged: onSearchChanged,
-                            controller: _searchController,
-                            leading: Padding(
-                              padding: const EdgeInsets.only(left: 5),
-                              child: state is SearchUsersLoadingState
-                                  ? const SizedBox(
-                                      height: 22,
-                                      width: 22,
-                                      child: CircularProgressIndicator(
+                          /// Search bar for exploring users; triggers onSearchChanged
+                          SliverToBoxAdapter(
+                            child: SearchBar(
+                              textStyle: WidgetStateProperty.all(
+                                const TextStyle(color: Colors.white),
+                              ),
+                              textInputAction: TextInputAction.search,
+                              hintText: 'Explore',
+                              onChanged: onSearchChanged,
+                              controller: _searchController,
+                              leading: Padding(
+                                padding: const EdgeInsets.only(left: 5),
+                                child: state is SearchUsersLoadingState
+                                    ? const SizedBox(
+                                        height: 22,
+                                        width: 22,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : const HugeIcon(
+                                        icon: HugeIcons.strokeRoundedSearch01,
+                                        size: 32,
                                         color: Colors.white,
-                                        strokeWidth: 2,
                                       ),
-                                    )
-                                  : const HugeIcon(
-                                      icon: HugeIcons.strokeRoundedSearch01,
-                                      size: 32,
-                                      color: Colors.white,
-                                    ),
+                              ),
                             ),
                           ),
-                        ),
 
-                        // Space below search bar
-                        const SliverToBoxAdapter(
-                          child: SizedBox(height: 15),
-                        ),
+                          // Space below search bar
+                          const SliverToBoxAdapter(
+                            child: SizedBox(height: 15),
+                          ),
 
-                        // // Stories horizontally scrollable list
-                        // const SliverToBoxAdapter(child: StoryListView()),
+                          // // Stories horizontally scrollable list
+                          // const SliverToBoxAdapter(child: StoryListView()),
 
-                        // // Space below stories
-                        // const SliverToBoxAdapter(
-                        //   child: SizedBox(height: 20),
-                        // ),
+                          // // Space below stories
+                          // const SliverToBoxAdapter(
+                          //   child: SizedBox(height: 20),
+                          // ),
 
-                        // If a new post is being composed, and there is a pending post or error/loading, show the upload preview
-                        if (socialCubit.postContentController.text.isNotEmpty ||
-                            socialCubit.postImagePicked != null)
-                          if (state is CreatePostLoadingState ||
-                              state is UploadPostImageFailureState ||
-                              state is CreatePostFailureState)
-                            const SliverToBoxAdapter(child: UploadPostDemo()),
+                          // If a new post is being composed, and there is a pending post or error/loading, show the upload preview
+                          if (socialCubit
+                                  .postContentController.text.isNotEmpty ||
+                              socialCubit.postImagePicked != null)
+                            if (state is CreatePostLoadingState ||
+                                state is UploadPostImageFailureState ||
+                                state is CreatePostFailureState)
+                              const SliverToBoxAdapter(child: UploadPostDemo()),
 
-                        // Main feed items (list of posts as a SliverList)
-                        const SliverListfeedItems(),
+                          // Main feed items (list of posts as a SliverList)
+                          const SliverListfeedItems(),
 
-                        // Show a call to action message if there are no posts from friends (feed is empty)
-                        if (socialCubit.freindsPostsModelList.isEmpty)
-                          SliverToBoxAdapter(
-                            child: Padding(
-                              padding: EdgeInsets.only(
-                                  top: MediaQuery.sizeOf(context).height / 5),
-                              child: Align(
-                                alignment: Alignment.center,
-                                child: Text(
-                                  'Follow some friends or share your first post ✨',
-                                  textAlign: TextAlign.center,
-                                  style: FontsStyle.font20Poppins,
+                          // Show a call to action message if there are no posts from friends (feed is empty)
+                          if (socialCubit.freindsPostsModelList.isEmpty)
+                            SliverToBoxAdapter(
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                    top: MediaQuery.sizeOf(context).height / 5),
+                                child: Align(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    'Follow some friends or share your first post ✨',
+                                    textAlign: TextAlign.center,
+                                    style: FontsStyle.font20Poppins,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
-                if (_searchController.text.isNotEmpty)
-
-                  /// Dropdown user search suggestions. Only visible when actively searching
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    top: 63,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                      // Height is dynamic: #suggestions * 80, clamped to max 300
-                      height: isSearching && searchResults.isNotEmpty
-                          ? (searchResults.length * 80).toDouble().clamp(0, 300)
-                          : 0,
-                      child: Material(
-                        elevation: 6,
-                        color: defaultColor,
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(12)),
-                        child: ListView.builder(
-                          padding: const EdgeInsets.all(8),
-                          itemCount: searchResults.length,
-                          itemBuilder: (context, index) {
-                            return GestureDetector(
-                              onTap: () async {
-                                FocusScope.of(context).unfocus();
-
-                                // Navigates to the selected user's profile view
-                                await Navigator.pushNamed(
-                                  context,
-                                  UserView.routName,
-                                  arguments: searchResults[index],
-                                );
-                                // After returning from profile, clear suggestions & remove focus
-                                setState(() {
-                                  searchResults.clear();
-                                  isSearching = false;
-                                  _searchController.clear();
-                                });
-                              },
-                              child: UserSuggestionItem(
-                                userModel: searchResults[index],
-                                isFromSearch: true,
-                              ),
-                            );
-                          },
-                        ),
+                        ],
                       ),
                     ),
                   ),
-              ],
-            );
-          },
+                  if (_searchController.text.isNotEmpty)
+
+                    /// Dropdown user search suggestions. Only visible when actively searching
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      top: 63,
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                        // Height is dynamic: #suggestions * 80, clamped to max 300
+                        height: isSearching && searchResults.isNotEmpty
+                            ? (searchResults.length * 80)
+                                .toDouble()
+                                .clamp(0, 300)
+                            : 0,
+                        child: Material(
+                          elevation: 6,
+                          color: defaultColor,
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(12)),
+                          child: ListView.builder(
+                            padding: const EdgeInsets.all(8),
+                            itemCount: searchResults.length,
+                            itemBuilder: (context, index) {
+                              return GestureDetector(
+                                onTap: () async {
+                                  FocusScope.of(context).unfocus();
+
+                                  // Navigates to the selected user's profile view
+                                  await Navigator.pushNamed(
+                                    context,
+                                    UserView.routName,
+                                    arguments: searchResults[index],
+                                  );
+                                  // After returning from profile, clear suggestions & remove focus
+                                  setState(() {
+                                    searchResults.clear();
+                                    isSearching = false;
+                                    _searchController.clear();
+                                  });
+                                },
+                                child: UserSuggestionItem(
+                                  userModel: searchResults[index],
+                                  isFromSearch: true,
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
