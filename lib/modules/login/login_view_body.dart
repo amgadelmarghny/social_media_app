@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/modules/login/widgets/sign_up_navigator_row.dart';
 import 'package:social_media_app/shared/bloc/login_cubit/login_cubit.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
-import 'package:social_media_app/shared/components/auth_icon_list.dart';
 import 'package:social_media_app/shared/components/navigators.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
 import '../../layout/home/home_view.dart';
@@ -87,19 +86,20 @@ class LoginViewBody extends StatelessWidget {
                     height: 15,
                   ),
                 ),
-                SliverToBoxAdapter(
-                  child: Text(
-                    'Or sign in with',
-                    textAlign: TextAlign.center,
-                    style: FontsStyle.font18PopinWithShadowOption(),
-                  ),
-                ),
-                const SliverToBoxAdapter(
-                  child: SizedBox(
-                    height: 10,
-                  ),
-                ),
-                const SliverToBoxAdapter(child: AuthIocnList()),
+                //TODO: Applay sign in with facebock and google.
+                // SliverToBoxAdapter(
+                //   child: Text(
+                //     'Or sign in with',
+                //     textAlign: TextAlign.center,
+                //     style: FontsStyle.font18PopinWithShadowOption(),
+                //   ),
+                // ),
+                // const SliverToBoxAdapter(
+                //   child: SizedBox(
+                //     height: 10,
+                //   ),
+                // ),
+                // const SliverToBoxAdapter(child: AuthIocnList()),
                 const SliverFillRemaining(
                   hasScrollBody: false,
                   child: Align(

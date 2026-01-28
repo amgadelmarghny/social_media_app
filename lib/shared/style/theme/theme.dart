@@ -5,8 +5,9 @@ import '../fonts/font_style.dart';
 
 abstract class CustomThemeMode {
   static final lightTheme = ThemeData(
-
-    indicatorColor: Colors.white,
+    tabBarTheme: TabBarThemeData(
+      indicatorColor: Colors.white, // ✅ Correct location
+    ),
     primaryColor: defaultTextColor,
     scaffoldBackgroundColor: Colors.transparent,
     iconTheme: const IconThemeData(color: Colors.white),

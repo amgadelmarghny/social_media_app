@@ -28,9 +28,9 @@ class CommentItem extends StatelessWidget {
         children: [
           GestureDetector(
             onTap: () async {
-              UserModel userModel = await BlocProvider.of<SocialCubit>(context)
+              UserModel? userModel = await BlocProvider.of<SocialCubit>(context)
                   .getUserData(userUid: commentModel.userUid);
-              if (context.mounted) {
+              if (context.mounted && userModel != null) {
                 Navigator.pushNamed(
                   context,
                   UserView.routName,
@@ -63,10 +63,10 @@ class CommentItem extends StatelessWidget {
                     children: [
                       GestureDetector(
                         onTap: () async {
-                          UserModel userModel =
+                         final UserModel? userModel =
                               await BlocProvider.of<SocialCubit>(context)
                                   .getUserData(userUid: commentModel.userUid);
-                          if (context.mounted) {
+                          if (context.mounted && userModel != null) {
                             Navigator.pushNamed(
                               context,
                               UserView.routName,
@@ -140,39 +140,39 @@ class CommentItem extends StatelessWidget {
                     ],
                   ),
                 ),
-                // Row(
-                //   children: [
-                //     Text(
-                //       timeAgo(commentModel.dateTime),
-                //       style: FontsStyle.font18PopinWithShadowOption(
-                //           isShadow: true),
-                //     ),
-                //     const Spacer(),
-                //     TextButton(
-                //       onPressed: () {
-                        //TODO: Add Like Comment
-                //       },
-                //       child: Text(
-                //         'Like',
-                //         style: FontsStyle.font18PopinWithShadowOption(
-                //             isShadow: true),
-                //       ),
-                //     ),
-                //     const SizedBox(
-                //       width: 15,
-                //     ),
-                //     TextButton(
-                //       onPressed: () {
-                         //TODO: Add reply Comment
-                //       },
-                //       child: Text(
-                //         'Reply',
-                //         style: FontsStyle.font18PopinWithShadowOption(
-                //             isShadow: true),
-                //       ),
-                //     ),
-                 // ],
-              //   )
+                Row(
+                  children: [
+                    Text(
+                      timeAgo(commentModel.dateTime),
+                      style: FontsStyle.font18PopinWithShadowOption(
+                          isShadow: true),
+                    ),
+                    const Spacer(),
+                    // TextButton(
+                    //   onPressed: () {
+                    //    // TODO: Add Like Comment
+                    //   },
+                    //   child: Text(
+                    //     'Like',
+                    //     style: FontsStyle.font18PopinWithShadowOption(
+                    //         isShadow: true),
+                    //   ),
+                    // ),
+                    // const SizedBox(
+                    //   width: 15,
+                    // ),
+                    // TextButton(
+                    //   onPressed: () {
+                    //    //  TODO: Add reply Comment
+                    //   },
+                    //   child: Text(
+                    //     'Reply',
+                    //     style: FontsStyle.font18PopinWithShadowOption(
+                    //         isShadow: true),
+                    //   ),
+                    // ),
+                  ],
+                )
               ],
             ),
           )

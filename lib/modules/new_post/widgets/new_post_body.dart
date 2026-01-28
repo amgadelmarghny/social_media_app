@@ -60,9 +60,12 @@ class CreatePostSheetBody extends StatelessWidget {
                       alignment: Alignment.topRight,
                       children: [
                         // Display the picked image.
-                        Image.file(
-                          socialCubit.postImagePicked!,
-                          fit: BoxFit.scaleDown,
+                        SizedBox(
+                          height: MediaQuery.sizeOf(context).height / 2,
+                          child: Image.file(
+                            socialCubit.postImagePicked!,
+                            fit: BoxFit.scaleDown,
+                          ),
                         ),
                         // Button to remove the picked image.
                         Padding(

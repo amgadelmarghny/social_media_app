@@ -75,7 +75,6 @@ class CommentsCubit extends Cubit<CommentsState> {
         errMessage: "Gallery access permission denied"));
     return null;
   }
-
   // Helper function to open device gallery and allow user to pick an image
   Future<File?> _openGallery() async {
     emit(PickCommentImageLoadingState());

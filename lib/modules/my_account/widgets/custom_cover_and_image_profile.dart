@@ -5,8 +5,10 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:popover/popover.dart';
 import 'package:social_media_app/modules/login/login_view.dart';
+import 'package:social_media_app/modules/my_account/widgets/settings_pop_menu.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/components/show_toast.dart';
+import 'package:social_media_app/shared/style/theme/constant.dart';
 import '../../../shared/components/profile_picture_with_story.dart';
 import 'cover_image_menu_items.dart';
 import 'profile_image_menu_items.dart';
@@ -48,13 +50,13 @@ class CustomCoverAndImageProfile extends StatelessWidget {
 
     return BlocConsumer<SocialCubit, SocialState>(
       listener: (context, state) {
-        if (state is LogOutSuccessState) {
-          Navigator.pushNamedAndRemoveUntil(
-              context, LoginView.routeViewName, (route) => false);
-        }
         if (state is LogOutFailureState) {
           showToast(msg: state.errMessage, toastState: ToastState.error);
         }
+          if (state is DeleteAccountFailureState) {
+          showToast(msg: state.errMessage, toastState: ToastState.error);
+        }
+
       },
       builder: (context, state) {
         return Stack(
@@ -169,18 +171,26 @@ class CustomCoverAndImageProfile extends StatelessWidget {
                 left: 10,
                 bottom: 0,
                 child: AbsorbPointer(
-                  absorbing: state is LogOutLoadingState,
+                  absorbing: state is LogOutLoadingState ||
+                      state is DeleteAccountLoadingState,
                   child: ElevatedButton(
                     onPressed: () async {
-                      await context.read<SocialCubit>().logOut();
+                      showPopover(
+                        backgroundColor: const Color(0xff8862D9),
+                        height: 100,
+                        width: 250,
+                        context: context,
+                        bodyBuilder: (context) => const SettingPopMenuItems(),
+                      );
                     },
-                    child: state is LogOutLoadingState
+                    child: state is LogOutLoadingState ||
+                            state is DeleteAccountLoadingState
                         ? const Center(
                             child: CircularProgressIndicator(strokeWidth: 1.5),
                           )
                         : const HugeIcon(
-                            icon: HugeIcons.strokeRoundedLogout02,
-                            color: Colors.red,
+                            icon: HugeIcons.strokeRoundedSetting07,
+                            color: defaultColorButton,
                             size: 30,
                           ),
                   ),

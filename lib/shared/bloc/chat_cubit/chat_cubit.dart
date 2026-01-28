@@ -239,6 +239,14 @@ class ChatCubit extends Cubit<ChatState> {
         ),
       );
     }
+    if (recordUrl != null) {
+      emit(RecordAndUploadAVoiceSuccessState());
+
+      // delete record file from the device after get the url LInk
+      File(theRecordedFilePath).delete().catchError((e) {
+        debugPrint("Error deleting local file: $e");
+      });
+    }
     return recordUrl;
   }
 

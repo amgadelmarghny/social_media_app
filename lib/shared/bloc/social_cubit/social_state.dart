@@ -197,3 +197,13 @@ final class LogOutFailureState extends SocialState {
 
   LogOutFailureState({required this.errMessage});
 }
+
+final class DeleteAccountLoadingState extends SocialState {}
+
+final class DeleteAccountSuccessState extends SocialState {}
+
+final class DeleteAccountFailureState extends SocialState {
+  final String errMessage;
+
+  DeleteAccountFailureState({required this.errMessage});
+}

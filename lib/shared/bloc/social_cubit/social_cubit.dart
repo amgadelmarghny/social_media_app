@@ -131,18 +131,31 @@ class SocialCubit extends Cubit<SocialState> {
       FirebaseFirestore.instance.collection(kUsersCollection);
 
   // Fetch user data from Firestore and update [userModel]
-  Future<UserModel> getUserData({required String userUid}) async {
+  Future<UserModel?> getUserData({required String userUid}) async {
+    // اجعل الـ Return Type nullable
     emit(GetMyDataLoadingState());
-    DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
-        await _userCollectionRef.doc(userUid).get();
-    Map<String, dynamic> userModelData = documentSnapshot.data()!;
-    UserModel spacificUserModel = UserModel.fromJson(userModelData);
-    // Only update userModel if it's the first time or the current user's data is required
-    if (userModel == null || userModel!.uid == userUid) {
-      userModel = spacificUserModel;
+    try {
+      DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
+          await _userCollectionRef.doc(userUid).get();
+
+      if (documentSnapshot.exists && documentSnapshot.data() != null) {
+        Map<String, dynamic> userModelData = documentSnapshot.data()!;
+        UserModel specificUserModel = UserModel.fromJson(userModelData);
+        // Only update userModel if it's the first time or the current user's data is required
+        if (userModel == null || userModel!.uid == userUid) {
+          userModel = specificUserModel;
+        }
+        emit(GetMyDataSuccessState());
+        return specificUserModel;
+      } else {
+        // لو مش موجود، ممكن تبعث فشل أو تتعامل معاه
+        emit(GetMyDataFailureState(errMessage: "User data not found"));
+        return null;
+      }
+    } catch (e) {
+      emit(GetMyDataFailureState(errMessage: e.toString()));
+      return null;
     }
-    emit(GetMyDataSuccessState());
-    return spacificUserModel;
   }
 
   // TextEditingControllers for user profile editing
@@ -201,7 +214,7 @@ class SocialCubit extends Cubit<SocialState> {
     // Permission granted on the first try
     if (status.isGranted) {
       return await _openGallery();
-    } 
+    }
     // If permission denied, try requesting again depending on platform/version
     else if (status.isDenied) {
       // Retry logic for Android, using correct permission depending on version
@@ -215,7 +228,7 @@ class SocialCubit extends Cubit<SocialState> {
 
       // If granted on retry, open gallery
       if (status.isGranted) return await _openGallery();
-    } 
+    }
     // If permission permanently denied, prompt user to go to app settings
     else if (status.isPermanentlyDenied) {
       openAppSettings();
@@ -481,7 +494,10 @@ class SocialCubit extends Cubit<SocialState> {
       List<String> usersLikeUids =
           await _getUsersLikesUidInPost(postId: postId);
       for (var userUid in usersLikeUids) {
-        userModelList.add(await getUserData(userUid: userUid));
+        UserModel? userModel = await getUserData(userUid: userUid);
+        if (userModel != null) {
+          userModelList.add(userModel);
+        }
       }
 
       emit(GetUsersLikesPostSuccessState());
@@ -570,8 +586,10 @@ class SocialCubit extends Cubit<SocialState> {
     followings.clear();
     numberOfFollowing = followingSnapshot.docs.length;
     for (var userDoc in followingSnapshot.docs) {
-      final userModel = await getUserData(userUid: userDoc.id);
-      followings.add(userModel);
+      final UserModel? userModel = await getUserData(userUid: userDoc.id);
+      if (userModel != null) {
+        followings.add(userModel);
+      }
     }
     emit(GetFollowingSuccessState());
     return followingSnapshot;
@@ -591,8 +609,8 @@ class SocialCubit extends Cubit<SocialState> {
     followers.clear();
     numberOfFollowers = followersSnapshot.docs.length;
     for (var userDoc in followersSnapshot.docs) {
-      final userModel = await getUserData(userUid: userDoc.id);
-      followers.add(userModel);
+      final UserModel? userModel = await getUserData(userUid: userDoc.id);
+      if (userModel != null) followers.add(userModel);
     }
     emit(GetFollowersSuccessState());
   }
@@ -681,7 +699,159 @@ class SocialCubit extends Cubit<SocialState> {
       followings.clear();
       emit(LogOutSuccessState());
     } on Exception catch (e) {
-      emit(LogOutFailureState(errMessage:'error during logout :  ${e.toString()}'));
+      emit(LogOutFailureState(
+          errMessage: 'error during logout :  ${e.toString()}'));
+    }
+  }
+
+  // Function to permanently delete the user account and all associated data
+  Future<void> deleteUserAccount() async {
+    emit(DeleteAccountLoadingState());
+    try {
+      String uid = currentUserUid;
+      User? user = FirebaseAuth.instance.currentUser;
+
+      if (user == null) throw Exception("No user found");
+
+      // 1. Delete profile photo and cover photo from Firebase Storage if they exist
+      if (userModel?.photo != null) {
+        try {
+          await FirebaseStorage.instance.refFromURL(userModel!.photo!).delete();
+        } catch (e) {
+          debugPrint("Profile photo already deleted or not found");
+        }
+      }
+      if (userModel?.cover != null) {
+        try {
+          await FirebaseStorage.instance.refFromURL(userModel!.cover!).delete();
+        } catch (e) {
+          debugPrint("Cover photo already deleted or not found");
+        }
+      }
+
+      // 2. Delete all user's posts and their images from Storage and Firestore
+      var userPosts =
+          await _postCollectionRef.where('uid', isEqualTo: uid).get();
+      for (var post in userPosts.docs) {
+        // Delete post image from Storage if it exists
+        if (post.data()['postImage'] != null) {
+          try {
+            await FirebaseStorage.instance
+                .refFromURL(post.data()['postImage'])
+                .delete();
+          } catch (e) {
+            debugPrint("Post image not found in storage");
+          }
+        }
+        // Delete the post document itself
+        await post.reference.delete();
+      }
+
+      // 3. Delete all user's comments (and their images) from ALL posts, including others' posts
+      var allPosts =
+          await FirebaseFirestore.instance.collection(kPostsCollection).get();
+      for (var postDoc in allPosts.docs) {
+        var myComments = await postDoc.reference
+            .collection(kCommentsCollection)
+            .where('uid', isEqualTo: uid)
+            .get();
+
+        for (var comment in myComments.docs) {
+          // Delete comment image from Storage if it exists
+          if (comment.data()['image'] != null) {
+            try {
+              await FirebaseStorage.instance
+                  .refFromURL(comment.data()['image'])
+                  .delete();
+            } catch (e) {
+              debugPrint("Comment image not found in storage");
+            }
+          }
+          // Delete the comment document itself
+          await comment.reference.delete();
+        }
+      }
+
+      // 4. Handle user chat conversations and delete from both sides
+      var chatListSnapshot =
+          await _userCollectionRef.doc(uid).collection(kChatCollection).get();
+
+      for (var chatDoc in chatListSnapshot.docs) {
+        String friendUid = chatDoc.id;
+
+        // A. Delete messages and attached files (images/voice records) from Storage and Firestore for the friend
+        var friendMessages = await _userCollectionRef
+            .doc(friendUid)
+            .collection(kChatCollection)
+            .doc(uid)
+            .collection(kMessageCollection)
+            .get();
+
+        for (var msg in friendMessages.docs) {
+          // Delete images attached to the message, if any
+          if (msg.data()['images'] != null) {
+            for (var imgUrl in (msg.data()['images'] as List)) {
+              try {
+                await FirebaseStorage.instance.refFromURL(imgUrl).delete();
+              } catch (e) {}
+            }
+          }
+          // Delete voice record attached to the message, if any
+          if (msg.data()['voiceRecord'] != null) {
+            try {
+              await FirebaseStorage.instance
+                  .refFromURL(msg.data()['voiceRecord'])
+                  .delete();
+            } catch (e) {}
+          }
+          await msg.reference.delete();
+        }
+
+        // B. Delete chat preview from friend's chats
+        await _userCollectionRef
+            .doc(friendUid)
+            .collection(kChatCollection)
+            .doc(uid)
+            .delete();
+
+        // C. Delete messages and preview from user's own chats
+        var myMessages =
+            await chatDoc.reference.collection(kMessageCollection).get();
+        for (var msg in myMessages.docs) {
+          await msg.reference.delete();
+        }
+        await chatDoc.reference.delete();
+      }
+
+      // 5. Delete user's main document
+      await _userCollectionRef.doc(uid).delete();
+
+      // 6. Permanently delete user account from Firebase Authentication
+      await user.delete();
+
+      // Clear all local and model user data to prevent data bleed between sessions
+      await CacheHelper.deleteCash(key: kUidToken);
+      userModel = null;
+      uidTokenCache = null;
+      myPostsModelList.clear();
+      myPostsIdList.clear();
+      freindsPostsModelList.clear();
+      freindsPostsIdList.clear();
+      followers.clear();
+      followings.clear();
+
+      emit(DeleteAccountSuccessState());
+    } on FirebaseAuthException catch (e) {
+      // If the account deletion requires re-authentication, emit a helpful message
+      if (e.code == 'requires-recent-login') {
+        emit(DeleteAccountFailureState(
+            errMessage:
+                "For security reasons, please sign out and then sign in again before deleting your account."));
+      } else {
+        emit(DeleteAccountFailureState(errMessage: e.toString()));
+      }
+    } catch (e) {
+      emit(DeleteAccountFailureState(errMessage: e.toString()));
     }
   }
 }

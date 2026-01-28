@@ -2,10 +2,12 @@
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/modules/feeds/widgets/upload_post_demo_widget.dart';
+import 'package:social_media_app/modules/login/login_view.dart';
 import 'package:social_media_app/modules/my_account/widgets/custom_cover_and_image_profile.dart';
 import 'package:social_media_app/modules/my_account/widgets/my_account_name_and_update_button.dart';
 import 'package:social_media_app/modules/my_account/widgets/my_followers_and_followind_and_bio_account.dart';
 import 'package:social_media_app/modules/my_account/widgets/my_sliver_posts_list_account.dart';
+import 'package:social_media_app/modules/register/register_view.dart';
 import 'package:social_media_app/shared/bloc/user_cubit/user_cubit.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/components/constants.dart';
@@ -85,6 +87,15 @@ class _UsersBodyState extends State<UsersBody> {
                 state is UploadProfileImageSuccessState) {
               showToast(
                   msg: 'Added successfully', toastState: ToastState.success);
+            }
+            if (state is DeleteAccountSuccessState) {
+              Navigator.pushNamedAndRemoveUntil(
+                  context, LoginView.routeViewName, (route) => false);
+            }
+
+            if (state is LogOutSuccessState) {
+              Navigator.pushNamedAndRemoveUntil(
+                  context, RegisterView.routeViewName, (route) => false);
             }
           },
           builder: (context, state) {
