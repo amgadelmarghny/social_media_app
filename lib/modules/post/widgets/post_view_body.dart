@@ -143,6 +143,9 @@ class _PostViewBodyState extends State<PostViewBody> {
                   postId: widget.postId,
                   commentsNum: widget.postModel.commentsNum,
                   creatorUid: widget.postModel.userName,
+                  authorName: widget.postModel.userName,
+                  postText: widget.postModel.content,
+                  postImage: widget.postModel.postImage,
                 ),
               ),
               BlocBuilder<CommentsCubit, CommentsState>(

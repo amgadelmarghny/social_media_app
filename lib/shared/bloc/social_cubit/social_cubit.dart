@@ -469,6 +469,17 @@ class SocialCubit extends Cubit<SocialState> {
     }
   }
 
+  Future<void> reportPost(String postId) async {
+    try {
+      await _postCollectionRef.doc(postId).delete();
+      getMyUserPosts(userModel!.uid);
+      await getTimelinePosts();
+      emit(RemovePostState());
+    } on Exception catch (e) {
+      emit(RemovePostFailureState(errMessage: e.toString()));
+    }
+  }
+
   // Get UIDs of all users who liked a specific post
   Future<List<String>> _getUsersLikesUidInPost({required String postId}) async {
     List<String> usersLikesUid = [];

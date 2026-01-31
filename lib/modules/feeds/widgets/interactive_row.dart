@@ -1,6 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:social_media_app/modules/feeds/widgets/comments_sheet.dart';
 import 'package:social_media_app/modules/feeds/widgets/users_suggestion_sheet.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
@@ -16,6 +21,9 @@ class InteractiveRow extends StatelessWidget {
     this.showCommentSheet = true,
     required this.commentsNum,
     required this.creatorUid,
+    required this.authorName,
+    required this.postText,
+    required this.postImage,
   });
 
   final int numOfLikes, commentsNum;
@@ -23,6 +31,8 @@ class InteractiveRow extends StatelessWidget {
   final bool isLike;
   final void Function()? onLikeButtonTap;
   final bool showCommentSheet;
+  final String authorName;
+  final String? postText, postImage;
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +123,26 @@ class InteractiveRow extends StatelessWidget {
         ),
         const Spacer(),
         IconButton(
-          onPressed: () {},
+          onPressed: () async {
+            if (postText != null) {
+              final String contentToShare =
+                  'Check out this post by $authorName:\n\n$postText\n\n- Sent from zmlni application';
+
+              await SharePlus.instance.share(ShareParams(text: contentToShare));
+            }
+            if (postImage != null) {
+              final url = Uri.parse(postImage!);
+              final response = await http.get(url);
+              final bytes = response.bodyBytes;
+
+              final temp = await getTemporaryDirectory();
+              final path = '${temp.path}/image.jpg';
+              File(path).writeAsBytesSync(bytes);
+
+              await SharePlus.instance
+                  .share(ShareParams(files: [XFile(path)], text: postText));
+            }
+          },
           icon: SvgPicture.asset(
             'lib/assets/images/share.svg',
           ),
