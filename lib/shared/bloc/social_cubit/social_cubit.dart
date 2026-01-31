@@ -9,6 +9,7 @@ import 'package:icon_broken/icon_broken.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:social_media_app/models/create_post_impl_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:social_media_app/models/post_model.dart';
 import 'package:social_media_app/models/user_model.dart';
 import 'package:social_media_app/modules/chat/chats_body.dart';
@@ -144,6 +145,7 @@ class SocialCubit extends Cubit<SocialState> {
         // Only update userModel if it's the first time or the current user's data is required
         if (userModel == null || userModel!.uid == userUid) {
           userModel = specificUserModel;
+          await getReportedPosts();
         }
         emit(GetMyDataSuccessState());
         return specificUserModel;
@@ -469,15 +471,83 @@ class SocialCubit extends Cubit<SocialState> {
     }
   }
 
-  Future<void> reportPost(String postId) async {
+  List<String> reportedPostsIds = [];
+
+  Future<void> getReportedPosts() async {
     try {
-      await _postCollectionRef.doc(postId).delete();
-      getMyUserPosts(userModel!.uid);
-      await getTimelinePosts();
+      var snapshot = await _userCollectionRef
+          .doc(currentUserUid)
+          .collection(kReportedPostsCollection)
+          .get();
+      reportedPostsIds = snapshot.docs.map((doc) => doc.id).toList();
+    } catch (e) {
+      debugPrint("Error fetching reported posts: $e");
+    }
+  }
+
+  Future<void> reportPost(
+      {required String postId, required String reason}) async {
+    try {
+      // 1. Hide locally
+      if (!reportedPostsIds.contains(postId)) {
+        reportedPostsIds.add(postId);
+      }
+
+      int friendPostIndex = freindsPostsIdList.indexOf(postId);
+      if (friendPostIndex != -1) {
+        freindsPostsIdList.removeAt(friendPostIndex);
+        freindsPostsModelList.removeAt(friendPostIndex);
+      }
+
+      int myPostIndex = myPostsIdList.indexOf(postId);
+      if (myPostIndex != -1) {
+        myPostsIdList.removeAt(myPostIndex);
+        myPostsModelList.removeAt(myPostIndex);
+      }
+
+      // 2. Save to Firestore (Users -> Me -> ReportedPosts)
+      await _userCollectionRef
+          .doc(currentUserUid)
+          .collection(kReportedPostsCollection)
+          .doc(postId)
+          .set({
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+
+      // 3. Save to Global Reports Collection (for Admin)
+      await FirebaseFirestore.instance.collection(kReportsCollection).add({
+        'reporterUid': currentUserUid,
+        'postId': postId,
+        'timestamp': FieldValue.serverTimestamp(),
+        'reason': reason,
+      });
+
+      // 4. Send Email Intent
+      final Uri emailLaunchUri = Uri(
+        scheme: 'mailto',
+        path: 'codmego@gmail.com',
+        query: _encodeQueryParameters(<String, String>{
+          'subject': 'Report Post: $postId',
+          'body':
+              'I want to report the post with ID: $postId.\n\nReason: $reason',
+        }),
+      );
+
+      if (await canLaunchUrl(emailLaunchUri)) {
+        await launchUrl(emailLaunchUri);
+      }
+
       emit(RemovePostState());
     } on Exception catch (e) {
       emit(RemovePostFailureState(errMessage: e.toString()));
     }
+  }
+
+  String? _encodeQueryParameters(Map<String, String> params) {
+    return params.entries
+        .map((e) =>
+            '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+        .join('&');
   }
 
   // Get UIDs of all users who liked a specific post
@@ -656,8 +726,10 @@ class SocialCubit extends Cubit<SocialState> {
 
       // Step 5: Deserialize all timeline posts
       for (var postDoc in postsSnapshot.docs) {
-        freindsPostsModelList.add(PostModel.fromJson(postDoc.data()));
-        freindsPostsIdList.add(postDoc.id);
+        if (!reportedPostsIds.contains(postDoc.id)) {
+          freindsPostsModelList.add(PostModel.fromJson(postDoc.data()));
+          freindsPostsIdList.add(postDoc.id);
+        }
       }
 
       emit(GetFeedsPostsSuccessState());

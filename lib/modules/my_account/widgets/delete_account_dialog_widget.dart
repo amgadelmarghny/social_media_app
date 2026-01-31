@@ -13,6 +13,7 @@ class DeleteAccountDialogWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      backgroundColor: const Color(0xFF1F1D2B),
       title: Row(
         children: [
           Icon(IconBroken.Danger, color: Colors.red),
@@ -23,13 +24,14 @@ class DeleteAccountDialogWidget extends StatelessWidget {
                 child: Text(
                   'Permanently Delete Account',
                   textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white),
                 )),
           ),
         ],
       ),
       content: const Text(
         'Are you sure you want to delete your account? This action will permanently delete all your posts, photos, and messages, and cannot be undone.',
-        style: TextStyle(fontSize: 16),
+        style: TextStyle(fontSize: 16, color: Colors.white),
       ),
       actions: [
         TextButton(

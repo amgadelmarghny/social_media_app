@@ -60,6 +60,7 @@ dependencies:
   shared_preferences: ^2.5.4
   skeletonizer: ^2.0.0
   smooth_page_indicator: ^2.0.1
+  url_launcher: ^6.3.2
   voice_message_package: ^2.0.0
   wechat_assets_picker: ^10.1.0
 dev_dependencies:

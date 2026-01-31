@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hugeicons/hugeicons.dart';
 import 'package:popover/popover.dart';
 import 'package:social_media_app/modules/user/user_view.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import '../../../shared/components/profile_picture_with_story.dart';
 import '../../../shared/style/fonts/font_style.dart';
+import 'delete_post_option.dart';
+import 'report_post_option.dart';
 
 class ProfilePostRow extends StatelessWidget {
   const ProfilePostRow({
@@ -85,80 +86,13 @@ class ProfilePostRow extends StatelessWidget {
                 height: 50,
                 width: 250,
                 backgroundColor: const Color(0xff8862D9),
-                bodyBuilder: (context) =>userUid == BlocProvider.of<SocialCubit>(context).userModel!.uid ? GestureDetector(
-                  onTap: () async {
-                    if (context.mounted) Navigator.pop(context);
-                    await BlocProvider.of<SocialCubit>(context)
-                        .deletePost(postId!)
-                        .then((value) {
-                      // If we're in PostView (detail view), pop back to feed after deletion
-                      if (context.mounted && isItDeletedThroughPostView) {
-                        Navigator.pop(context);
-                      }
-                    });
-                  },
-                  child: Container(
-                    height: 50,
-                    color: const Color(0xff8862D9),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CircleAvatar(
-                          backgroundColor: Colors.white.withValues(alpha: 0.3),
-                          radius: 15,
-                          child: const HugeIcon(
-                            icon: HugeIcons.strokeRoundedDelete03,
-                            color: Colors.red,
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Text(
-                          'Delete post',
-                          style: FontsStyle.font18PopinWithShadowOption(),
-                        )
-                      ],
-                    ),
-                  ),
-                ):
-                GestureDetector(
-                  onTap: () async {
-                    if (context.mounted) Navigator.pop(context);
-                    await BlocProvider.of<SocialCubit>(context)
-                        .deletePost(postId!)
-                        .then((value) {
-                      // If we're in PostView (detail view), pop back to feed after deletion
-                      if (context.mounted && isItDeletedThroughPostView) {
-                        Navigator.pop(context);
-                      }
-                    });
-                  },
-                  child: Container(
-                    height: 50,
-                    color: const Color(0xff8862D9),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CircleAvatar(
-                          backgroundColor: Colors.white.withValues(alpha: 0.3),
-                          radius: 15,
-                          child: const HugeIcon(
-                            icon: HugeIcons.strokeRoundedDelete03,
-                            color: Colors.red,
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Text(
-                          'Report post',
-                          style: FontsStyle.font18PopinWithShadowOption(),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
+                bodyBuilder: (context) => userUid ==
+                        BlocProvider.of<SocialCubit>(context).userModel!.uid
+                    ? DeletePostOption(
+                        postId: postId!,
+                        isItDeletedThroughPostView: isItDeletedThroughPostView,
+                      )
+                    : ReportPostOption(postId: postId! , isItDeletedThroughPostView: isItDeletedThroughPostView,),
               );
             },
             icon: const Icon(Icons.more_vert),
