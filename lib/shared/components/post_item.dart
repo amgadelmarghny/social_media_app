@@ -59,8 +59,10 @@ class _PostItemState extends State<PostItem> {
         isLike = !isLike;
       });
       // get likesCollection to access docs length for number of likes
-      likesCollection = await BlocProvider.of<SocialCubit>(context)
-          .toggleLike(postId: widget.postId, isLike: isLike);
+      likesCollection = await BlocProvider.of<SocialCubit>(context).toggleLike(
+          postId: widget.postId,
+          isLike: isLike,
+          postCreatorUid: widget.postModel.creatorUid);
     }
 
     return BlocBuilder<SocialCubit, SocialState>(

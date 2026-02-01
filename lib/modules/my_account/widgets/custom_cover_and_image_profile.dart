@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:popover/popover.dart';
-import 'package:social_media_app/modules/login/login_view.dart';
 import 'package:social_media_app/modules/my_account/widgets/settings_pop_menu.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/components/show_toast.dart';

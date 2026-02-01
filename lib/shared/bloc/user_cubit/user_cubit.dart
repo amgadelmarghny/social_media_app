@@ -3,6 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/models/post_model.dart';
 import 'package:social_media_app/models/user_model.dart';
 import 'package:social_media_app/shared/components/constants.dart';
+import 'package:flutter/material.dart';
+import '../../../../models/notification_model.dart';
+import 'package:social_media_app/shared/dio_helper.dart';
 
 part 'user_state.dart';
 
@@ -71,10 +74,19 @@ class UserCubit extends Cubit<UserState> {
       // Clear the current list before adding new data.
       followings.clear();
 
+      // Use a Set to track UIDs and prevent duplicates
+      final seenUids = <String>{};
+
       // For each following, fetch the user data and add to the list.
       for (var doc in snapshot.docs) {
+        // Skip if we've already processed this UID
+        if (seenUids.contains(doc.id)) continue;
+
         final userModel = await _userCollection.doc(doc.id).get();
-        followings.add(UserModel.fromJson(userModel.data()!));
+        if (userModel.exists && userModel.data() != null) {
+          followings.add(UserModel.fromJson(userModel.data()!));
+          seenUids.add(doc.id);
+        }
       }
       emit(GetUserFollowingSuccessState());
     } catch (e) {
@@ -102,10 +114,19 @@ class UserCubit extends Cubit<UserState> {
       // Clear the current list before adding new data.
       followers.clear();
 
+      // Use a Set to track UIDs and prevent duplicates
+      final seenUids = <String>{};
+
       // For each follower, fetch the user data and add to the list.
       for (var doc in snapshot.docs) {
+        // Skip if we've already processed this UID
+        if (seenUids.contains(doc.id)) continue;
+
         final userModel = await _userCollection.doc(doc.id).get();
-        followers.add(UserModel.fromJson(userModel.data()!));
+        if (userModel.exists && userModel.data() != null) {
+          followers.add(UserModel.fromJson(userModel.data()!));
+          seenUids.add(doc.id);
+        }
       }
       emit(GetUserFollowersSuccessState());
     } catch (e) {
@@ -145,6 +166,7 @@ class UserCubit extends Cubit<UserState> {
   /// [myUid] - The UID of the current user.
   /// [userUid] - The UID of the user to follow.
   Future<void> followUser(String myUid, String userUid) async {
+    emit(FollowUserLoading());
     try {
       // Add the user to the current user's following collection.
       await _userCollection
@@ -162,6 +184,64 @@ class UserCubit extends Cubit<UserState> {
 
       // Update follow status and emit state.
       isFollowing = true;
+
+      // Send Notification to the followed user
+      // We need sender (current user) info.
+      // Since UserCubit doesn't hold 'currentUserModel' directly, we might need to fetch it or rely on SocialCubit.
+      // However, we can fetch it briefly using myUid.
+      try {
+        final myUserDoc = await _userCollection.doc(myUid).get();
+        if (myUserDoc.exists) {
+          final myUserData = myUserDoc.data();
+          if (myUserData != null) {
+            final senderName =
+                '${myUserData['firstName']} ${myUserData['lastName']}';
+            final senderPhoto = myUserData['photo'] ?? '';
+
+            final notificationId =
+                DateTime.now().millisecondsSinceEpoch.toString();
+            final notification = NotificationModel(
+              notificationId: notificationId,
+              senderUid: myUid,
+              receiverUid: userUid,
+              senderName: senderName,
+              senderPhoto: senderPhoto,
+              type: 'follow',
+              content: 'started following you',
+              isRead: false,
+              dateTime: DateTime.now(),
+            );
+
+            await _userCollection
+                .doc(userUid)
+                .collection('notifications')
+                .doc(notificationId)
+                .set(notification.toMap());
+
+            // Send Push Notification
+            // Calculate target token and send
+            // We need the FOLLOWED user's token.
+
+            final followedUserDoc = await _userCollection.doc(userUid).get();
+            if (followedUserDoc.exists) {
+              final followedUserData = followedUserDoc.data();
+              if (followedUserData != null) {
+                final String? fToken = followedUserData['fcmToken'];
+                if (fToken != null && fToken.isNotEmpty) {
+                  await DioHelper.post(
+                    token: fToken,
+                    title: senderName,
+                    bodyContent: 'started following you',
+                  );
+                }
+              }
+            }
+          }
+        }
+      } catch (e) {
+        debugPrint("Error sending follow notification: $e");
+      }
+
       emit(FollowStatusChanged(isFollowing));
     } catch (e) {
       // Emit error state if something goes wrong.
@@ -174,6 +254,7 @@ class UserCubit extends Cubit<UserState> {
   /// [myUid] - The UID of the current user.
   /// [userUid] - The UID of the user to unfollow.
   Future<void> unfollowUser(String myUid, String userUid) async {
+    emit(FollowUserLoading());
     try {
       // Remove the user from the current user's following collection.
       await _userCollection

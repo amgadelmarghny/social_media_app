@@ -9,6 +9,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:social_media_app/models/comment_model.dart';
 import 'package:social_media_app/shared/components/constants.dart';
+import 'package:social_media_app/models/notification_model.dart';
+import 'package:social_media_app/shared/dio_helper.dart';
 part 'comments_state.dart';
 
 class CommentsCubit extends Cubit<CommentsState> {
@@ -75,6 +77,7 @@ class CommentsCubit extends Cubit<CommentsState> {
         errMessage: "Gallery access permission denied"));
     return null;
   }
+
   // Helper function to open device gallery and allow user to pick an image
   Future<File?> _openGallery() async {
     emit(PickCommentImageLoadingState());
@@ -106,7 +109,9 @@ class CommentsCubit extends Cubit<CommentsState> {
   TextEditingController commentController = TextEditingController();
 
   Future<void> addComment(
-      {required String postId, required CommentModel commentModel}) async {
+      {required String postId,
+      required CommentModel commentModel,
+      required String postUid}) async {
     emit(AddCommentLoading());
     try {
       await FirebaseFirestore.instance
@@ -114,6 +119,51 @@ class CommentsCubit extends Cubit<CommentsState> {
           .doc(postId)
           .collection(kCommentsCollection)
           .add(commentModel.toMap());
+
+      // Send Notification if commenter is not the post owner
+      if (postUid != currentUser.uid) {
+        final notificationId = DateTime.now().millisecondsSinceEpoch.toString();
+        final notification = NotificationModel(
+          notificationId: notificationId,
+          senderUid: currentUser.uid,
+          receiverUid: postUid,
+          senderName: commentModel.userName,
+          senderPhoto: commentModel.profilePhoto,
+          type: 'comment',
+          content: 'commented: ${commentModel.comment ?? "Sent an image"}',
+          postId: postId,
+          isRead: false,
+          dateTime: DateTime.now(),
+        );
+
+        await FirebaseFirestore.instance
+            .collection(kUsersCollection)
+            .doc(postUid)
+            .collection('notifications')
+            .doc(notificationId)
+            .set(notification.toMap());
+
+        // Send Push Notification
+        final postOwnerDoc = await FirebaseFirestore.instance
+            .collection(kUsersCollection)
+            .doc(postUid)
+            .get();
+        if (postOwnerDoc.exists) {
+          final postOwnerData = postOwnerDoc.data();
+          if (postOwnerData != null) {
+            final String? token = postOwnerData['fcmToken'];
+            if (token != null && token.isNotEmpty) {
+              await DioHelper.post(
+                token: token,
+                title: commentModel.userName ?? "User",
+                bodyContent:
+                    'commented: ${commentModel.comment ?? "Sent an image"}',
+              );
+            }
+          }
+        }
+      }
+
       emit(AddCommentSuccess());
       await getComments(postId: postId);
     } catch (err) {

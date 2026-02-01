@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:social_media_app/modules/register/widgets/user_name_text_field.dart';
 import 'package:social_media_app/shared/bloc/register_cubit/register_cubit.dart';
+import 'package:social_media_app/shared/components/formatters/date_month_formatter.dart';
+import 'package:social_media_app/shared/components/formatters/name_formatter.dart';
 import 'package:social_media_app/shared/components/gender_icon_list.dart';
 import 'package:social_media_app/shared/components/text_form_field.dart';
 import 'package:social_media_app/shared/components/year_picker.dart';
@@ -37,6 +39,7 @@ class RegisterTextFields extends StatelessWidget {
                     hintText: 'First Name',
                     controller: registerCubit.firstNameController,
                     textInputType: TextInputType.name,
+                    inputFormatters: [NameFormatter()],
                     onFieldSubmitted: (unnamed) =>
                         FocusScope.of(context).requestFocus(lastNameFocus),
                   ),
@@ -49,6 +52,7 @@ class RegisterTextFields extends StatelessWidget {
                   child: CustomTextField(
                     hintText: 'Last Name',
                     focusNode: lastNameFocus,
+                    inputFormatters: [NameFormatter()],
                     onFieldSubmitted: (unnamed) =>
                         FocusScope.of(context).requestFocus(emailFocus),
                     textInputType: TextInputType.name,
@@ -90,6 +94,15 @@ class RegisterTextFields extends StatelessWidget {
               textInputType: TextInputType.visiblePassword,
               obscureText: registerCubit.isObscure,
               controller: registerCubit.passwordController,
+              customValidator: (value) {
+                if (value?.isEmpty ?? true) {
+                  return 'Password is required';
+                }
+                if (value!.contains(' ')) {
+                  return '⚠️ Password contains spaces';
+                }
+                return null;
+              },
               suffixIcon: IconButton(
                 onPressed: () {
                   // Toggle password visibility.
@@ -121,8 +134,9 @@ class RegisterTextFields extends StatelessWidget {
                   child: CustomTextField(
                     hintText: 'Date/month',
                     focusNode: birthOfDateFocus,
-                    textInputType: TextInputType.datetime,
+                    textInputType: TextInputType.number,
                     controller: registerCubit.dateAndMonthController,
+                    inputFormatters: [DateMonthFormatter()],
                   ),
                 ),
                 const Spacer(

@@ -123,6 +123,7 @@ class AddCommentButton extends StatelessWidget {
             .addComment(
           postId: postId,
           commentModel: commentModel,
+          postUid: creatorUid,
         )
             .then((value) async {
           // Remove comment text and image after adding comment successfully
@@ -153,6 +154,7 @@ class AddCommentButton extends StatelessWidget {
           .addComment(
         postId: postId,
         commentModel: commentModel,
+        postUid: creatorUid,
       )
           .then(
         (value) async {

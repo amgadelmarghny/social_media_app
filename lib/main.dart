@@ -18,6 +18,7 @@ import 'package:social_media_app/shared/dio_helper.dart';
 import 'package:social_media_app/shared/network/local/cache_helper.dart';
 import 'package:social_media_app/shared/components/constants.dart';
 import 'package:social_media_app/shared/style/theme/theme.dart';
+import 'package:social_media_app/shared/services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,6 +28,17 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Initialize notification service
+  final notificationService = NotificationService();
+  await notificationService.initialize();
+  await notificationService.configureFCM();
+
+  // Save FCM token if user is already logged in
+  if (FirebaseAuth.instance.currentUser != null) {
+    await notificationService.saveFCMToken();
+  }
+
   runApp(const SocialMediaApp());
 }
 

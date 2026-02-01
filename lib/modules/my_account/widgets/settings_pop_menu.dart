@@ -48,7 +48,7 @@ class SettingPopMenuItems extends StatelessWidget {
               context: context,
               builder: (context) => DeleteAccountDialogWidget(),
             );
-            Navigator.pop(context);
+          if (context.mounted) Navigator.pop(context);
           },
           child: Container(
             height: 50,

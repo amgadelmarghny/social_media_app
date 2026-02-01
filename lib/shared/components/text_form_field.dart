@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
 
 class CustomTextField extends StatelessWidget {
@@ -19,6 +20,8 @@ class CustomTextField extends StatelessWidget {
     this.errorText,
     this.onFieldSubmitted,
     this.focusNode,
+    this.inputFormatters,
+    this.customValidator,
   });
 
   final TextEditingController? controller;
@@ -36,6 +39,8 @@ class CustomTextField extends StatelessWidget {
   final String? errorText;
   final void Function(String)? onFieldSubmitted;
   final FocusNode? focusNode;
+  final List<TextInputFormatter>? inputFormatters;
+  final String? Function(String?)? customValidator;
 
   @override
   Widget build(BuildContext context) {
@@ -50,16 +55,18 @@ class CustomTextField extends StatelessWidget {
         maxLines: 1,
         keyboardType: textInputType,
         obscureText: obscureText,
+        inputFormatters: inputFormatters,
         style: FontsStyle.font18PopinWithShadowOption().copyWith(
           color:
               outLineBorderColor != Colors.white ? Colors.black : Colors.white,
         ),
-        validator: (data) {
-          if (data?.isEmpty ?? true) {
-            return 'FIELD IS EMPTY';
-          }
-          return null;
-        },
+        validator: customValidator ??
+            (data) {
+              if (data?.isEmpty ?? true) {
+                return 'FIELD IS EMPTY';
+              }
+              return null;
+            },
         controller: controller,
         onChanged: onChange,
         decoration: InputDecoration(

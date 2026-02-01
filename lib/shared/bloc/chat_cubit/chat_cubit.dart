@@ -13,9 +13,11 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
 import 'package:social_media_app/models/chat_item_model.dart';
 import 'package:social_media_app/models/message_model.dart';
+import 'package:social_media_app/models/notification_model.dart';
 import 'package:social_media_app/shared/components/constants.dart';
 import 'package:social_media_app/shared/network/local/cache_helper.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
+import 'package:social_media_app/shared/dio_helper.dart';
 
 part 'chat_state.dart';
 
@@ -115,6 +117,96 @@ class ChatCubit extends Cubit<ChatState> {
       voiceMessage: messageModel.voiceRecord,
       images: messageModel.images,
     );
+
+    // Send Notification to Receiver
+    String notificationContent = '';
+    String? notificationSubType;
+
+    if (messageModel.voiceRecord != null &&
+        messageModel.voiceRecord!.isNotEmpty) {
+      notificationContent = 'Voice recording';
+      notificationSubType = 'voice';
+    } else if (messageModel.images != null && messageModel.images!.isNotEmpty) {
+      // If image matches with text
+      if (messageModel.textMessage != null &&
+          messageModel.textMessage!.isNotEmpty) {
+        notificationContent = messageModel.textMessage!;
+      } else {
+        notificationContent = 'Sent an image';
+      }
+      notificationSubType = 'image';
+    } else {
+      notificationContent = messageModel.textMessage ?? '';
+      notificationSubType = 'text';
+    }
+
+    final notificationId = DateTime.now().millisecondsSinceEpoch.toString();
+    // Assuming we can get sender name/photo. Since we occupy 'socialCubit' usually or have user data.
+    // However, ChatCubit has 'currentUserId'. It doesn't have 'currentUserModel' directly loaded in a field always.
+    // But 'sendAMessage' is usually called where we have data.
+    // Actually, 'MessageModel' has 'uid'.
+    // We need SENDER name and photo to save in notification.
+    // We can fetch it or rely on it being passed?
+    // Let's fetch it briefly or use a cached user if possible.
+    // To avoid async fetch delay, we could pass it. But _sendTextImageRecord is private.
+    // We can fetch user data from Firestore using currentUserId.
+
+    try {
+      final userDoc = await FirebaseFirestore.instance
+          .collection(kUsersCollection)
+          .doc(messageModel.uid)
+          .get();
+
+      if (userDoc.exists) {
+        final senderData = userDoc.data();
+        if (senderData != null) {
+          final senderName =
+              '${senderData['firstName']} ${senderData['lastName']}';
+          final senderPhoto = senderData['photo'] ?? '';
+
+          final notification = NotificationModel(
+            notificationId: notificationId,
+            senderUid: messageModel.uid,
+            receiverUid: messageModel.friendUid,
+            senderName: senderName,
+            senderPhoto: senderPhoto,
+            type: 'message',
+            subType: notificationSubType,
+            content: notificationContent,
+            isRead: false,
+            dateTime: DateTime.now(),
+          );
+
+          await FirebaseFirestore.instance
+              .collection(kUsersCollection)
+              .doc(messageModel.friendUid)
+              .collection('notifications')
+              .doc(notificationId)
+              .set(notification.toMap());
+
+          // Send Push Notification
+          final friendDoc = await FirebaseFirestore.instance
+              .collection(kUsersCollection)
+              .doc(messageModel.friendUid)
+              .get();
+          if (friendDoc.exists) {
+            final friendData = friendDoc.data();
+            if (friendData != null) {
+              final String? token = friendData['fcmToken'];
+              if (token != null && token.isNotEmpty) {
+                await DioHelper.post(
+                  token: token,
+                  title: senderName,
+                  bodyContent: notificationContent,
+                );
+              }
+            }
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('Error sending notification: $e');
+    }
   }
 
   /// True if an audio recording is currently happening; controls button/UI state
@@ -312,7 +404,7 @@ class ChatCubit extends Cubit<ChatState> {
     }
 
     // After checking permission status...
-    if (status.isGranted) {
+    if (status.isGranted && context.mounted) {
       // User granted access; show asset picker dialog
       final List<AssetEntity>? result = await AssetPicker.pickAssets(
         context,

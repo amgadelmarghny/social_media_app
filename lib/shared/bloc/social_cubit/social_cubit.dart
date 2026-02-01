@@ -3,8 +3,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_media_app/shared/dio_helper.dart';
+import 'package:social_media_app/shared/services/notification_service.dart';
 import 'package:icon_broken/icon_broken.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -21,6 +24,7 @@ import 'package:social_media_app/shared/components/constants.dart';
 import 'package:social_media_app/shared/network/local/cache_helper.dart';
 import '../../../models/like_model.dart';
 import '../../../models/update_user_impl_model.dart';
+import 'package:social_media_app/models/notification_model.dart';
 part 'social_state.dart';
 
 class SocialCubit extends Cubit<SocialState> {
@@ -133,7 +137,6 @@ class SocialCubit extends Cubit<SocialState> {
 
   // Fetch user data from Firestore and update [userModel]
   Future<UserModel?> getUserData({required String userUid}) async {
-    // اجعل الـ Return Type nullable
     emit(GetMyDataLoadingState());
     try {
       DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
@@ -146,6 +149,8 @@ class SocialCubit extends Cubit<SocialState> {
         if (userModel == null || userModel!.uid == userUid) {
           userModel = specificUserModel;
           await getReportedPosts();
+          // Use NotificationService instead of updateFCMToken
+          await NotificationService().saveFCMToken(userUid);
         }
         emit(GetMyDataSuccessState());
         return specificUserModel;
@@ -239,6 +244,20 @@ class SocialCubit extends Cubit<SocialState> {
     // Permission still denied or failed, emit failure state and return null
     emit(PickImageFailureState(errMessage: "Gallery access permission denied"));
     return null;
+  }
+
+  // Helper function to update FCM Token
+  Future<void> updateFCMToken() async {
+    try {
+      String? token = await FirebaseMessaging.instance.getToken();
+      if (token != null && currentUserUid.isNotEmpty) {
+        await _userCollectionRef
+            .doc(currentUserUid)
+            .update({'fcmToken': token});
+      }
+    } catch (e) {
+      debugPrint("Error updating FCM Token: $e");
+    }
   }
 
   // Helper function to open device gallery and allow user to pick an image
@@ -600,7 +619,9 @@ class SocialCubit extends Cubit<SocialState> {
 
   // Toggle like/unlike for a post (if [isLike] is true, add; else, remove)
   Future<QuerySnapshot<Map<String, dynamic>>> toggleLike(
-      {required String postId, required bool isLike}) async {
+      {required String postId,
+      required bool isLike,
+      required String postCreatorUid}) async {
     emit(ToggleLikeLoadingState());
     DocumentReference postDocRef = _postCollectionRef.doc(postId);
     if (isLike) {
@@ -615,6 +636,47 @@ class SocialCubit extends Cubit<SocialState> {
             .collection(kLikesCollection)
             .doc(userModel!.uid)
             .set(likeUserModel.toJson());
+
+        // Send Notification if liker is not the post owner
+        if (postCreatorUid != userModel!.uid) {
+          final notificationId =
+              DateTime.now().millisecondsSinceEpoch.toString();
+          final notification = NotificationModel(
+            notificationId: notificationId,
+            senderUid: userModel!.uid,
+            receiverUid: postCreatorUid,
+            senderName: '${userModel!.firstName} ${userModel!.lastName}',
+            senderPhoto: userModel!.photo,
+            type: 'like',
+            content: 'liked your post',
+            postId: postId,
+            isRead: false,
+            dateTime: DateTime.now(),
+          );
+
+          await _userCollectionRef
+              .doc(postCreatorUid)
+              .collection('notifications')
+              .doc(notificationId)
+              .set(notification.toMap());
+
+          // Send Push Notification
+          final postOwnerDoc =
+              await _userCollectionRef.doc(postCreatorUid).get();
+          if (postOwnerDoc.exists) {
+            final postOwnerData = postOwnerDoc.data();
+            if (postOwnerData != null) {
+              final String? token = postOwnerData['fcmToken'];
+              if (token != null && token.isNotEmpty) {
+                await DioHelper.post(
+                  token: token,
+                  title: '${userModel!.firstName} ${userModel!.lastName}',
+                  bodyContent: 'liked your post',
+                );
+              }
+            }
+          }
+        }
       } catch (errMessage) {
         emit(LikePostFailureState(
             errMessage: 'Like error: ${errMessage.toString()}'));
@@ -625,6 +687,8 @@ class SocialCubit extends Cubit<SocialState> {
             .collection(kLikesCollection)
             .doc(userModel!.uid)
             .delete();
+        // Ideally we might want to remove the notification if unlike happens,
+        // but typically we let it be or it complicates things unnecessarily.
       } catch (errMessage) {
         emit(LikePostFailureState(
             errMessage: 'Like error: ${errMessage.toString()}'));
@@ -634,6 +698,19 @@ class SocialCubit extends Cubit<SocialState> {
     final likesCollection = await getPostLikes(postId);
     emit(ToggleLikeSuccessState());
     return likesCollection;
+  }
+
+  // Fetch a single post by ID (Helper for notifications)
+  Future<PostModel?> getPostById(String postId) async {
+    try {
+      DocumentSnapshot doc = await _postCollectionRef.doc(postId).get();
+      if (doc.exists) {
+        return PostModel.fromJson(doc.data() as Map<String, dynamic>);
+      }
+    } catch (e) {
+      debugPrint("Error fetching post by ID: $e");
+    }
+    return null;
   }
 
   // Get all like documents for a given post

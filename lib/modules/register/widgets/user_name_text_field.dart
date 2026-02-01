@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/shared/bloc/register_cubit/register_cubit.dart';
+import 'package:social_media_app/shared/components/formatters/username_formatter.dart';
 import 'package:social_media_app/shared/components/text_form_field.dart';
 
 /// A custom text field widget for entering a username during registration.
@@ -66,6 +67,7 @@ class _UserNameTextFieldState extends State<UserNameTextField> {
       controller: registerCubit.userNameController,
       onFieldSubmitted: widget.onFieldSubmitted,
       errorText: errorText,
+      inputFormatters: [UsernameFormatter()],
       // Show a loading spinner as a suffix icon while checking username
       suffixIcon: isChecking
           ? const SizedBox(

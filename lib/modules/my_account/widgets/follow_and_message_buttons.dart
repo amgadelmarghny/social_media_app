@@ -24,22 +24,27 @@ class FollowAndMessageButtons extends StatelessWidget {
           builder: (context, state) {
             final userCubit = context.read<UserCubit>();
             final isFollowing = userCubit.isFollowing;
+            bool isLoading = state is FollowUserLoading;
 
             return Expanded(
-              child: CustomButton(
-                height: 50,
-                text: isFollowing ? "Unfollow" : "Follow",
-                onTap: () async {
-                  if (isFollowing) {
-                    await userCubit.unfollowUser(uid, userModel.uid);
-                  } else {
-                    await userCubit.followUser(uid, userModel.uid);
-                  }
-                  userCubit.getFollowers(userModel.uid);
-                  if (context.mounted) {
-                    context.read<SocialCubit>().getFollowing();
-                  }
-                },
+              child: AbsorbPointer(
+                absorbing: isLoading,
+                child: CustomButton(
+                  height: 50,
+                  isLoading: isLoading,
+                  text: isFollowing ? "Unfollow" : "Follow",
+                  onTap: () async {
+                    if (isFollowing) {
+                      await userCubit.unfollowUser(uid, userModel.uid);
+                    } else {
+                      await userCubit.followUser(uid, userModel.uid);
+                    }
+                    userCubit.getFollowers(userModel.uid);
+                    if (context.mounted) {
+                      context.read<SocialCubit>().getFollowing();
+                    }
+                  },
+                ),
               ),
             );
           },

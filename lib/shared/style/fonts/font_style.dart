@@ -17,6 +17,32 @@ abstract class FontsStyle {
     );
   }
 
+  static TextStyle font16Poppins({Color color = Colors.white}) {
+    return TextStyle(
+      fontFamily: 'Poppins',
+      color: color,
+      fontSize: getResponsiveFontSize(fontSize: 16),
+      fontWeight: FontWeight.w500,
+    );
+  }
+
+  static TextStyle font14RegularForNotification({Color color = Colors.white}) {
+    return TextStyle(
+        fontFamily: 'Poppins',
+        color: color,
+        fontSize: getResponsiveFontSize(fontSize: 14),
+        fontWeight: FontWeight.normal);
+  }
+
+  static TextStyle font12Popin({Color color = Colors.white}) {
+    return TextStyle(
+      fontFamily: 'Poppins',
+      color: color,
+      fontSize: getResponsiveFontSize(fontSize: 12),
+      fontWeight: FontWeight.normal,
+    );
+  }
+
   static TextStyle font18PopinWithShadowOption(
       {Color color = Colors.white,
       bool isShadow = false,

@@ -5,7 +5,7 @@ abstract class DioHelper {
   static late Dio _dio;
   static init() {
     _dio = Dio(BaseOptions(
-      baseUrl: 'https://fcm.googleapis.com/v1/projects/zmlni-6c5f7/',
+      baseUrl: 'https://fcm.googleapis.com/fcm/',
       receiveDataWhenStatusError: true,
     ));
   }
@@ -16,12 +16,11 @@ abstract class DioHelper {
     required String bodyContent,
   }) async {
     await _dio.post(
-      'messages:send',
+      'send',
       options: Options(
         headers: {
           'Content-Type': 'application/json',
-          'Authorization':
-              'Bearer ${ApiKeys.cloudMessagingKey}',
+          'Authorization': 'key=${ApiKeys.cloudMessagingKey}',
         },
       ),
       data: {
@@ -29,8 +28,21 @@ abstract class DioHelper {
         'notification': {
           'title': title,
           'body': bodyContent,
+          'sound': 'default',
+        },
+        'android': {
+          'priority': 'HIGH',
+          'notification': {
+            'notification_priority': 'PRIORITY_MAX',
+            'sound': 'default',
+            'default_sound': true,
+            'default_vibrate_timings': true,
+            'default_light_settings': true,
+          },
         },
         'data': {
+          'type': 'order',
+          'id': '87',
           'click_action': 'FLUTTER_NOTIFICATION_CLICK',
         }
       },

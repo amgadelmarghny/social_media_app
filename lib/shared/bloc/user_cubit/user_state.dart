@@ -37,13 +37,16 @@ class FollowStatusChanged extends UserState {
   final bool isFollowing;
 
   /// Constructor for [FollowStatusChanged].
+  /// Constructor for [FollowStatusChanged].
   FollowStatusChanged(this.isFollowing);
 }
+
+class FollowUserLoading extends UserState {}
 
 class GetUserFollowersLoadingState extends UserState {}
 
 /// State indicating that fetching followers was successful.
- class GetUserFollowersSuccessState extends UserState {}
+class GetUserFollowersSuccessState extends UserState {}
 
 class GetUserFollowersFailureState extends UserState {
   final String errMessage;

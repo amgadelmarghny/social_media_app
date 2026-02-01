@@ -56,8 +56,10 @@ class _PostViewBodyState extends State<PostViewBody> {
     isLike = !isLike;
 
     // Update the like in Firestore and refresh the likes collection.
-    likesCollection = await BlocProvider.of<SocialCubit>(context)
-        .toggleLike(postId: widget.postId, isLike: isLike);
+    likesCollection = await BlocProvider.of<SocialCubit>(context).toggleLike(
+        postId: widget.postId,
+        isLike: isLike,
+        postCreatorUid: widget.postModel.creatorUid);
 
     // Don't call getPosts() here as it's expensive and not needed
     // The BlocListener in PostItem will handle the state update
