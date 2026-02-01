@@ -5,7 +5,7 @@ abstract class DioHelper {
   static late Dio _dio;
   static init() {
     _dio = Dio(BaseOptions(
-      baseUrl: 'https://fcm.googleapis.com/fcm/',
+      baseUrl: 'https://fcm.googleapis.com/v1/projects/zmlni-6c5f7/messages:',
       receiveDataWhenStatusError: true,
     ));
   }
@@ -20,7 +20,7 @@ abstract class DioHelper {
       options: Options(
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'key=${ApiKeys.cloudMessagingKey}',
+          'Authorization': 'Bearer ${ApiKeys.cloudMessagingKey}',
         },
       ),
       data: {
