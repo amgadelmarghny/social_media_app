@@ -33,6 +33,19 @@ class SocialCubit extends Cubit<SocialState> {
 
   SocialCubit() : super(SocialInitial()) {
     _initializeUidToken();
+    _startNotificationListener();
+  }
+
+  // To track unread notifications for the badge
+  bool hasUnreadNotifications = false;
+
+  void _startNotificationListener() {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      if (currentBottomNavBarIndex != 4) {
+        hasUnreadNotifications = true;
+        emit(BottomNavBarState());
+      }
+    });
   }
 
   // Initialize the cached UID token
@@ -52,6 +65,9 @@ class SocialCubit extends Cubit<SocialState> {
 
   // Change current index of the bottom navbar and emit state
   void changeBottomNavBar(int value) {
+    if (value == 4) {
+      hasUnreadNotifications = false;
+    }
     currentBottomNavBarIndex = value;
     emit(BottomNavBarState());
   }
@@ -66,22 +82,47 @@ class SocialCubit extends Cubit<SocialState> {
   ];
 
   // Bottom navigation bar items
-  final List<BottomNavigationBarItem> bottomNavigationBarItem = const [
-    BottomNavigationBarItem(icon: Icon(IconBroken.Home), label: ''),
-    BottomNavigationBarItem(
-        icon: Padding(
-          padding: EdgeInsets.only(right: 10),
-          child: Icon(IconBroken.Chat),
+  // Bottom navigation bar items
+  List<BottomNavigationBarItem> get bottomNavigationBarItem => [
+        const BottomNavigationBarItem(icon: Icon(IconBroken.Home), label: ''),
+        const BottomNavigationBarItem(
+            icon: Padding(
+              padding: EdgeInsets.only(right: 10),
+              child: Icon(IconBroken.Chat),
+            ),
+            label: ''),
+        const BottomNavigationBarItem(
+            icon: SizedBox(
+              width: 35,
+            ),
+            label: ''),
+        const BottomNavigationBarItem(
+            icon: Icon(IconBroken.Profile), label: ''),
+        BottomNavigationBarItem(
+          icon: Stack(
+            children: [
+              const Icon(IconBroken.Notification),
+              if (hasUnreadNotifications)
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  child: Container(
+                    padding: const EdgeInsets.all(1),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    constraints: const BoxConstraints(
+                      minWidth: 8,
+                      minHeight: 8,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          label: '',
         ),
-        label: ''),
-    BottomNavigationBarItem(
-        icon: SizedBox(
-          width: 35,
-        ),
-        label: ''),
-    BottomNavigationBarItem(icon: Icon(IconBroken.Profile), label: ''),
-    BottomNavigationBarItem(icon: Icon(IconBroken.Notification), label: ''),
-  ];
+      ];
 
   // Current Firebase User for email verification
   User? userVerification = FirebaseAuth.instance.currentUser;
