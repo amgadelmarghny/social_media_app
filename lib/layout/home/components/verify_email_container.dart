@@ -61,7 +61,7 @@ class VerifyEmailContainer extends StatelessWidget {
                         style: FontsStyle.font15Popin()),
                     const SizedBox(height: 4),
                     Text(
-                        'Verified: ${BlocProvider.of<SocialCubit>(context).userVerification!.emailVerified ? 'Yes' : 'No'}',
+                        'Verified: ${BlocProvider.of<SocialCubit>(context).userVerification!.emailVerified ? 'Yes' : 'No, Maybe you will find the email in the spam folder'}',
                         style: FontsStyle.font15Popin()),
                   ],
                 ),

@@ -10,7 +10,7 @@ import 'package:social_media_app/shared/style/theme/constant.dart';
 
 /// A widget that represents the interactive chat input section at the bottom of the chat view.
 /// Can switch between text input and voice recording mode.
-class ChatViewInteracrive extends StatelessWidget {
+class ChatViewInteracrive extends StatefulWidget {
   /// The UID of the friend we're chatting with
   final String friendUid;
 
@@ -22,6 +22,25 @@ class ChatViewInteracrive extends StatelessWidget {
     required this.friendUid,
     required this.friendToken,
   });
+
+  @override
+  State<ChatViewInteracrive> createState() => _ChatViewInteracriveState();
+}
+
+class _ChatViewInteracriveState extends State<ChatViewInteracrive> {
+  late TextEditingController _textEditingController;
+
+  @override
+  void initState() {
+    super.initState();
+    _textEditingController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _textEditingController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +99,10 @@ class ChatViewInteracrive extends StatelessWidget {
               Expanded(
                 child: AnimatedCrossFade(
                   // Text field for typing a chat message (default)
-                  firstChild: CustomChatTextField(friendUid: friendUid),
+                  firstChild: CustomChatTextField(
+                    friendUid: widget.friendUid,
+                    controller: _textEditingController,
+                  ),
                   // Voice recording animated waveform (shown while recording)
                   secondChild: const StreamVoiceWidget(),
                   crossFadeState: chatCubit.isRecording
@@ -92,7 +114,7 @@ class ChatViewInteracrive extends StatelessWidget {
               if (chatCubit.pickedImages.isEmpty)
                 // The microphone/send voice icon button; handles recording or sending voice
                 CustomVoiceRecordIcon(
-                  friendUid: friendUid,
+                  friendUid: widget.friendUid,
                 ),
             ],
           );

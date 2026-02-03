@@ -7,50 +7,49 @@ import 'package:social_media_app/shared/components/constants.dart';
 import 'package:social_media_app/shared/network/local/cache_helper.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
 
-class CustomChatTextField extends StatelessWidget {
+class CustomChatTextField extends StatefulWidget {
   const CustomChatTextField({
     super.key,
     required this.friendUid,
+    required this.controller,
   });
 
   final String friendUid;
+  final TextEditingController controller;
 
   @override
-  Widget build(BuildContext context) {
-    TextEditingController controller = TextEditingController();
+  State<CustomChatTextField> createState() => _CustomChatTextFieldState();
+}
 
+class _CustomChatTextFieldState extends State<CustomChatTextField> {
+  @override
+  Widget build(BuildContext context) {
     return TextFormField(
-      controller: controller,
+      minLines: 1,
+      maxLines: 5,
+      keyboardType: TextInputType.multiline,
+      controller: widget.controller,
       onFieldSubmitted: (value) async {
         if (BlocProvider.of<ChatCubit>(context).pickedImages.isNotEmpty) {
           await BlocProvider.of<ChatCubit>(context)
               .uploadAndSendPickedImagesWithTextMessageOrNot(
-            friendUid: friendUid,
-            textMessage: controller.text.isNotEmpty ? controller.text : null,
+            friendUid: widget.friendUid,
+            textMessage: widget.controller.text.isNotEmpty
+                ? widget.controller.text
+                : null,
           );
         } else {
-          if (controller.text.isNotEmpty) {
+          if (widget.controller.text.isNotEmpty) {
             MessageModel model = MessageModel(
-                textMessage: controller.text,
+                textMessage: widget.controller.text,
                 uid: CacheHelper.getData(key: kUidToken),
-                friendUid: friendUid,
+                friendUid: widget.friendUid,
                 dateTime: DateTime.now());
 
-            await BlocProvider.of<ChatCubit>(context).sendAMessage(model)
-                //  .then((value) {
-                // if (context.mounted) {
-                //   BlocProvider.of<ChatCubit>(context)
-                //       .pushMessageNotificationToTheFriend(
-                //     token: friendToken,
-                //     title: "New message from ${model.uid}",
-                //     content: controller.text,
-                //   );
-                // }
-                //})
-                ;
+            await BlocProvider.of<ChatCubit>(context).sendAMessage(model);
           }
         }
-        controller.clear();
+        widget.controller.clear();
       },
       style: FontsStyle.font18PopinWithShadowOption(),
       decoration: InputDecoration(
@@ -66,34 +65,24 @@ class CustomChatTextField extends StatelessWidget {
                       .isNotEmpty) {
                     await BlocProvider.of<ChatCubit>(context)
                         .uploadAndSendPickedImagesWithTextMessageOrNot(
-                      friendUid: friendUid,
-                      textMessage:
-                          controller.text.isNotEmpty ? controller.text : null,
+                      friendUid: widget.friendUid,
+                      textMessage: widget.controller.text.isNotEmpty
+                          ? widget.controller.text
+                          : null,
                     );
                   } else {
-                    if (controller.text.isNotEmpty) {
+                    if (widget.controller.text.isNotEmpty) {
                       MessageModel model = MessageModel(
-                          textMessage: controller.text,
+                          textMessage: widget.controller.text,
                           uid: CacheHelper.getData(key: kUidToken),
-                          friendUid: friendUid,
+                          friendUid: widget.friendUid,
                           dateTime: DateTime.now());
 
                       await BlocProvider.of<ChatCubit>(context)
-                              .sendAMessage(model)
-                          //  .then((value) {
-                          // if (context.mounted) {
-                          //   BlocProvider.of<ChatCubit>(context)
-                          //       .pushMessageNotificationToTheFriend(
-                          //     token: friendToken,
-                          //     title: "New message from ${model.uid}",
-                          //     content: controller.text,
-                          //   );
-                          // }
-                          //})
-                          ;
+                          .sendAMessage(model);
                     }
                   }
-                  controller.clear();
+                  widget.controller.clear();
                 },
                 icon:
                     (state is SendMessageLoading || state is UploadImageLoading)
