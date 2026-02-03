@@ -14,14 +14,20 @@ class MyVoiceMessageWidget extends StatefulWidget {
     super.key,
     required this.audioUrl,
     required this.dateTime,
+    required this.isRead,
+    required this.isDelivered,
   });
+
+  final bool isRead;
+  final bool isDelivered;
 
   @override
   State<MyVoiceMessageWidget> createState() => _MyVoiceMessageWidgetState();
 }
 
 class _MyVoiceMessageWidgetState extends State<MyVoiceMessageWidget> {
-  late VoiceController voiceController; // Controller for handling voice message playback
+  late VoiceController
+      voiceController; // Controller for handling voice message playback
 
   @override
   void initState() {
@@ -66,10 +72,12 @@ class _MyVoiceMessageWidgetState extends State<MyVoiceMessageWidget> {
         }
       },
       child: Align(
-        alignment: Alignment.topRight, // Align this bubble to the right (my messages)
+        alignment:
+            Alignment.topRight, // Align this bubble to the right (my messages)
         child: Container(
           constraints: BoxConstraints(
-            maxWidth: MediaQuery.sizeOf(context).width * 0.85, // Limit bubble width
+            maxWidth:
+                MediaQuery.sizeOf(context).width * 0.85, // Limit bubble width
           ),
           // Margin around the bubble
           margin: const EdgeInsets.symmetric(vertical: 3, horizontal: 15),
@@ -100,10 +108,27 @@ class _MyVoiceMessageWidgetState extends State<MyVoiceMessageWidget> {
               ),
               // Message time in bottom-right corner
               Padding(
-                padding: const EdgeInsets.only(right: 20, bottom: 10),
-                child: Text(
-                  date,
-                  style: const TextStyle(color: Colors.white, fontSize: 11),
+                padding: const EdgeInsets.only(right: 12, bottom: 8),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      date,
+                      style: const TextStyle(color: Colors.white, fontSize: 11),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      widget.isRead
+                          ? Icons.done_all
+                          : widget.isDelivered
+                              ? Icons.done_all
+                              : Icons.check,
+                      size: 14,
+                      color: widget.isRead
+                          ? defaultTextColor
+                          : const Color(0XFFC4C2CB),
+                    ),
+                  ],
                 ),
               ),
             ],

@@ -22,7 +22,12 @@ class MyPhotosWithTextMessageBubbleChat extends StatelessWidget {
     required this.message,
     required this.images,
     required this.dateTime,
+    required this.isRead,
+    required this.isDelivered,
   });
+
+  final bool isRead;
+  final bool isDelivered;
 
   @override
   Widget build(BuildContext context) {
@@ -61,9 +66,27 @@ class MyPhotosWithTextMessageBubbleChat extends StatelessWidget {
               // Displays (possibly long) text with read-more/less feature.
               CustomReadMoreText(text: message!),
             // Timestamp below the content, right-aligned, muted color.
-            Text(
-              date,
-              style: const TextStyle(color: Colors.white54, fontSize: 12),
+            // Timestamp below the content, right-aligned, muted color.
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  date,
+                  style: const TextStyle(color: Colors.white54, fontSize: 12),
+                ),
+                const SizedBox(width: 5),
+                Icon(
+                  isRead
+                      ? Icons.done_all
+                      : isDelivered
+                          ? Icons.done_all
+                          : Icons.check,
+                  size: 16,
+                  color: isRead
+                      ? const Color(0xff3B21B2)
+                      : const Color(0XFFC4C2CB),
+                ),
+              ],
             ),
           ],
         ),
@@ -71,5 +94,3 @@ class MyPhotosWithTextMessageBubbleChat extends StatelessWidget {
     );
   }
 }
-
-

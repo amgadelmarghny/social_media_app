@@ -7,6 +7,8 @@ class MessageModel extends Equatable {
   final List<String>? images;
   final String uid, friendUid;
   final DateTime dateTime;
+  final bool isRead;
+  final bool isDelivered;
 
   const MessageModel({
     this.textMessage,
@@ -15,6 +17,8 @@ class MessageModel extends Equatable {
     required this.uid,
     required this.friendUid,
     required this.dateTime,
+    this.isRead = false,
+    this.isDelivered = false,
   });
 
   factory MessageModel.fromJson(json) => MessageModel(
@@ -25,6 +29,8 @@ class MessageModel extends Equatable {
         uid: json['uid'],
         friendUid: json['friendUid'],
         dateTime: (json['dateTime'] as Timestamp).toDate(),
+        isRead: json['isRead'] ?? false,
+        isDelivered: json['isDelivered'] ?? false,
       );
 
   Map<String, dynamic> toJson() => {
@@ -34,9 +40,19 @@ class MessageModel extends Equatable {
         'uid': uid,
         'friendUid': friendUid,
         kCreatedAt: dateTime,
+        'isRead': isRead,
+        'isDelivered': isDelivered,
       };
 
   @override
-  List<Object?> get props =>
-      [textMessage, uid, friendUid, dateTime, voiceRecord, images];
+  List<Object?> get props => [
+        textMessage,
+        uid,
+        friendUid,
+        dateTime,
+        voiceRecord,
+        images,
+        isRead,
+        isDelivered,
+      ];
 }

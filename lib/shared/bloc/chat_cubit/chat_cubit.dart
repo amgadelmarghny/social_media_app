@@ -77,6 +77,8 @@ class ChatCubit extends Cubit<ChatState> {
       'voiceRecord': messageModel.voiceRecord,
       'images': messageModel.images,
       kCreatedAt: timestamp,
+      'isRead': false,
+      'isDelivered': false,
     };
 
     // Prepare document refs for sender and recipient (chat preview + messages)
@@ -92,9 +94,18 @@ class ChatCubit extends Cubit<ChatState> {
         .collection(kChatCollection)
         .doc(messageModel.uid);
 
-    // Store the message in both parties' message subcollections
-    await senderDoc.collection(kMessageCollection).add(messageData);
-    await receiverDoc.collection(kMessageCollection).add(messageData);
+    // Generate a unique ID for the message
+    final messageId = senderDoc.collection(kMessageCollection).doc().id;
+
+    // Store the message in both parties' message subcollections using the SAME ID
+    await senderDoc
+        .collection(kMessageCollection)
+        .doc(messageId)
+        .set(messageData);
+    await receiverDoc
+        .collection(kMessageCollection)
+        .doc(messageId)
+        .set(messageData);
 
     // Update chat preview for sender (current user)
     await senderDoc.set(messageModel.toJson());
@@ -107,6 +118,8 @@ class ChatCubit extends Cubit<ChatState> {
       'voiceRecord': messageModel.voiceRecord,
       'images': messageModel.images,
       kCreatedAt: timestamp,
+      'isRead': false, // Preview also tracks read status if needed
+      'isDelivered': false,
     };
     await receiverDoc.set(receiverChatPreview);
 
@@ -540,7 +553,24 @@ class ChatCubit extends Cubit<ChatState> {
         messageList.clear();
 
         for (var doc in event.docs) {
-          messageList.add(MessageModel.fromJson(doc.data()));
+          final message = MessageModel.fromJson(doc.data());
+          messageList.add(message);
+
+          // If the message is from the friend (incoming) and NOT read, mark it as read/delivered
+          if (message.uid == friendUid && !message.isRead) {
+            // Update MY copy (Receiver)
+            doc.reference.update({'isRead': true, 'isDelivered': true});
+
+            // Update FRIEND'S copy (Sender) - so they see blue ticks
+            FirebaseFirestore.instance
+                .collection(kUsersCollection)
+                .doc(friendUid)
+                .collection(kChatCollection)
+                .doc(currentUserId)
+                .collection(kMessageCollection)
+                .doc(doc.id)
+                .update({'isRead': true, 'isDelivered': true});
+          }
         }
 
         // Emit updated messages to UI (copy used in case of mutation by listeners)

@@ -118,19 +118,27 @@ class _ChatViewBodyState extends State<ChatViewBody> {
                         if (message.uid == currentUserId) {
                           if (message.images != null) {
                             return MyPhotosWithTextMessageBubbleChat(
-                                message: message.textMessage,
-                                images: message.images!,
-                                dateTime: message.dateTime);
+                              message: message.textMessage,
+                              images: message.images!,
+                              dateTime: message.dateTime,
+                              isRead: message.isRead,
+                              isDelivered: message.isDelivered,
+                            );
                           }
                           if (message.textMessage != null) {
                             return MyBubbleChat(
-                                message: message.textMessage!,
-                                dateTime: message.dateTime);
+                              message: message.textMessage!,
+                              dateTime: message.dateTime,
+                              isRead: message.isRead,
+                              isDelivered: message.isDelivered,
+                            );
                           } else if (message.voiceRecord != null) {
                             return MyVoiceMessageWidget(
                               key: ValueKey(message.voiceRecord),
                               audioUrl: message.voiceRecord!,
                               dateTime: message.dateTime,
+                              isRead: message.isRead,
+                              isDelivered: message.isDelivered,
                             );
                           }
                         } else {
