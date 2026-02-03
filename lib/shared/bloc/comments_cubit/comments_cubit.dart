@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -10,7 +11,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:social_media_app/models/comment_model.dart';
 import 'package:social_media_app/shared/components/constants.dart';
 import 'package:social_media_app/models/notification_model.dart';
-import 'package:social_media_app/shared/dio_helper.dart';
+
+import 'package:social_media_app/shared/services/notification_service.dart';
 part 'comments_state.dart';
 
 class CommentsCubit extends Cubit<CommentsState> {
@@ -153,11 +155,10 @@ class CommentsCubit extends Cubit<CommentsState> {
           if (postOwnerData != null) {
             final String? token = postOwnerData['fcmToken'];
             if (token != null && token.isNotEmpty) {
-              await DioHelper.post(
-                token: token,
-                title: commentModel.userName ?? "User",
-                bodyContent:
-                    'commented: ${commentModel.comment ?? "Sent an image"}',
+              await NotificationService().sendNotification(
+                receiverToken: token,
+                title: commentModel.userName,
+                body: 'commented: ${commentModel.comment ?? "Sent an image"}',
               );
             }
           }
@@ -168,6 +169,7 @@ class CommentsCubit extends Cubit<CommentsState> {
       await getComments(postId: postId);
     } catch (err) {
       emit(AddCommentFailure(error: err.toString()));
+      log(err.toString());
     }
   }
 

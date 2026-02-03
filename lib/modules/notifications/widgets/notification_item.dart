@@ -62,14 +62,14 @@ class NotificationItem extends StatelessWidget {
             if (model.type == 'like' || model.type == 'comment')
               // Optionally show a small icon indicating type
               Icon(
-                model.type == 'like' ? Icons.favorite : Icons.comment,
+                model.type == 'like' ? Icons.favorite : Icons.comment_outlined,
                 size: 30,
-                color: model.type == 'like' ? defaultTextColor : Colors.blue,
+                color: model.type == 'like' ? defaultColorButton : Colors.white54,
               ),
             if (model.type == 'message' && model.subType == 'image')
-              const Icon(Icons.image, size: 20, color: Colors.purple),
+              const Icon(Icons.image, size: 20, color: Colors.white54),
             if (model.type == 'message' && model.subType == 'voice')
-              const Icon(Icons.mic, size: 20, color: Colors.orange),
+              const Icon(Icons.mic, size: 20, color: Colors.white54),
             if (model.type == 'follow')
               const Icon(Icons.person_add, size: 30, color: Colors.white54),
           ],

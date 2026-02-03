@@ -17,7 +17,8 @@ import 'package:social_media_app/models/notification_model.dart';
 import 'package:social_media_app/shared/components/constants.dart';
 import 'package:social_media_app/shared/network/local/cache_helper.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
-import 'package:social_media_app/shared/dio_helper.dart';
+
+import 'package:social_media_app/shared/services/notification_service.dart';
 
 part 'chat_state.dart';
 
@@ -162,7 +163,7 @@ class ChatCubit extends Cubit<ChatState> {
         if (senderData != null) {
           final senderName =
               '${senderData['firstName']} ${senderData['lastName']}';
-          final senderPhoto = senderData['photo'] ?? '';
+          final String? senderPhoto = senderData['photo'];
 
           final notification = NotificationModel(
             notificationId: notificationId,
@@ -194,10 +195,10 @@ class ChatCubit extends Cubit<ChatState> {
             if (friendData != null) {
               final String? token = friendData['fcmToken'];
               if (token != null && token.isNotEmpty) {
-                await DioHelper.post(
-                  token: token,
+                await NotificationService().sendNotification(
+                  receiverToken: token,
                   title: senderName,
-                  bodyContent: notificationContent,
+                  body: notificationContent,
                 );
               }
             }
@@ -623,23 +624,6 @@ class ChatCubit extends Cubit<ChatState> {
     chatItemsList.sort((a, b) => b.dateTime.compareTo(a.dateTime));
     emit(GetChatsSuccessState());
   }
-
-  /*
-  // Example: How to send push notification after message (not in use; left for reference)
-  // Future<void> pushMessageNotificationToTheFriend({
-  //   required String token,
-  //   required String title,
-  //   required String content,
-  // }) async {
-  //   try {
-  //     await DioHelper.post(token: token, title: title, bodyContent: content);
-  //     emit(PushMessageNotificationToTheFriendSuccess());
-  //   } on Exception catch (e) {
-  //     emit(PushMessageNotificationToTheFriendFailure(
-  //         errMessage: 'Error sending push notification: ${e.toString()}'));
-  //   }
-  // }
-  */
 
   /// Disposes of the Firestore listener to avoid leaks; always call when cubit is closed
   @override

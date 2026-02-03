@@ -45,10 +45,13 @@ Future<String?> pickYear({required BuildContext context}) async {
                       label: Container(
                         color: Colors.white,
                         padding: const EdgeInsets.all(5),
-                        child: Text(
-                          // Showing the year text, it starts from 2022 and ends in 1900 (you can modify this as you like)
-                          (2024 - index).toString(),
-                          style: TextStyle(color: Colors.black54),
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            // Showing the year text, it starts from 2022 and ends in 1900 (you can modify this as you like)
+                            (2024 - index).toString(),
+                            style: TextStyle(color: Colors.black54),
+                          ),
                         ),
                       ),
                     ),

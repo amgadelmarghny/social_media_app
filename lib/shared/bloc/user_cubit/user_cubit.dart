@@ -5,7 +5,8 @@ import 'package:social_media_app/models/user_model.dart';
 import 'package:social_media_app/shared/components/constants.dart';
 import 'package:flutter/material.dart';
 import '../../../../models/notification_model.dart';
-import 'package:social_media_app/shared/dio_helper.dart';
+
+import 'package:social_media_app/shared/services/notification_service.dart';
 
 part 'user_state.dart';
 
@@ -72,9 +73,8 @@ class UserCubit extends Cubit<UserState> {
       // Update the number of followings.
       numberOfFollowing = snapshot.docs.length;
       // Clear the current list before adding new data.
-      followings.clear();
-
-      // Use a Set to track UIDs and prevent duplicates
+      // Use a temporary list to avoid race conditions
+      List<UserModel> tempFollowings = [];
       final seenUids = <String>{};
 
       // For each following, fetch the user data and add to the list.
@@ -84,10 +84,11 @@ class UserCubit extends Cubit<UserState> {
 
         final userModel = await _userCollection.doc(doc.id).get();
         if (userModel.exists && userModel.data() != null) {
-          followings.add(UserModel.fromJson(userModel.data()!));
+          tempFollowings.add(UserModel.fromJson(userModel.data()!));
           seenUids.add(doc.id);
         }
       }
+      followings = tempFollowings;
       emit(GetUserFollowingSuccessState());
     } catch (e) {
       // Emit error state if something goes wrong.
@@ -112,9 +113,8 @@ class UserCubit extends Cubit<UserState> {
       // Update the number of followers.
       numberOfFollowers = snapshot.docs.length;
       // Clear the current list before adding new data.
-      followers.clear();
-
-      // Use a Set to track UIDs and prevent duplicates
+      // Use a temporary list
+      List<UserModel> tempFollowers = [];
       final seenUids = <String>{};
 
       // For each follower, fetch the user data and add to the list.
@@ -124,10 +124,11 @@ class UserCubit extends Cubit<UserState> {
 
         final userModel = await _userCollection.doc(doc.id).get();
         if (userModel.exists && userModel.data() != null) {
-          followers.add(UserModel.fromJson(userModel.data()!));
+          tempFollowers.add(UserModel.fromJson(userModel.data()!));
           seenUids.add(doc.id);
         }
       }
+      followers = tempFollowers;
       emit(GetUserFollowersSuccessState());
     } catch (e) {
       // Emit error state if something goes wrong.
@@ -196,7 +197,7 @@ class UserCubit extends Cubit<UserState> {
           if (myUserData != null) {
             final senderName =
                 '${myUserData['firstName']} ${myUserData['lastName']}';
-            final senderPhoto = myUserData['photo'] ?? '';
+            final String? senderPhoto = myUserData['photo'];
 
             final notificationId =
                 DateTime.now().millisecondsSinceEpoch.toString();
@@ -228,10 +229,10 @@ class UserCubit extends Cubit<UserState> {
               if (followedUserData != null) {
                 final String? fToken = followedUserData['fcmToken'];
                 if (fToken != null && fToken.isNotEmpty) {
-                  await DioHelper.post(
-                    token: fToken,
+                  await NotificationService().sendNotification(
+                    receiverToken: fToken,
                     title: senderName,
-                    bodyContent: 'started following you',
+                    body: 'started following you',
                   );
                 }
               }

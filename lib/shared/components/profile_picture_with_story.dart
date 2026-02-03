@@ -37,7 +37,7 @@ class ProfilePictureWithStory extends StatelessWidget {
           ]),
           shape: BoxShape.circle,
         ),
-        child: image != null
+        child: image != null && image != ''
             ? CachedNetworkImage(
                 fit: BoxFit.cover,
                 imageUrl: image!,

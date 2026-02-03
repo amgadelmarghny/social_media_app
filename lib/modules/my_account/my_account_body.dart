@@ -134,7 +134,10 @@ class _UsersBodyState extends State<UsersBody> {
                           // to cancel adding post or upload it again
                           state is UploadPostImageFailureState ||
                           state is CreatePostFailureState)
-                        const SliverToBoxAdapter(child: UploadPostDemo()),
+                        const SliverToBoxAdapter(child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          child: UploadPostDemo(),
+                        )),
                     //user's posts
                     const MySliverPostsListAccount(),
                   ],

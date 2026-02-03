@@ -1,8 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/foundation.dart';
+import 'package:googleapis_auth/auth_io.dart';
+import 'package:googleapis_auth/googleapis_auth.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 /// Top-level function to handle background messages
 /// This must be a top-level function (not inside a class)
@@ -16,11 +21,71 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 /// Service class to manage all notification-related functionality
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+
   factory NotificationService() => _instance;
   NotificationService._internal();
 
-  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+  Future<AccessCredentials> _getAccessToken() async {
+    final serviceAccountPath = "important/notification_key.json";
+
+    String serviceAccountJson = await rootBundle.loadString(serviceAccountPath);
+    final serviceAccountCredentials =
+        ServiceAccountCredentials.fromJson(serviceAccountJson);
+    final scopes = ["https://www.googleapis.com/auth/firebase.messaging"];
+    final client =
+        await clientViaServiceAccount(serviceAccountCredentials, scopes);
+    return client.credentials;
+  }
+
+  Future<void> sendNotification({
+    required String receiverToken,
+    required String title,
+    required String body,
+  }) async {
+    final credentials = await _getAccessToken();
+    final url = Uri.parse(
+        'https://fcm.googleapis.com/v1/projects/zmlni-6c5f7/messages:send');
+    final accessToken = credentials.accessToken.data;
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'message': {
+          'token': receiverToken,
+          'notification': {
+            'title': title,
+            'body': body,
+          },
+          'android': {
+            'notification': {
+              'sound': 'default',
+              'channel_id': 'high_importance_channel',
+              'priority': 'high',
+            },
+          },
+          'apns': {
+            'payload': {
+              'aps': {
+                'sound': 'default',
+              },
+            },
+          },
+        },
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      debugPrint('Notification sent successfully');
+    } else {
+      debugPrint('Failed to send notification: ${response.body}');
+    }
+  }
 
   /// Initialize local notifications with Android and iOS settings
   Future<void> initialize() async {
@@ -81,15 +146,14 @@ class NotificationService {
   /// Configure Firebase Cloud Messaging
   Future<void> configureFCM() async {
     // Request permission for iOS
-    await FirebaseMessaging.instance.requestPermission(
+    await _firebaseMessaging.requestPermission(
       alert: true,
       badge: true,
       sound: true,
     );
 
     // Set foreground notification presentation options for iOS
-    await FirebaseMessaging.instance
-        .setForegroundNotificationPresentationOptions(
+    await _firebaseMessaging.setForegroundNotificationPresentationOptions(
       alert: true,
       badge: true,
       sound: true,
@@ -105,7 +169,7 @@ class NotificationService {
     FirebaseMessaging.onMessageOpenedApp.listen(_handleMessageOpenedApp);
 
     // Handle notification tap when app was terminated
-    FirebaseMessaging.instance.getInitialMessage().then((message) {
+    _firebaseMessaging.getInitialMessage().then((message) {
       if (message != null) {
         _handleMessageOpenedApp(message);
       }
@@ -187,7 +251,7 @@ class NotificationService {
       }
 
       // Get FCM token
-      final String? token = await FirebaseMessaging.instance.getToken();
+      final String? token = await _firebaseMessaging.getToken();
       if (token == null) {
         debugPrint('Failed to get FCM token');
         return;
@@ -209,7 +273,7 @@ class NotificationService {
 
   /// Setup listener for FCM token refresh
   void setupTokenRefreshListener() {
-    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
+    _firebaseMessaging.onTokenRefresh.listen((newToken) async {
       debugPrint('FCM token refreshed: $newToken');
 
       // Auto-save the new token to Firestore

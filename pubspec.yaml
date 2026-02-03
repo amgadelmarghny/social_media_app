@@ -13,7 +13,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.0+4
+version: 1.0.0+5
 
 environment:
   sdk: ">=3.3.3 <4.0.0"
@@ -45,6 +45,7 @@ dependencies:
   flutter_native_splash: ^2.4.7
   flutter_svg: ^2.2.3
   fluttertoast: ^9.0.0
+  googleapis_auth: ^2.0.0
   http: ^1.6.0
   hugeicons: ^1.1.4
   icon_broken: ^1.1.0
@@ -82,6 +83,7 @@ flutter:
   uses-material-design: true
   assets:
     - lib/assets/images/
+    - important/notification_key.json
   fonts:
     - family: Poppins
       fonts:

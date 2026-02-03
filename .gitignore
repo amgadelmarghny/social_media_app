@@ -42,4 +42,4 @@ app.*.map.json
 /android/app/release
 
 # Sensitive Keys
-lib/shared/keys.dart
+important/notification_key.json

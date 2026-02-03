@@ -6,7 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social_media_app/shared/dio_helper.dart';
+
 import 'package:social_media_app/shared/services/notification_service.dart';
 import 'package:icon_broken/icon_broken.dart';
 import 'package:image_picker/image_picker.dart';
@@ -177,8 +177,9 @@ class SocialCubit extends Cubit<SocialState> {
       FirebaseFirestore.instance.collection(kUsersCollection);
 
   // Fetch user data from Firestore and update [userModel]
-  Future<UserModel?> getUserData({required String userUid}) async {
-    emit(GetMyDataLoadingState());
+  Future<UserModel?> getUserData(
+      {required String userUid, bool emitState = true}) async {
+    if (emitState) emit(GetMyDataLoadingState());
     try {
       DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
           await _userCollectionRef.doc(userUid).get();
@@ -193,15 +194,17 @@ class SocialCubit extends Cubit<SocialState> {
           // Use NotificationService instead of updateFCMToken
           await NotificationService().saveFCMToken(userUid);
         }
-        emit(GetMyDataSuccessState());
+        if (emitState) emit(GetMyDataSuccessState());
         return specificUserModel;
       } else {
         // لو مش موجود، ممكن تبعث فشل أو تتعامل معاه
-        emit(GetMyDataFailureState(errMessage: "User data not found"));
+        if (emitState) {
+          emit(GetMyDataFailureState(errMessage: "User data not found"));
+        }
         return null;
       }
     } catch (e) {
-      emit(GetMyDataFailureState(errMessage: e.toString()));
+      if (emitState) emit(GetMyDataFailureState(errMessage: e.toString()));
       return null;
     }
   }
@@ -454,7 +457,12 @@ class SocialCubit extends Cubit<SocialState> {
       commentsNum: createPostImplModel.commentsNum,
     );
     try {
-      await _postCollectionRef.add(postModel.toJson());
+      DocumentReference docRef =
+          await _postCollectionRef.add(postModel.toJson());
+
+      // Notify followers about the new post
+      _notifyFollowers(postModel, docRef.id);
+
       postContentController.clear();
       postImagePicked = null;
       emit(CreatePostSuccessState());
@@ -464,6 +472,61 @@ class SocialCubit extends Cubit<SocialState> {
       await getTimelinePosts();
     } catch (err) {
       emit(CreatePostFailureState(errMessage: err.toString()));
+    }
+  }
+
+  // Helper function to notify followers
+  Future<void> _notifyFollowers(PostModel postModel, String postDocId) async {
+    try {
+      // 1. Get followers
+      final followersSnapshot = await _userCollectionRef
+          .doc(userModel!.uid)
+          .collection(kFollowersCollection)
+          .get();
+
+      for (var followerDoc in followersSnapshot.docs) {
+        final followerUid = followerDoc.id;
+
+        // 2. Create Notification Model
+        final notificationId = DateTime.now().millisecondsSinceEpoch.toString();
+        final notification = NotificationModel(
+          notificationId: notificationId,
+          senderUid: userModel!.uid,
+          receiverUid: followerUid,
+          senderName: '${userModel!.firstName} ${userModel!.lastName}',
+          senderPhoto: userModel!.photo,
+          type: 'post',
+          content: 'published a new post',
+          postId: postDocId,
+          isRead: false,
+          dateTime: DateTime.now(),
+        );
+
+        // 3. Save to Firestore (Follower's notifications)
+        await _userCollectionRef
+            .doc(followerUid)
+            .collection('notifications')
+            .doc(notificationId)
+            .set(notification.toMap());
+
+        // 4. Send Push Notification
+        final followerUserDoc = await _userCollectionRef.doc(followerUid).get();
+        if (followerUserDoc.exists) {
+          final followerData = followerUserDoc.data();
+          if (followerData != null) {
+            final String? token = followerData['fcmToken'];
+            if (token != null && token.isNotEmpty) {
+              await NotificationService().sendNotification(
+                receiverToken: token,
+                title: '${userModel!.firstName} ${userModel!.lastName}',
+                body: 'published a new post',
+              );
+            }
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('Error notifying followers: $e');
     }
   }
 
@@ -635,7 +698,8 @@ class SocialCubit extends Cubit<SocialState> {
       List<String> usersLikeUids =
           await _getUsersLikesUidInPost(postId: postId);
       for (var userUid in usersLikeUids) {
-        UserModel? userModel = await getUserData(userUid: userUid);
+        UserModel? userModel =
+            await getUserData(userUid: userUid, emitState: false);
         if (userModel != null) {
           userModelList.add(userModel);
         }
@@ -709,10 +773,10 @@ class SocialCubit extends Cubit<SocialState> {
             if (postOwnerData != null) {
               final String? token = postOwnerData['fcmToken'];
               if (token != null && token.isNotEmpty) {
-                await DioHelper.post(
-                  token: token,
+                await NotificationService().sendNotification(
+                  receiverToken: token,
                   title: '${userModel!.firstName} ${userModel!.lastName}',
-                  bodyContent: 'liked your post',
+                  body: 'liked your post',
                 );
               }
             }
@@ -721,6 +785,7 @@ class SocialCubit extends Cubit<SocialState> {
       } catch (errMessage) {
         emit(LikePostFailureState(
             errMessage: 'Like error: ${errMessage.toString()}'));
+        print('Like error :::::: $errMessage');
       }
     } else {
       try {
@@ -776,20 +841,28 @@ class SocialCubit extends Cubit<SocialState> {
   late int numberOfFollowing;
 
   // Get the users the current user is following
+  // Get the users the current user is following
   Future<QuerySnapshot<Map<String, dynamic>>> getFollowing() async {
     final followingSnapshot = await FirebaseFirestore.instance
         .collection(kUsersCollection)
         .doc(currentUserUid)
         .collection(kFollowingCollection)
         .get();
-    followings.clear();
+
+    // Use a temporary list to avoid duplicates/race conditions during async fetching
+    List<UserModel> tempFollowings = [];
     numberOfFollowing = followingSnapshot.docs.length;
+
     for (var userDoc in followingSnapshot.docs) {
-      final UserModel? userModel = await getUserData(userUid: userDoc.id);
+      final UserModel? userModel =
+          await getUserData(userUid: userDoc.id, emitState: false);
       if (userModel != null) {
-        followings.add(userModel);
+        tempFollowings.add(userModel);
       }
     }
+
+    // Assign the full list at once
+    followings = tempFollowings;
     emit(GetFollowingSuccessState());
     return followingSnapshot;
   }

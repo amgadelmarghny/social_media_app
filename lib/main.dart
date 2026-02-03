@@ -14,7 +14,6 @@ import 'package:social_media_app/shared/bloc/app_cubit/app_cubit.dart';
 import 'package:social_media_app/shared/bloc/bloc_observer.dart';
 import 'package:social_media_app/shared/bloc/chat_cubit/chat_cubit.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
-import 'package:social_media_app/shared/dio_helper.dart';
 import 'package:social_media_app/shared/network/local/cache_helper.dart';
 import 'package:social_media_app/shared/components/constants.dart';
 import 'package:social_media_app/shared/style/theme/theme.dart';
@@ -24,7 +23,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = MyBlocObserver();
   await CacheHelper.init();
-  DioHelper.init();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );

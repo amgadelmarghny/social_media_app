@@ -58,6 +58,15 @@ class UserViewBody extends StatelessWidget {
                   ),
                 ),
               ),
+              SliverToBoxAdapter(
+                child: Transform.translate(
+                  offset: const Offset(0.0, -10),
+                  child: Text(
+                    '@${userModel.userName}',
+                    style: FontsStyle.font18PopinWithShadowOption(),
+                  ),
+                ),
+              ),
               const SliverToBoxAdapter(
                 child: SizedBox(
                   height: 15,
