@@ -40,12 +40,13 @@ class _CustomChatTextFieldState extends State<CustomChatTextField> {
           );
         } else {
           if (widget.controller.text.isNotEmpty) {
+            widget.controller.clear();
+
             MessageModel model = MessageModel(
                 textMessage: widget.controller.text,
                 uid: CacheHelper.getData(key: kUidToken),
                 friendUid: widget.friendUid,
                 dateTime: DateTime.now());
-            widget.controller.clear();
             await BlocProvider.of<ChatCubit>(context).sendAMessage(model);
           }
         }

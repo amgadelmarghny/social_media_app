@@ -138,6 +138,14 @@ class _NotificationsBodyState extends State<NotificationsBody> {
     );
 
     try {
+      // Mark as read in Firestore
+      await FirebaseFirestore.instance
+          .collection(kUsersCollection)
+          .doc(cubit.currentUserUid)
+          .collection('notifications')
+          .doc(model.notificationId)
+          .update({'isRead': true});
+
       if (model.type == 'message') {
         // Navigate to ChatView
         // We need the UserModel of the sender
@@ -169,7 +177,7 @@ class _NotificationsBodyState extends State<NotificationsBody> {
             // debugPrint("Post not found");
           }
         } else {
-          Navigator.pop(context); // Close loading
+          if(context.mounted) Navigator.pop(context); // Close loading
         }
       } else if (model.type == 'follow') {
         // Navigate to UserView
@@ -181,7 +189,7 @@ class _NotificationsBodyState extends State<NotificationsBody> {
           // debugPrint("User not found");
         }
       } else {
-        Navigator.pop(context); // Close loading
+        if(context.mounted) Navigator.pop(context); // Close loading
       }
     } catch (e) {
       if (context.mounted) Navigator.pop(context); // Close loading

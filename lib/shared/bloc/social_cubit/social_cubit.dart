@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -39,9 +40,17 @@ class SocialCubit extends Cubit<SocialState> {
   bool hasUnreadNotifications = false;
   bool hasUnreadMessages = false;
 
+  StreamSubscription? _messagesUnreadSubscription;
+  StreamSubscription? _notificationsUnreadSubscription;
+
   void _startNotificationListener() {
+    // 1. Listen for background/foreground FCM messages (already partially here)
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       if (message.data['type'] == 'message') {
+        final senderUid = message.data['uid'];
+        if (senderUid != null) {
+          _markMessagesAsDelivered(senderUid);
+        }
         if (currentBottomNavBarIndex != 1) {
           hasUnreadMessages = true;
           emit(BottomNavBarState());
@@ -51,6 +60,42 @@ class SocialCubit extends Cubit<SocialState> {
           hasUnreadNotifications = true;
           emit(BottomNavBarState());
         }
+      }
+    });
+
+    // 2. Listen to Firestore for ACTUAL unread status (covers app restarts and sync)
+    _listenForFirestoreUnreadStates();
+  }
+
+  void _listenForFirestoreUnreadStates() {
+    _messagesUnreadSubscription?.cancel();
+    _notificationsUnreadSubscription?.cancel();
+
+    // Listen to chats for any isRead == false
+    _messagesUnreadSubscription = FirebaseFirestore.instance
+        .collection(kUsersCollection)
+        .doc(currentUserUid)
+        .collection(kChatCollection)
+        .where('isRead', isEqualTo: false)
+        .snapshots()
+        .listen((event) {
+      if (currentBottomNavBarIndex != 1) {
+        hasUnreadMessages = event.docs.isNotEmpty;
+        emit(BottomNavBarState());
+      }
+    });
+
+    // Listen to notifications for any isRead == false
+    _notificationsUnreadSubscription = FirebaseFirestore.instance
+        .collection(kUsersCollection)
+        .doc(currentUserUid)
+        .collection('notifications')
+        .where('isRead', isEqualTo: false)
+        .snapshots()
+        .listen((event) {
+      if (currentBottomNavBarIndex != 4) {
+        hasUnreadNotifications = event.docs.isNotEmpty;
+        emit(BottomNavBarState());
       }
     });
   }
@@ -80,6 +125,54 @@ class SocialCubit extends Cubit<SocialState> {
     }
     currentBottomNavBarIndex = value;
     emit(BottomNavBarState());
+  }
+
+  void _markMessagesAsDelivered(String senderUid) async {
+    try {
+      final messagesRef = FirebaseFirestore.instance
+          .collection(kUsersCollection)
+          .doc(currentUserUid)
+          .collection(kChatCollection)
+          .doc(senderUid)
+          .collection(kMessageCollection);
+
+      final unreadMessages = await messagesRef
+          .where('uid', isEqualTo: senderUid)
+          .where('isDelivered', isEqualTo: false)
+          .get();
+
+      for (var doc in unreadMessages.docs) {
+        // Update receiver's copy
+        await doc.reference.update({'isDelivered': true});
+
+        // Update sender's copy
+        await FirebaseFirestore.instance
+            .collection(kUsersCollection)
+            .doc(senderUid)
+            .collection(kChatCollection)
+            .doc(currentUserUid)
+            .collection(kMessageCollection)
+            .doc(doc.id)
+            .update({'isDelivered': true});
+      }
+
+      // Also update chat preview for both
+      await FirebaseFirestore.instance
+          .collection(kUsersCollection)
+          .doc(currentUserUid)
+          .collection(kChatCollection)
+          .doc(senderUid)
+          .update({'isDelivered': true});
+
+      await FirebaseFirestore.instance
+          .collection(kUsersCollection)
+          .doc(senderUid)
+          .collection(kChatCollection)
+          .doc(currentUserUid)
+          .update({'isDelivered': true});
+    } catch (e) {
+      // debugPrint("Error marking as delivered: $e");
+    }
   }
 
   // List of widgets shown in the body based on the current navbar index
@@ -227,7 +320,6 @@ class SocialCubit extends Cubit<SocialState> {
         if (emitState) emit(GetMyDataSuccessState());
         return specificUserModel;
       } else {
-        // لو مش موجود، ممكن تبعث فشل أو تتعامل معاه
         if (emitState) {
           emit(GetMyDataFailureState(errMessage: "User data not found"));
         }
@@ -869,7 +961,6 @@ class SocialCubit extends Cubit<SocialState> {
       } catch (errMessage) {
         emit(LikePostFailureState(
             errMessage: 'Like error: ${errMessage.toString()}'));
-        print('Like error :::::: $errMessage');
       }
     } else {
       try {

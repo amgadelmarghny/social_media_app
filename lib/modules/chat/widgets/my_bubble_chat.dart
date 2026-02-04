@@ -74,10 +74,9 @@ class MyBubbleChat extends StatelessWidget {
                               ? Icons.done_all
                               : Icons.check,
                   size: 16,
-                  color: (isRead && !isSelfChat)
+                  color: isRead
                       ? const Color(0xFF03A9F4) // Blue seen color
-                      : const Color(
-                          0XFFC4C2CB), // Gray for unsent or self-chat seen
+                      : const Color(0XFFC4C2CB), // Gray for others
                 ),
               ],
             ),

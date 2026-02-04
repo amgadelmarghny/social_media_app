@@ -124,16 +124,6 @@ class ChatCubit extends Cubit<ChatState> {
     };
     await receiverDoc.set(receiverChatPreview);
 
-    // Locally update displayed chat preview items (UI refresh)
-    _updateChatItemInList(
-      friendUid: messageModel.friendUid,
-      dateTime: messageModel.dateTime,
-      textMessage: messageModel.textMessage,
-      voiceMessage: messageModel.voiceRecord,
-      images: messageModel.images,
-      isRead: true, // It's our sent message, so it's read
-    );
-
     // Send Notification to Receiver
     String notificationContent = '';
 
@@ -571,77 +561,43 @@ class ChatCubit extends Cubit<ChatState> {
   /// List of chat previews (sidebar/recent chats) for current user
   List<ChatItemModel> chatItemsList = [];
 
+  /// Subscription handler for the chat list stream
+  StreamSubscription<QuerySnapshot>? _chatsSubscription;
+
   /// Loads all chat preview items for this user (called on chat list screen load)
+  /// Uses a real-time listener to update the list automatically.
   Future<void> getChats() async {
     emit(GetChatsLoadingState());
-    try {
-      // Query all chat preview docs, newest on top
-      final chatCollection = await FirebaseFirestore.instance
-          .collection(kUsersCollection)
-          .doc(currentUserId)
-          .collection(kChatCollection)
-          .orderBy(kCreatedAt, descending: true)
-          .get();
 
-      chatItemsList.clear();
-      // Convert Firestore docs to ChatItemModel instances for the UI
-      for (var chatItem in chatCollection.docs) {
-        ChatItemModel chatItemModel = ChatItemModel(
-          uid: chatItem.id,
-          textMessage: chatItem.data()['textMessage'],
-          voiceRecord: chatItem.data()['voiceRecord'],
-          images: (chatItem.data()['images']),
-          dateTime: (chatItem.data()[kCreatedAt] as Timestamp).toDate(),
-          isRead: chatItem.data()['isRead'] ?? true,
-        );
-        chatItemsList.add(chatItemModel);
-      }
-      emit(GetChatsSuccessState());
-    } on Exception catch (e) {
-      emit(GetChatsFailureState(errMessage: e.toString()));
-    }
-  }
+    // Cancel old subscription if exists
+    _chatsSubscription?.cancel();
 
-  /// Locally updates (adds/modifies) a ChatItemModel in [chatItemsList] after message was sent
-  /// Ensures chat sidebar/list reflects latest message contents & timestamp immediately
-  void _updateChatItemInList({
-    required String friendUid,
-    String? textMessage,
-    String? voiceMessage,
-    List<String>? images,
-    required DateTime dateTime,
-    required bool isRead,
-  }) {
-    // If already exists, update the entry. Otherwise, add as new chat preview.
-    final existingIndex = chatItemsList.indexWhere(
-      (item) => item.uid == friendUid,
+    _chatsSubscription = FirebaseFirestore.instance
+        .collection(kUsersCollection)
+        .doc(currentUserId)
+        .collection(kChatCollection)
+        .orderBy(kCreatedAt, descending: true)
+        .snapshots()
+        .listen(
+      (event) {
+        chatItemsList.clear();
+        for (var chatItem in event.docs) {
+          ChatItemModel chatItemModel = ChatItemModel(
+            uid: chatItem.id,
+            textMessage: chatItem.data()['textMessage'],
+            voiceRecord: chatItem.data()['voiceRecord'],
+            images: (chatItem.data()['images']),
+            dateTime: (chatItem.data()[kCreatedAt] as Timestamp).toDate(),
+            isRead: chatItem.data()['isRead'] ?? true,
+          );
+          chatItemsList.add(chatItemModel);
+        }
+        emit(GetChatsSuccessState());
+      },
+      onError: (error) {
+        emit(GetChatsFailureState(errMessage: error.toString()));
+      },
     );
-
-    if (existingIndex != -1) {
-      chatItemsList[existingIndex] = ChatItemModel(
-        uid: friendUid,
-        textMessage: textMessage,
-        voiceRecord: voiceMessage,
-        images: images,
-        dateTime: dateTime,
-        isRead: isRead,
-      );
-    } else {
-      chatItemsList.add(
-        ChatItemModel(
-          uid: friendUid,
-          textMessage: textMessage,
-          dateTime: dateTime,
-          voiceRecord: voiceMessage,
-          images: images,
-          isRead: isRead,
-        ),
-      );
-    }
-
-    // Re-sort for newest at the top
-    chatItemsList.sort((a, b) => b.dateTime.compareTo(a.dateTime));
-    emit(GetChatsSuccessState());
   }
 
   /// Disposes of the Firestore listener to avoid leaks; always call when cubit is closed

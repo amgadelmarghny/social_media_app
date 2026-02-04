@@ -12,6 +12,7 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:social_media_app/main.dart';
 import 'package:social_media_app/models/user_model.dart';
+import 'package:social_media_app/shared/components/constants.dart';
 import 'package:social_media_app/modules/chat/chat_view.dart';
 import 'package:social_media_app/layout/home/home_view.dart';
 
@@ -20,9 +21,57 @@ import 'package:social_media_app/layout/home/home_view.dart';
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   debugPrint('Background message received: ${message.messageId}');
-  debugPrint('Title: ${message.notification?.title}');
-  debugPrint('Body: ${message.notification?.body}');
-  debugPrint('Data: ${message.data}');
+  if (message.data['type'] == 'message') {
+    final senderUid = message.data['uid'];
+    final receiverUid = FirebaseAuth.instance.currentUser?.uid;
+    if (senderUid != null && receiverUid != null) {
+      try {
+        final messagesRef = FirebaseFirestore.instance
+            .collection(kUsersCollection)
+            .doc(receiverUid)
+            .collection(kChatCollection)
+            .doc(senderUid)
+            .collection(kMessageCollection);
+
+        final unreadMessages = await messagesRef
+            .where('uid', isEqualTo: senderUid)
+            .where('isDelivered', isEqualTo: false)
+            .get();
+
+        for (var doc in unreadMessages.docs) {
+          // Update receiver's copy
+          await doc.reference.update({'isDelivered': true});
+
+          // Update sender's copy
+          await FirebaseFirestore.instance
+              .collection(kUsersCollection)
+              .doc(senderUid)
+              .collection(kChatCollection)
+              .doc(receiverUid)
+              .collection(kMessageCollection)
+              .doc(doc.id)
+              .update({'isDelivered': true});
+        }
+
+        // Also update chat preview for both
+        await FirebaseFirestore.instance
+            .collection(kUsersCollection)
+            .doc(receiverUid)
+            .collection(kChatCollection)
+            .doc(senderUid)
+            .update({'isDelivered': true});
+
+        await FirebaseFirestore.instance
+            .collection(kUsersCollection)
+            .doc(senderUid)
+            .collection(kChatCollection)
+            .doc(receiverUid)
+            .update({'isDelivered': true});
+      } catch (e) {
+        debugPrint("Error marking as delivered in background: $e");
+      }
+    }
+  }
 }
 
 /// Service class to manage all notification-related functionality
