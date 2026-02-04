@@ -8,6 +8,8 @@ import 'package:googleapis_auth/auth_io.dart';
 import 'package:googleapis_auth/googleapis_auth.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 import 'package:social_media_app/main.dart';
 import 'package:social_media_app/models/user_model.dart';
 import 'package:social_media_app/modules/chat/chat_view.dart';
@@ -49,6 +51,7 @@ class NotificationService {
     required String receiverToken,
     required String title,
     required String body,
+    String? senderPhoto,
     Map<String, dynamic>? data,
   }) async {
     final credentials = await _getAccessToken();
@@ -67,8 +70,14 @@ class NotificationService {
           'notification': {
             'title': title,
             'body': body,
+            if (senderPhoto != null && senderPhoto.isNotEmpty)
+              'image': senderPhoto,
           },
-          'data': data?.map((key, value) => MapEntry(key, value.toString())),
+          'data': {
+            ...?data?.map((key, value) => MapEntry(key, value.toString())),
+            if (senderPhoto != null && senderPhoto.isNotEmpty)
+              'senderPhoto': senderPhoto,
+          },
           'android': {
             'priority': 'high',
             'notification': {
@@ -229,8 +238,20 @@ class NotificationService {
         title: message.notification!.title ?? 'New Notification',
         body: message.notification!.body ?? '',
         payload: message.data.toString(),
+        imageUrl: message.data['senderPhoto'] ??
+            message.notification!.android?.imageUrl,
       );
     }
+  }
+
+  /// Download and save image to local storage for local notifications
+  Future<String?> _downloadAndSaveFile(String url, String fileName) async {
+    final Directory directory = await getApplicationDocumentsDirectory();
+    final String filePath = '${directory.path}/$fileName';
+    final http.Response response = await http.get(Uri.parse(url));
+    final File file = File(filePath);
+    await file.writeAsBytes(response.bodyBytes);
+    return filePath;
   }
 
   /// Show local notification
@@ -238,9 +259,19 @@ class NotificationService {
     required String title,
     required String body,
     String? payload,
+    String? imageUrl,
   }) async {
-    const AndroidNotificationDetails androidDetails =
-        AndroidNotificationDetails(
+    String? largeIconPath;
+    if (imageUrl != null && imageUrl.isNotEmpty) {
+      try {
+        largeIconPath =
+            await _downloadAndSaveFile(imageUrl, 'notification_icon.jpg');
+      } catch (e) {
+        debugPrint('Error downloading notification icon: $e');
+      }
+    }
+
+    AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
       'high_importance_channel', // Must match the channel ID created
       'High Importance Notifications',
       channelDescription: 'This channel is used for important notifications',
@@ -249,15 +280,21 @@ class NotificationService {
       showWhen: true,
       enableVibration: true,
       playSound: true,
+      largeIcon:
+          largeIconPath != null ? FilePathAndroidBitmap(largeIconPath) : null,
+      styleInformation: (imageUrl != null && imageUrl.isNotEmpty)
+          ? const BigTextStyleInformation(
+              '') // Needed to show large icon properly sometimes, or just use default
+          : null,
     );
 
-    const DarwinNotificationDetails iosDetails = DarwinNotificationDetails(
+    DarwinNotificationDetails iosDetails = const DarwinNotificationDetails(
       presentAlert: true,
       presentBadge: true,
       presentSound: true,
     );
 
-    const NotificationDetails notificationDetails = NotificationDetails(
+    NotificationDetails notificationDetails = NotificationDetails(
       android: androidDetails,
       iOS: iosDetails,
     );

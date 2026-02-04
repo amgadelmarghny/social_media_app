@@ -184,6 +184,7 @@ class ChatCubit extends Cubit<ChatState> {
                   receiverToken: token,
                   title: senderName,
                   body: notificationContent,
+                  senderPhoto: senderData['photo'],
                   data: {
                     'type': 'message',
                     'uid': messageModel.uid,

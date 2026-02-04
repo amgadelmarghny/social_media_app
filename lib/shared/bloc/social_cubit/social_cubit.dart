@@ -598,6 +598,7 @@ class SocialCubit extends Cubit<SocialState> {
                 receiverToken: token,
                 title: '${userModel!.firstName} ${userModel!.lastName}',
                 body: 'published a new post',
+                senderPhoto: userModel!.photo,
                 data: {
                   'type': 'post',
                   'postId': postDocId,
@@ -859,6 +860,7 @@ class SocialCubit extends Cubit<SocialState> {
                   receiverToken: token,
                   title: '${userModel!.firstName} ${userModel!.lastName}',
                   body: 'liked your post',
+                  senderPhoto: userModel!.photo,
                 );
               }
             }

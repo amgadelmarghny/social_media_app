@@ -43,6 +43,7 @@ class _ChatsBodyState extends State<ChatsBody> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
+      bottom: false,
       child: NotificationListener<ScrollNotification>(
         // Listen for user scroll updates to reset bottom padding as the user scrolls up
         onNotification: (scrollNotification) {

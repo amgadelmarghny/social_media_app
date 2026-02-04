@@ -95,6 +95,7 @@ class _FeedsBodyState extends State<FeedsBody> {
 
     // NotificationListener is used to dynamically change feed padding when scrolling up
     return SafeArea(
+      bottom: false,
       child: NotificationListener<ScrollNotification>(
         onNotification: (scrollNotification) {
           // If user scrolls UP, reduce padding to show more feed

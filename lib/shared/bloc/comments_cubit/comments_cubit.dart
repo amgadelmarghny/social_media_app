@@ -158,6 +158,7 @@ class CommentsCubit extends Cubit<CommentsState> {
                 receiverToken: token,
                 title: commentModel.userName,
                 body: 'commented: ${commentModel.comment ?? "Sent an image"}',
+                senderPhoto: commentModel.profilePhoto,
               );
             }
           }

@@ -232,6 +232,7 @@ class UserCubit extends Cubit<UserState> {
                     receiverToken: fToken,
                     title: senderName,
                     body: 'started following you',
+                    senderPhoto: senderPhoto,
                   );
                 }
               }
@@ -239,7 +240,7 @@ class UserCubit extends Cubit<UserState> {
           }
         }
       } catch (e) {
-       // debugPrint("Error sending follow notification: $e");
+        // debugPrint("Error sending follow notification: $e");
       }
 
       emit(FollowStatusChanged(isFollowing));

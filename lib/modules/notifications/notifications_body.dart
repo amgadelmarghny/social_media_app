@@ -51,6 +51,7 @@ class _NotificationsBodyState extends State<NotificationsBody> {
     }
 
     return SafeArea(
+      bottom: false,
       child: NotificationListener<ScrollNotification>(
         onNotification: (scrollNotification) {
           if (scrollNotification is ScrollUpdateNotification) {
@@ -146,7 +147,7 @@ class _NotificationsBodyState extends State<NotificationsBody> {
           Navigator.pushNamed(context, ChatView.routeName,
               arguments: userModel);
         } else {
-         // debugPrint("User not found");
+          // debugPrint("User not found");
         }
       } else if (model.type == 'like' || model.type == 'comment') {
         // Navigate to PostView
@@ -165,7 +166,7 @@ class _NotificationsBodyState extends State<NotificationsBody> {
               ),
             );
           } else {
-           // debugPrint("Post not found");
+            // debugPrint("Post not found");
           }
         } else {
           Navigator.pop(context); // Close loading
@@ -177,14 +178,14 @@ class _NotificationsBodyState extends State<NotificationsBody> {
         if (userModel != null && context.mounted) {
           Navigator.pushNamed(context, UserView.routName, arguments: userModel);
         } else {
-           // debugPrint("User not found");
+          // debugPrint("User not found");
         }
       } else {
         Navigator.pop(context); // Close loading
       }
     } catch (e) {
       if (context.mounted) Navigator.pop(context); // Close loading
-     // debugPrint("Error handling notification tap: $e");
+      // debugPrint("Error handling notification tap: $e");
     }
   }
 }
