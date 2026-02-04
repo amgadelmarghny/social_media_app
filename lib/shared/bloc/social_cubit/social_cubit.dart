@@ -6,7 +6,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:social_media_app/shared/services/notification_service.dart';
 import 'package:icon_broken/icon_broken.dart';
 import 'package:image_picker/image_picker.dart';
@@ -300,7 +299,7 @@ class SocialCubit extends Cubit<SocialState> {
             .update({'fcmToken': token});
       }
     } catch (e) {
-      debugPrint("Error updating FCM Token: $e");
+    //  debugPrint("Error updating FCM Token: $e");
     }
   }
 
@@ -419,23 +418,71 @@ class SocialCubit extends Cubit<SocialState> {
   }
 
   // Search for users by username substring query, case-insensitive, limited to 20 users
+  // Search for users by username or "First Name + Last Name"
   Future<List<UserModel>?> searchUsers(String query) async {
     emit(SearchUsersLoadingState());
     if (query.trim().isEmpty) return [];
 
-    final q = query.toLowerCase();
-    final List<UserModel> usersList;
+    // Normalize query: lowercase and single spaces
+    final String normalizedQuery =
+        query.toLowerCase().trim().replaceAll(RegExp(r'\s+'), ' ');
+    // Keep casing of first word for Capitalized FirstName search
+    final List<String> queryParts =
+        query.trim().replaceAll(RegExp(r'\s+'), ' ').split(' ');
+    final String firstWord = queryParts.isNotEmpty ? queryParts.first : "";
+
+    String capitalizedFirstWord = "";
+    if (firstWord.isNotEmpty) {
+      capitalizedFirstWord = firstWord.length > 1
+          ? firstWord[0].toUpperCase() + firstWord.substring(1).toLowerCase()
+          : firstWord.toUpperCase();
+    }
+
     try {
-      final snapshot = await FirebaseFirestore.instance
+      Map<String, UserModel> usersMap = {};
+
+      // 1. Search by userName (lowercase prefix)
+      // Expects userName to be stored in a way that matches lowercase query (or purely lowercase)
+      final userNameSnapshot = await FirebaseFirestore.instance
           .collection(kUsersCollection)
           .orderBy('userName')
-          .startAt([q])
-          .endAt(['$q\uf8ff'])
+          .startAt([normalizedQuery])
+          .endAt(['$normalizedQuery\uf8ff'])
           .limit(20)
           .get();
 
-      usersList =
-          snapshot.docs.map((doc) => UserModel.fromJson(doc.data())).toList();
+      for (var doc in userNameSnapshot.docs) {
+        usersMap[doc.id] = UserModel.fromJson(doc.data());
+      }
+
+      // 2. Search by firstName (Capitalized prefix)
+      if (capitalizedFirstWord.isNotEmpty) {
+        final firstNameSnapshot = await FirebaseFirestore.instance
+            .collection(kUsersCollection)
+            .orderBy('firstName')
+            .startAt([capitalizedFirstWord])
+            .endAt(['$capitalizedFirstWord\uf8ff'])
+            .limit(20)
+            .get();
+
+        for (var doc in firstNameSnapshot.docs) {
+          if (!usersMap.containsKey(doc.id)) {
+            usersMap[doc.id] = UserModel.fromJson(doc.data());
+          }
+        }
+      }
+
+      // 3. Filter results locally to match full name or userName strictly
+      final List<UserModel> usersList = usersMap.values.where((user) {
+        final String fullName =
+            '${user.firstName} ${user.lastName}'.toLowerCase();
+        final String userName = user.userName.toLowerCase();
+
+        // Check if query matches the start of username OR start of Full Name
+        return userName.startsWith(normalizedQuery) ||
+            fullName.startsWith(normalizedQuery);
+      }).toList();
+
       emit(SearchUsersSuccessState());
       return usersList;
     } on Exception catch (e) {
@@ -526,7 +573,7 @@ class SocialCubit extends Cubit<SocialState> {
         }
       }
     } catch (e) {
-      debugPrint('Error notifying followers: $e');
+    //  debugPrint('Error notifying followers: $e');
     }
   }
 
@@ -604,7 +651,7 @@ class SocialCubit extends Cubit<SocialState> {
           .get();
       reportedPostsIds = snapshot.docs.map((doc) => doc.id).toList();
     } catch (e) {
-      debugPrint("Error fetching reported posts: $e");
+     // debugPrint("Error fetching reported posts: $e");
     }
   }
 
@@ -814,7 +861,7 @@ class SocialCubit extends Cubit<SocialState> {
         return PostModel.fromJson(doc.data() as Map<String, dynamic>);
       }
     } catch (e) {
-      debugPrint("Error fetching post by ID: $e");
+    //  debugPrint("Error fetching post by ID: $e");
     }
     return null;
   }
@@ -992,14 +1039,14 @@ class SocialCubit extends Cubit<SocialState> {
         try {
           await FirebaseStorage.instance.refFromURL(userModel!.photo!).delete();
         } catch (e) {
-          debugPrint("Profile photo already deleted or not found");
+          emit(GetMyPostsFailure(errMessage: "Profile photo already deleted or not found"));
         }
       }
       if (userModel?.cover != null) {
         try {
           await FirebaseStorage.instance.refFromURL(userModel!.cover!).delete();
         } catch (e) {
-          debugPrint("Cover photo already deleted or not found");
+          emit(GetMyPostsFailure(errMessage: "Cover photo already deleted or not found"));
         }
       }
 
@@ -1014,7 +1061,7 @@ class SocialCubit extends Cubit<SocialState> {
                 .refFromURL(post.data()['postImage'])
                 .delete();
           } catch (e) {
-            debugPrint("Post image not found in storage");
+            emit(GetMyPostsFailure(errMessage: "Post image not found in storage"));
           }
         }
         // Delete the post document itself
@@ -1038,7 +1085,7 @@ class SocialCubit extends Cubit<SocialState> {
                   .refFromURL(comment.data()['image'])
                   .delete();
             } catch (e) {
-              debugPrint("Comment image not found in storage");
+              emit(GetMyPostsFailure(errMessage: "Comment image not found in storage"));
             }
           }
           // Delete the comment document itself
@@ -1067,7 +1114,9 @@ class SocialCubit extends Cubit<SocialState> {
             for (var imgUrl in (msg.data()['images'] as List)) {
               try {
                 await FirebaseStorage.instance.refFromURL(imgUrl).delete();
-              } catch (e) {}
+              } catch (e) {
+                emit(GetMyPostsFailure(errMessage: "Image not found in storage"));
+              }
             }
           }
           // Delete voice record attached to the message, if any
@@ -1076,7 +1125,9 @@ class SocialCubit extends Cubit<SocialState> {
               await FirebaseStorage.instance
                   .refFromURL(msg.data()['voiceRecord'])
                   .delete();
-            } catch (e) {}
+            } catch (e) {
+              emit(GetMyPostsFailure(errMessage: "Voice record not found in storage"));
+            }
           }
           await msg.reference.delete();
         }

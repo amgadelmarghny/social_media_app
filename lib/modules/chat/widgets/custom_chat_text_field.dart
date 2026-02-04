@@ -45,11 +45,10 @@ class _CustomChatTextFieldState extends State<CustomChatTextField> {
                 uid: CacheHelper.getData(key: kUidToken),
                 friendUid: widget.friendUid,
                 dateTime: DateTime.now());
-
+            widget.controller.clear();
             await BlocProvider.of<ChatCubit>(context).sendAMessage(model);
           }
         }
-        widget.controller.clear();
       },
       style: FontsStyle.font18PopinWithShadowOption(),
       decoration: InputDecoration(
@@ -77,12 +76,11 @@ class _CustomChatTextFieldState extends State<CustomChatTextField> {
                           uid: CacheHelper.getData(key: kUidToken),
                           friendUid: widget.friendUid,
                           dateTime: DateTime.now());
-
+                      widget.controller.clear();
                       await BlocProvider.of<ChatCubit>(context)
                           .sendAMessage(model);
                     }
                   }
-                  widget.controller.clear();
                 },
                 icon:
                     (state is SendMessageLoading || state is UploadImageLoading)

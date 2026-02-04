@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter/foundation.dart';
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:googleapis_auth/googleapis_auth.dart';
 import 'package:http/http.dart' as http;
@@ -63,10 +63,11 @@ class NotificationService {
             'body': body,
           },
           'android': {
+            'priority': 'high',
             'notification': {
               'sound': 'default',
               'channel_id': 'high_importance_channel',
-              'priority': 'high',
+              'click_action': 'FLUTTER_NOTIFICATION_CLICK',
             },
           },
           'apns': {
@@ -138,9 +139,10 @@ class NotificationService {
 
   /// Handle notification tap events
   void _onNotificationTapped(NotificationResponse notificationResponse) {
-    debugPrint('Notification tapped: ${notificationResponse.payload}');
-    // TODO: Navigate to specific screen based on payload
-    // You can parse the payload and use Navigator to open specific screens
+    debugPrint(
+        'Notification tapped with payload: ${notificationResponse.payload}');
+    // Navigation logic will be handled by the app's navigation system
+    // The payload can be parsed to determine which screen to open
   }
 
   /// Configure Firebase Cloud Messaging
@@ -198,7 +200,8 @@ class NotificationService {
   /// Handle message opened from background state
   void _handleMessageOpenedApp(RemoteMessage message) {
     debugPrint('Message opened from background: ${message.messageId}');
-    // TODO: Navigate to specific screen based on message data
+    debugPrint('Message data: ${message.data}');
+    // Navigation logic can be implemented here based on message.data
     // Example: if (message.data['type'] == 'chat') { navigate to chat }
   }
 

@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -169,7 +168,6 @@ class CommentsCubit extends Cubit<CommentsState> {
       await getComments(postId: postId);
     } catch (err) {
       emit(AddCommentFailure(error: err.toString()));
-      log(err.toString());
     }
   }
 

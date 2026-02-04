@@ -18,10 +18,11 @@ class MyBubbleChat extends StatelessWidget {
     required this.dateTime,
     required this.isRead,
     required this.isDelivered,
+    required this.isSending,
   });
 
   final bool isRead;
-  final bool isDelivered;
+  final bool isDelivered, isSending;
 
   @override
   Widget build(BuildContext context) {
@@ -63,13 +64,15 @@ class MyBubbleChat extends StatelessWidget {
                 ),
                 const SizedBox(width: 5),
                 Icon(
-                  isRead
-                      ? Icons.done_all
-                      : isDelivered
+                  isSending
+                      ? Icons.timer_outlined
+                      : isRead
                           ? Icons.done_all
-                          : Icons.check,
+                          : isDelivered
+                              ? Icons.done_all
+                              : Icons.check,
                   size: 16,
-                  color: isRead
+                  color: isRead || !isSending
                       ? const Color(0xff3B21B2)
                       : const Color(0XFFC4C2CB),
                 ),

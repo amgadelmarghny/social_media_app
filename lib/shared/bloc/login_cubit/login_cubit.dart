@@ -139,19 +139,42 @@ class LoginCubit extends Cubit<LoginState> {
     }
   }
 
-  /// Update FCM token for the user document in Firestore
+  /// Update FCM token for the user document in Firestore with retry mechanism
   Future<void> updateFCMToken(String uid) async {
     try {
+      // Wait briefly to ensure Firebase Messaging is initialized
+      await Future.delayed(const Duration(seconds: 1));
+
       String? token = await FirebaseMessaging.instance.getToken();
+
       if (token != null) {
+        // First attempt to update the user's FCM token in Firestore
         await FirebaseFirestore.instance
             .collection(kUsersCollection)
             .doc(uid)
-            .update({'fcmToken': token});
+            .update({
+          'fcmToken': token,
+          'tokenUpdatedAt': FieldValue.serverTimestamp()
+        });
+      } else {
+        // Token is null, wait and try again after 3 seconds
+        await Future.delayed(const Duration(seconds: 3));
+        token = await FirebaseMessaging.instance.getToken();
+
+        if (token != null) {
+          // Successfully acquired a token on the second attempt, update in Firestore
+          await FirebaseFirestore.instance
+              .collection(kUsersCollection)
+              .doc(uid)
+              .update({
+            'fcmToken': token,
+            'tokenUpdatedAt': FieldValue.serverTimestamp()
+          });
+        }
       }
     } catch (error) {
-      emit(LoginFailureState(
-          errMessage: 'An unexpected error occurred: $error'));
+      // Log error but don't emit failure state to avoid disrupting login flow
+      debugPrint('Error updating FCM token after login: $error');
     }
   }
 

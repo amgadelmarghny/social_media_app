@@ -257,7 +257,8 @@ class ChatCubit extends Cubit<ChatState> {
       isRecording = false;
       emit(RecordingCancelled());
     } catch (e) {
-      debugPrint("Error cancelling: $e");
+      emit(RecordAndUploadAVoiceFailureState(
+          errMessage: "Error cancelling: $e"));
     }
   }
 

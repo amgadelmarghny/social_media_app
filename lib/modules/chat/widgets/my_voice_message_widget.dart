@@ -16,10 +16,11 @@ class MyVoiceMessageWidget extends StatefulWidget {
     required this.dateTime,
     required this.isRead,
     required this.isDelivered,
+    required this.isSending,
   });
 
   final bool isRead;
-  final bool isDelivered;
+  final bool isDelivered, isSending;
 
   @override
   State<MyVoiceMessageWidget> createState() => _MyVoiceMessageWidgetState();
@@ -118,14 +119,16 @@ class _MyVoiceMessageWidgetState extends State<MyVoiceMessageWidget> {
                     ),
                     const SizedBox(width: 4),
                     Icon(
-                      widget.isRead
-                          ? Icons.done_all
-                          : widget.isDelivered
+                      widget.isSending
+                          ? Icons.timer_outlined
+                          : widget.isRead
                               ? Icons.done_all
-                              : Icons.check,
-                      size: 14,
-                      color: widget.isRead
-                          ? defaultTextColor
+                              : widget.isDelivered
+                                  ? Icons.done_all
+                                  : Icons.check,
+                      size: 16,
+                      color: widget.isRead || !widget.isSending
+                          ? const Color(0xff3B21B2)
                           : const Color(0XFFC4C2CB),
                     ),
                   ],

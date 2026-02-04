@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/models/post_model.dart';
 import 'package:social_media_app/models/user_model.dart';
 import 'package:social_media_app/shared/components/constants.dart';
-import 'package:flutter/material.dart';
 import '../../../../models/notification_model.dart';
 
 import 'package:social_media_app/shared/services/notification_service.dart';
@@ -240,7 +239,7 @@ class UserCubit extends Cubit<UserState> {
           }
         }
       } catch (e) {
-        debugPrint("Error sending follow notification: $e");
+       // debugPrint("Error sending follow notification: $e");
       }
 
       emit(FollowStatusChanged(isFollowing));

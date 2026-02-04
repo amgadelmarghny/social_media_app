@@ -49,6 +49,9 @@ class _ChatViewBodyState extends State<ChatViewBody> {
             buildWhen: (previous, current) =>
                 current is GetMessagesSuccess || current is GetMessagesLoading,
             builder: (context, state) {
+              final chatCubit = context.read<ChatCubit>();
+              bool isSending =
+                  state is SendMessageLoading || state is UploadImageLoading;
               // List to hold messages for chat
               List<MessageModel> messages = [];
               if (state is GetMessagesSuccess) {
@@ -57,7 +60,7 @@ class _ChatViewBodyState extends State<ChatViewBody> {
               } else {
                 // Otherwise, use messages cached in the cubit
                 // (e.g., during loading or as a fallback)
-                messages = BlocProvider.of<ChatCubit>(context).messageList;
+                messages = chatCubit.messageList;
               }
               return ListView.builder(
                 physics:
@@ -123,6 +126,7 @@ class _ChatViewBodyState extends State<ChatViewBody> {
                               dateTime: message.dateTime,
                               isRead: message.isRead,
                               isDelivered: message.isDelivered,
+                              isSending: isSending,
                             );
                           }
                           if (message.textMessage != null) {
@@ -131,6 +135,7 @@ class _ChatViewBodyState extends State<ChatViewBody> {
                               dateTime: message.dateTime,
                               isRead: message.isRead,
                               isDelivered: message.isDelivered,
+                              isSending: isSending,
                             );
                           } else if (message.voiceRecord != null) {
                             return MyVoiceMessageWidget(
@@ -139,6 +144,7 @@ class _ChatViewBodyState extends State<ChatViewBody> {
                               dateTime: message.dateTime,
                               isRead: message.isRead,
                               isDelivered: message.isDelivered,
+                              isSending: isSending,
                             );
                           }
                         } else {
