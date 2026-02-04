@@ -8,7 +8,9 @@ Future<String?> pickYear({required BuildContext context}) async {
     context: context,
     builder: (context) {
       final Size size = MediaQuery.of(context).size;
-      return AlertDialog(
+      int currentYear = DateTime.now().year;
+      int minimumeYear = currentYear - 13;
+     return AlertDialog(
         backgroundColor: defaultColorButton,
 
         title: const Text(
@@ -34,7 +36,7 @@ Future<String?> pickYear({required BuildContext context}) async {
                 (index) => InkWell(
                   onTap: () {
                     // The action you want to happen when you select the year below,
-                    selectedYear = (2024 - index).toString();
+                    selectedYear = (minimumeYear - index).toString();
                     // Quitting the dialog through navigator.
                     Navigator.pop(context);
                   },
@@ -49,7 +51,7 @@ Future<String?> pickYear({required BuildContext context}) async {
                           fit: BoxFit.scaleDown,
                           child: Text(
                             // Showing the year text, it starts from 2022 and ends in 1900 (you can modify this as you like)
-                            (2024 - index).toString(),
+                            (minimumeYear - index).toString(),
                             style: TextStyle(color: Colors.black54),
                           ),
                         ),
