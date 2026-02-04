@@ -13,7 +13,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
 import 'package:social_media_app/models/chat_item_model.dart';
 import 'package:social_media_app/models/message_model.dart';
-import 'package:social_media_app/models/notification_model.dart';
 import 'package:social_media_app/shared/components/constants.dart';
 import 'package:social_media_app/shared/network/local/cache_helper.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
@@ -107,8 +106,10 @@ class ChatCubit extends Cubit<ChatState> {
         .doc(messageId)
         .set(messageData);
 
-    // Update chat preview for sender (current user)
-    await senderDoc.set(messageModel.toJson());
+    // Update chat preview for sender (current user) - always marked as read for them
+    final senderChatPreview = messageModel.toJson();
+    senderChatPreview['isRead'] = true;
+    await senderDoc.set(senderChatPreview);
 
     // Prepare and update chat preview for recipient
     final receiverChatPreview = {
@@ -130,16 +131,15 @@ class ChatCubit extends Cubit<ChatState> {
       textMessage: messageModel.textMessage,
       voiceMessage: messageModel.voiceRecord,
       images: messageModel.images,
+      isRead: true, // It's our sent message, so it's read
     );
 
     // Send Notification to Receiver
     String notificationContent = '';
-    String? notificationSubType;
 
     if (messageModel.voiceRecord != null &&
         messageModel.voiceRecord!.isNotEmpty) {
       notificationContent = 'Voice recording';
-      notificationSubType = 'voice';
     } else if (messageModel.images != null && messageModel.images!.isNotEmpty) {
       // If image matches with text
       if (messageModel.textMessage != null &&
@@ -148,22 +148,12 @@ class ChatCubit extends Cubit<ChatState> {
       } else {
         notificationContent = 'Sent an image';
       }
-      notificationSubType = 'image';
     } else {
       notificationContent = messageModel.textMessage ?? '';
-      notificationSubType = 'text';
     }
 
-    final notificationId = DateTime.now().millisecondsSinceEpoch.toString();
-    // Assuming we can get sender name/photo. Since we occupy 'socialCubit' usually or have user data.
-    // However, ChatCubit has 'currentUserId'. It doesn't have 'currentUserModel' directly loaded in a field always.
-    // But 'sendAMessage' is usually called where we have data.
-    // Actually, 'MessageModel' has 'uid'.
-    // We need SENDER name and photo to save in notification.
-    // We can fetch it or rely on it being passed?
-    // Let's fetch it briefly or use a cached user if possible.
-    // To avoid async fetch delay, we could pass it. But _sendTextImageRecord is private.
-    // We can fetch user data from Firestore using currentUserId.
+    // REMOVED: Saving message to general notifications collection
+    // We only want push notifications and a badge on the chat icon.
 
     try {
       final userDoc = await FirebaseFirestore.instance
@@ -176,27 +166,9 @@ class ChatCubit extends Cubit<ChatState> {
         if (senderData != null) {
           final senderName =
               '${senderData['firstName']} ${senderData['lastName']}';
-          final String? senderPhoto = senderData['photo'];
 
-          final notification = NotificationModel(
-            notificationId: notificationId,
-            senderUid: messageModel.uid,
-            receiverUid: messageModel.friendUid,
-            senderName: senderName,
-            senderPhoto: senderPhoto,
-            type: 'message',
-            subType: notificationSubType,
-            content: notificationContent,
-            isRead: false,
-            dateTime: DateTime.now(),
-          );
-
-          await FirebaseFirestore.instance
-              .collection(kUsersCollection)
-              .doc(messageModel.friendUid)
-              .collection('notifications')
-              .doc(notificationId)
-              .set(notification.toMap());
+          // REMOVED: Saving message to general notifications collection
+          // We only want push notifications and a badge on the chat icon.
 
           // Send Push Notification
           final friendDoc = await FirebaseFirestore.instance
@@ -212,6 +184,10 @@ class ChatCubit extends Cubit<ChatState> {
                   receiverToken: token,
                   title: senderName,
                   body: notificationContent,
+                  data: {
+                    'type': 'message',
+                    'uid': messageModel.uid,
+                  },
                 );
               }
             }
@@ -625,6 +601,7 @@ class ChatCubit extends Cubit<ChatState> {
     String? voiceMessage,
     List<String>? images,
     required DateTime dateTime,
+    required bool isRead,
   }) {
     // If already exists, update the entry. Otherwise, add as new chat preview.
     final existingIndex = chatItemsList.indexWhere(
@@ -638,6 +615,7 @@ class ChatCubit extends Cubit<ChatState> {
         voiceRecord: voiceMessage,
         images: images,
         dateTime: dateTime,
+        isRead: isRead,
       );
     } else {
       chatItemsList.add(
@@ -647,6 +625,7 @@ class ChatCubit extends Cubit<ChatState> {
           dateTime: dateTime,
           voiceRecord: voiceMessage,
           images: images,
+          isRead: isRead,
         ),
       );
     }

@@ -74,6 +74,7 @@ class _ChatViewBodyState extends State<ChatViewBody> {
                   // Identify the current user id to distinguish own messages from friend's
                   final currentUserId =
                       BlocProvider.of<SocialCubit>(context).userModel!.uid;
+                  final bool isSelfChat = currentUserId == widget.friendUid;
 
                   // Flag to determine whether to show a header label for message date
                   bool showHeader = false;
@@ -127,6 +128,7 @@ class _ChatViewBodyState extends State<ChatViewBody> {
                               isRead: message.isRead,
                               isDelivered: message.isDelivered,
                               isSending: isSending,
+                              isSelfChat: isSelfChat,
                             );
                           }
                           if (message.textMessage != null) {
@@ -136,6 +138,7 @@ class _ChatViewBodyState extends State<ChatViewBody> {
                               isRead: message.isRead,
                               isDelivered: message.isDelivered,
                               isSending: isSending,
+                              isSelfChat: isSelfChat,
                             );
                           } else if (message.voiceRecord != null) {
                             return MyVoiceMessageWidget(
@@ -145,6 +148,7 @@ class _ChatViewBodyState extends State<ChatViewBody> {
                               isRead: message.isRead,
                               isDelivered: message.isDelivered,
                               isSending: isSending,
+                              isSelfChat: isSelfChat,
                             );
                           }
                         } else {

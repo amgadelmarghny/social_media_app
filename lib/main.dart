@@ -19,6 +19,8 @@ import 'package:social_media_app/shared/components/constants.dart';
 import 'package:social_media_app/shared/style/theme/theme.dart';
 import 'package:social_media_app/shared/services/notification_service.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = MyBlocObserver();
@@ -77,6 +79,7 @@ class SocialMediaApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
+        navigatorKey: navigatorKey,
         darkTheme: CustomThemeMode.darkTheme,
         theme: CustomThemeMode.lightTheme,
         themeMode: ThemeMode.light,

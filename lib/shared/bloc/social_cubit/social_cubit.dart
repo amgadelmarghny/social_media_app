@@ -37,12 +37,20 @@ class SocialCubit extends Cubit<SocialState> {
 
   // To track unread notifications for the badge
   bool hasUnreadNotifications = false;
+  bool hasUnreadMessages = false;
 
   void _startNotificationListener() {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      if (currentBottomNavBarIndex != 4) {
-        hasUnreadNotifications = true;
-        emit(BottomNavBarState());
+      if (message.data['type'] == 'message') {
+        if (currentBottomNavBarIndex != 1) {
+          hasUnreadMessages = true;
+          emit(BottomNavBarState());
+        }
+      } else {
+        if (currentBottomNavBarIndex != 4) {
+          hasUnreadNotifications = true;
+          emit(BottomNavBarState());
+        }
       }
     });
   }
@@ -67,6 +75,9 @@ class SocialCubit extends Cubit<SocialState> {
     if (value == 4) {
       hasUnreadNotifications = false;
     }
+    if (value == 1) {
+      hasUnreadMessages = false;
+    }
     currentBottomNavBarIndex = value;
     emit(BottomNavBarState());
   }
@@ -84,10 +95,30 @@ class SocialCubit extends Cubit<SocialState> {
   // Bottom navigation bar items
   List<BottomNavigationBarItem> get bottomNavigationBarItem => [
         const BottomNavigationBarItem(icon: Icon(IconBroken.Home), label: ''),
-        const BottomNavigationBarItem(
+        BottomNavigationBarItem(
             icon: Padding(
-              padding: EdgeInsets.only(right: 10),
-              child: Icon(IconBroken.Chat),
+              padding: const EdgeInsets.only(right: 10),
+              child: Stack(
+                children: [
+                  const Icon(IconBroken.Chat),
+                  if (hasUnreadMessages)
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      child: Container(
+                        padding: const EdgeInsets.all(1),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 8,
+                          minHeight: 8,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             ),
             label: ''),
         const BottomNavigationBarItem(
@@ -299,7 +330,7 @@ class SocialCubit extends Cubit<SocialState> {
             .update({'fcmToken': token});
       }
     } catch (e) {
-    //  debugPrint("Error updating FCM Token: $e");
+      //  debugPrint("Error updating FCM Token: $e");
     }
   }
 
@@ -567,13 +598,17 @@ class SocialCubit extends Cubit<SocialState> {
                 receiverToken: token,
                 title: '${userModel!.firstName} ${userModel!.lastName}',
                 body: 'published a new post',
+                data: {
+                  'type': 'post',
+                  'postId': postDocId,
+                },
               );
             }
           }
         }
       }
     } catch (e) {
-    //  debugPrint('Error notifying followers: $e');
+      //  debugPrint('Error notifying followers: $e');
     }
   }
 
@@ -651,7 +686,7 @@ class SocialCubit extends Cubit<SocialState> {
           .get();
       reportedPostsIds = snapshot.docs.map((doc) => doc.id).toList();
     } catch (e) {
-     // debugPrint("Error fetching reported posts: $e");
+      // debugPrint("Error fetching reported posts: $e");
     }
   }
 
@@ -861,7 +896,7 @@ class SocialCubit extends Cubit<SocialState> {
         return PostModel.fromJson(doc.data() as Map<String, dynamic>);
       }
     } catch (e) {
-    //  debugPrint("Error fetching post by ID: $e");
+      //  debugPrint("Error fetching post by ID: $e");
     }
     return null;
   }
@@ -1039,14 +1074,16 @@ class SocialCubit extends Cubit<SocialState> {
         try {
           await FirebaseStorage.instance.refFromURL(userModel!.photo!).delete();
         } catch (e) {
-          emit(GetMyPostsFailure(errMessage: "Profile photo already deleted or not found"));
+          emit(GetMyPostsFailure(
+              errMessage: "Profile photo already deleted or not found"));
         }
       }
       if (userModel?.cover != null) {
         try {
           await FirebaseStorage.instance.refFromURL(userModel!.cover!).delete();
         } catch (e) {
-          emit(GetMyPostsFailure(errMessage: "Cover photo already deleted or not found"));
+          emit(GetMyPostsFailure(
+              errMessage: "Cover photo already deleted or not found"));
         }
       }
 
@@ -1061,7 +1098,8 @@ class SocialCubit extends Cubit<SocialState> {
                 .refFromURL(post.data()['postImage'])
                 .delete();
           } catch (e) {
-            emit(GetMyPostsFailure(errMessage: "Post image not found in storage"));
+            emit(GetMyPostsFailure(
+                errMessage: "Post image not found in storage"));
           }
         }
         // Delete the post document itself
@@ -1085,7 +1123,8 @@ class SocialCubit extends Cubit<SocialState> {
                   .refFromURL(comment.data()['image'])
                   .delete();
             } catch (e) {
-              emit(GetMyPostsFailure(errMessage: "Comment image not found in storage"));
+              emit(GetMyPostsFailure(
+                  errMessage: "Comment image not found in storage"));
             }
           }
           // Delete the comment document itself
@@ -1115,7 +1154,8 @@ class SocialCubit extends Cubit<SocialState> {
               try {
                 await FirebaseStorage.instance.refFromURL(imgUrl).delete();
               } catch (e) {
-                emit(GetMyPostsFailure(errMessage: "Image not found in storage"));
+                emit(GetMyPostsFailure(
+                    errMessage: "Image not found in storage"));
               }
             }
           }
@@ -1126,7 +1166,8 @@ class SocialCubit extends Cubit<SocialState> {
                   .refFromURL(msg.data()['voiceRecord'])
                   .delete();
             } catch (e) {
-              emit(GetMyPostsFailure(errMessage: "Voice record not found in storage"));
+              emit(GetMyPostsFailure(
+                  errMessage: "Voice record not found in storage"));
             }
           }
           await msg.reference.delete();

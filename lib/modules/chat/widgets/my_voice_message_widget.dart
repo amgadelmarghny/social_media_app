@@ -17,10 +17,12 @@ class MyVoiceMessageWidget extends StatefulWidget {
     required this.isRead,
     required this.isDelivered,
     required this.isSending,
+    this.isSelfChat = false,
   });
 
   final bool isRead;
   final bool isDelivered, isSending;
+  final bool isSelfChat;
 
   @override
   State<MyVoiceMessageWidget> createState() => _MyVoiceMessageWidgetState();
@@ -127,9 +129,10 @@ class _MyVoiceMessageWidgetState extends State<MyVoiceMessageWidget> {
                                   ? Icons.done_all
                                   : Icons.check,
                       size: 16,
-                      color: widget.isRead || !widget.isSending
-                          ? const Color(0xff3B21B2)
-                          : const Color(0XFFC4C2CB),
+                      color: (widget.isRead && !widget.isSelfChat)
+                          ? const Color(0xFF03A9F4) // Blue seen color
+                          : const Color(
+                              0XFFC4C2CB), // Gray for unsent or self-chat seen
                     ),
                   ],
                 ),

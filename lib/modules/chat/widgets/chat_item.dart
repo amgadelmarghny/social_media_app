@@ -152,6 +152,18 @@ class _ChatItemState extends State<ChatItem> {
                           style: FontsStyle.font18PopinWithShadowOption(
                               color: Colors.white60),
                         ),
+                        if (!widget.chatItemModel.isRead)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: Container(
+                              width: 10,
+                              height: 10,
+                              decoration: const BoxDecoration(
+                                color: Colors.blue,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ),
                       ],
                     )
                   ],

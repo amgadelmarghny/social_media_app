@@ -8,6 +8,10 @@ import 'package:googleapis_auth/auth_io.dart';
 import 'package:googleapis_auth/googleapis_auth.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:social_media_app/main.dart';
+import 'package:social_media_app/models/user_model.dart';
+import 'package:social_media_app/modules/chat/chat_view.dart';
+import 'package:social_media_app/layout/home/home_view.dart';
 
 /// Top-level function to handle background messages
 /// This must be a top-level function (not inside a class)
@@ -16,6 +20,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   debugPrint('Background message received: ${message.messageId}');
   debugPrint('Title: ${message.notification?.title}');
   debugPrint('Body: ${message.notification?.body}');
+  debugPrint('Data: ${message.data}');
 }
 
 /// Service class to manage all notification-related functionality
@@ -44,6 +49,7 @@ class NotificationService {
     required String receiverToken,
     required String title,
     required String body,
+    Map<String, dynamic>? data,
   }) async {
     final credentials = await _getAccessToken();
     final url = Uri.parse(
@@ -62,6 +68,7 @@ class NotificationService {
             'title': title,
             'body': body,
           },
+          'data': data?.map((key, value) => MapEntry(key, value.toString())),
           'android': {
             'priority': 'high',
             'notification': {
@@ -141,8 +148,33 @@ class NotificationService {
   void _onNotificationTapped(NotificationResponse notificationResponse) {
     debugPrint(
         'Notification tapped with payload: ${notificationResponse.payload}');
-    // Navigation logic will be handled by the app's navigation system
-    // The payload can be parsed to determine which screen to open
+    if (notificationResponse.payload != null) {
+      // payload in _showLocalNotification is message.data.toString()
+      // This is basic, but we can try to parse if it's JSON-like or just rely on FCM listeners
+      // For Local Notifications, we might need a better payload format.
+    }
+  }
+
+  void navigateToScreen(Map<String, dynamic> data) async {
+    if (data['type'] == 'message') {
+      final String? senderUid = data['uid'];
+      if (senderUid != null) {
+        // Fetch user data from Firestore to navigate
+        final userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(senderUid)
+            .get();
+        if (userDoc.exists) {
+          final userModel = UserModel.fromJson(userDoc.data()!);
+          navigatorKey.currentState?.pushNamed(
+            ChatView.routeName,
+            arguments: userModel,
+          );
+        }
+      }
+    } else if (data['type'] == 'post') {
+      navigatorKey.currentState?.pushNamed(HomeView.routeViewName);
+    }
   }
 
   /// Configure Firebase Cloud Messaging
@@ -168,12 +200,16 @@ class NotificationService {
     FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
 
     // Handle notification tap when app is in background
-    FirebaseMessaging.onMessageOpenedApp.listen(_handleMessageOpenedApp);
+    FirebaseMessaging.onMessageOpenedApp.listen((message) {
+      debugPrint('Message opened from background: ${message.messageId}');
+      navigateToScreen(message.data);
+    });
 
     // Handle notification tap when app was terminated
     _firebaseMessaging.getInitialMessage().then((message) {
       if (message != null) {
-        _handleMessageOpenedApp(message);
+        debugPrint('Message opened from terminated: ${message.messageId}');
+        navigateToScreen(message.data);
       }
     });
 
@@ -195,14 +231,6 @@ class NotificationService {
         payload: message.data.toString(),
       );
     }
-  }
-
-  /// Handle message opened from background state
-  void _handleMessageOpenedApp(RemoteMessage message) {
-    debugPrint('Message opened from background: ${message.messageId}');
-    debugPrint('Message data: ${message.data}');
-    // Navigation logic can be implemented here based on message.data
-    // Example: if (message.data['type'] == 'chat') { navigate to chat }
   }
 
   /// Show local notification

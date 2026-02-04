@@ -5,6 +5,7 @@ class ChatItemModel extends Equatable {
   final DateTime dateTime;
   final String? textMessage, voiceRecord;
   final List? images;
+  final bool isRead;
 
   const ChatItemModel({
     required this.uid,
@@ -12,8 +13,10 @@ class ChatItemModel extends Equatable {
     required this.dateTime,
     this.voiceRecord,
     this.images,
+    this.isRead = true,
   });
 
   @override
-  List<Object?> get props => [uid, textMessage, voiceRecord, images, dateTime];
+  List<Object?> get props =>
+      [uid, textMessage, voiceRecord, images, dateTime, isRead];
 }
