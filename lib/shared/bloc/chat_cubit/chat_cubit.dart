@@ -538,7 +538,6 @@ class ChatCubit extends Cubit<ChatState> {
             // Update MY copy (Receiver)
             doc.reference.update({'isRead': true, 'isDelivered': true});
 
-            // Update FRIEND'S copy (Sender) - so they see blue ticks
             FirebaseFirestore.instance
                 .collection(kUsersCollection)
                 .doc(friendUid)
@@ -547,6 +546,14 @@ class ChatCubit extends Cubit<ChatState> {
                 .collection(kMessageCollection)
                 .doc(doc.id)
                 .update({'isRead': true, 'isDelivered': true});
+
+            // Update MY Chat Preview to mark it as read
+            FirebaseFirestore.instance
+                .collection(kUsersCollection)
+                .doc(currentUserId)
+                .collection(kChatCollection)
+                .doc(friendUid)
+                .update({'isRead': true});
           }
         }
 
@@ -584,6 +591,7 @@ class ChatCubit extends Cubit<ChatState> {
           voiceRecord: chatItem.data()['voiceRecord'],
           images: (chatItem.data()['images']),
           dateTime: (chatItem.data()[kCreatedAt] as Timestamp).toDate(),
+          isRead: chatItem.data()['isRead'] ?? true,
         );
         chatItemsList.add(chatItemModel);
       }
