@@ -20,7 +20,7 @@ class NotificationItem extends StatelessWidget {
     return Container(
       color: model.isRead
           ? Colors.transparent
-          : Colors.grey.withValues(alpha: 0.2),
+          : Colors.grey.withValues(alpha: 0.6),
       child: InkWell(
         onTap: onTap,
         child: Padding(
@@ -47,9 +47,7 @@ class NotificationItem extends StatelessWidget {
                               style: FontsStyle.font18PopinMedium()),
                           TextSpan(
                             text: _getNotificationText(),
-                            style: FontsStyle.font14RegularForNotification(
-                              color: const Color(0xffB1ACC7),
-                            ),
+                            style: FontsStyle.font16RegularForNotification(),
                           ),
                         ],
                       ),
@@ -59,7 +57,7 @@ class NotificationItem extends StatelessWidget {
                     const SizedBox(height: 5),
                     Text(
                       DateFormat.yMMMd().add_jm().format(model.dateTime),
-                      style: FontsStyle.font12Popin(color: Colors.grey),
+                      style: FontsStyle.font12Popin(),
                     ),
                   ],
                 ),
@@ -75,10 +73,6 @@ class NotificationItem extends StatelessWidget {
                       ? defaultColorButton
                       : Colors.white54,
                 ),
-              if (model.type == 'message' && model.subType == 'image')
-                const Icon(Icons.image, size: 20, color: Colors.white54),
-              if (model.type == 'message' && model.subType == 'voice')
-                const Icon(Icons.mic, size: 20, color: Colors.white54),
               if (model.type == 'follow')
                 const Icon(Icons.person_add, size: 30, color: Colors.white54),
             ],
@@ -93,8 +87,6 @@ class NotificationItem extends StatelessWidget {
       return 'liked your post';
     } else if (model.type == 'comment') {
       return model.content; // Content handles "commented: text"
-    } else if (model.type == 'message') {
-      return 'new message: ${model.content}'; // Content handles "Voice recording", "Sent an image", or text
     }
     return model.content;
   }

@@ -26,11 +26,11 @@ abstract class FontsStyle {
     );
   }
 
-  static TextStyle font14RegularForNotification({Color color = Colors.white}) {
+  static TextStyle font16RegularForNotification({Color color = Colors.white}) {
     return TextStyle(
         fontFamily: 'Poppins',
         color: color,
-        fontSize: getResponsiveFontSize(fontSize: 14),
+        fontSize: getResponsiveFontSize(fontSize: 16),
         fontWeight: FontWeight.normal);
   }
 
@@ -38,7 +38,7 @@ abstract class FontsStyle {
     return TextStyle(
       fontFamily: 'Poppins',
       color: color,
-      fontSize: getResponsiveFontSize(fontSize: 12),
+      fontSize: getResponsiveFontSize(fontSize: 1),
       fontWeight: FontWeight.normal,
     );
   }

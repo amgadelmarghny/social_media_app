@@ -219,7 +219,7 @@ class _FeedsBodyState extends State<FeedsBody> {
                           const SliverListfeedItems(),
 
                           // Show a call to action message if there are no posts from friends (feed is empty)
-                          if (socialCubit.freindsPostsModelList.isEmpty)
+                          if (socialCubit.friendsPostsModelList.isEmpty)
                             SliverToBoxAdapter(
                               child: Padding(
                                 padding: EdgeInsets.only(

@@ -97,10 +97,13 @@ class _NotificationsBodyState extends State<NotificationsBody> {
                 );
               }
 
-              var notifications = snapshot.data!.docs.map((doc) {
-                return NotificationModel.fromJson(
-                    doc.data() as Map<String, dynamic>);
-              }).toList();
+              var notifications = snapshot.data!.docs
+                  .map((doc) {
+                    return NotificationModel.fromJson(
+                        doc.data() as Map<String, dynamic>);
+                  })
+                  .where((notification) => notification.type != 'message')
+                  .toList();
 
               return ListView.separated(
                 controller: _scrollController,
@@ -177,7 +180,7 @@ class _NotificationsBodyState extends State<NotificationsBody> {
             // debugPrint("Post not found");
           }
         } else {
-          if(context.mounted) Navigator.pop(context); // Close loading
+          if (context.mounted) Navigator.pop(context); // Close loading
         }
       } else if (model.type == 'follow') {
         // Navigate to UserView
@@ -189,7 +192,7 @@ class _NotificationsBodyState extends State<NotificationsBody> {
           // debugPrint("User not found");
         }
       } else {
-        if(context.mounted) Navigator.pop(context); // Close loading
+        if (context.mounted) Navigator.pop(context); // Close loading
       }
     } catch (e) {
       if (context.mounted) Navigator.pop(context); // Close loading

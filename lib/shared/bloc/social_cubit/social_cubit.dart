@@ -791,10 +791,10 @@ class SocialCubit extends Cubit<SocialState> {
         reportedPostsIds.add(postId);
       }
 
-      int friendPostIndex = freindsPostsIdList.indexOf(postId);
+      int friendPostIndex = friendsPostsIdList.indexOf(postId);
       if (friendPostIndex != -1) {
-        freindsPostsIdList.removeAt(friendPostIndex);
-        freindsPostsModelList.removeAt(friendPostIndex);
+        friendsPostsIdList.removeAt(friendPostIndex);
+        friendsPostsModelList.removeAt(friendPostIndex);
       }
 
       int myPostIndex = myPostsIdList.indexOf(postId);
@@ -1063,8 +1063,8 @@ class SocialCubit extends Cubit<SocialState> {
   }
 
   // Timeline post models and their Firestore IDs
-  List<PostModel> freindsPostsModelList = [];
-  List<String> freindsPostsIdList = [];
+  List<PostModel> friendsPostsModelList = [];
+  List<String> friendsPostsIdList = [];
 
   // Fetch timeline posts (user + followings) and update lists
   Future<void> getTimelinePosts() async {
@@ -1087,14 +1087,14 @@ class SocialCubit extends Cubit<SocialState> {
           .get();
 
       // Step 4: Clear old timeline posts
-      freindsPostsModelList.clear();
-      freindsPostsIdList.clear();
+      friendsPostsModelList.clear();
+      friendsPostsIdList.clear();
 
       // Step 5: Deserialize all timeline posts
       for (var postDoc in postsSnapshot.docs) {
         if (!reportedPostsIds.contains(postDoc.id)) {
-          freindsPostsModelList.add(PostModel.fromJson(postDoc.data()));
-          freindsPostsIdList.add(postDoc.id);
+          friendsPostsModelList.add(PostModel.fromJson(postDoc.data()));
+          friendsPostsIdList.add(postDoc.id);
         }
       }
 
@@ -1142,8 +1142,8 @@ class SocialCubit extends Cubit<SocialState> {
       uidTokenCache = null;
       myPostsModelList.clear();
       myPostsIdList.clear();
-      freindsPostsModelList.clear();
-      freindsPostsIdList.clear();
+      friendsPostsModelList.clear();
+      friendsPostsIdList.clear();
       followers.clear();
       followings.clear();
       emit(LogOutSuccessState());
@@ -1294,8 +1294,8 @@ class SocialCubit extends Cubit<SocialState> {
       uidTokenCache = null;
       myPostsModelList.clear();
       myPostsIdList.clear();
-      freindsPostsModelList.clear();
-      freindsPostsIdList.clear();
+      friendsPostsModelList.clear();
+      friendsPostsIdList.clear();
       followers.clear();
       followings.clear();
 

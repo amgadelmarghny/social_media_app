@@ -19,12 +19,12 @@ class SliverListfeedItems extends StatelessWidget {
             return Skeletonizer(
               enabled: state is GetFeedsPostsLoadingState,
               child: PostItem(
-                postModel: socialCubit.freindsPostsModelList[index],
-                postId: socialCubit.freindsPostsIdList[index],
+                postModel: socialCubit.friendsPostsModelList[index],
+                postId: socialCubit.friendsPostsIdList[index],
               ),
             );
           },
-          itemCount: socialCubit.freindsPostsModelList.length,
+          itemCount: socialCubit.friendsPostsModelList.length,
         );
       },
     );

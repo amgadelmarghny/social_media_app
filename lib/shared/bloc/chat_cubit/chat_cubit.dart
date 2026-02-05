@@ -136,7 +136,7 @@ class ChatCubit extends Cubit<ChatState> {
           messageModel.textMessage!.isNotEmpty) {
         notificationContent = messageModel.textMessage!;
       } else {
-        notificationContent = 'Sent an image';
+      notificationContent = 'Sent an image';
       }
     } else {
       notificationContent = messageModel.textMessage ?? '';

@@ -23,14 +23,14 @@ class _HomeViewState extends State<HomeView> {
   void initState() {
     socialCubit = SocialCubit();
     // request notification permissions when the HomeView is first created.
-    requestNotificationPermision();
+    requestNotificationPermission();
     super.initState();
   }
 
   /// Requests notification permissions from the user.
   /// Shows a toast message based on the user's response.
 
-  Future<void> requestNotificationPermision() async {
+  Future<void> requestNotificationPermission() async {
     await Permission.notification.request();
   }
 
