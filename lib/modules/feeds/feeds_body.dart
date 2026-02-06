@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:animate_do/animate_do.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:social_media_app/layout/home/components/verify_email_container.dart';
 import 'package:social_media_app/models/user_model.dart';
@@ -165,30 +166,33 @@ class _FeedsBodyState extends State<FeedsBody> {
 
                           /// Search bar for exploring users; triggers onSearchChanged
                           SliverToBoxAdapter(
-                            child: SearchBar(
-                              textStyle: WidgetStateProperty.all(
-                                const TextStyle(color: Colors.white),
-                              ),
-                              textInputAction: TextInputAction.search,
-                              hintText: 'Explore',
-                              onChanged: onSearchChanged,
-                              controller: _searchController,
-                              leading: Padding(
-                                padding: const EdgeInsets.only(left: 5),
-                                child: state is SearchUsersLoadingState
-                                    ? const SizedBox(
-                                        height: 22,
-                                        width: 22,
-                                        child: CircularProgressIndicator(
+                            child: FadeInDown(
+                              duration: const Duration(milliseconds: 500),
+                              child: SearchBar(
+                                textStyle: WidgetStateProperty.all(
+                                  const TextStyle(color: Colors.white),
+                                ),
+                                textInputAction: TextInputAction.search,
+                                hintText: 'Explore',
+                                onChanged: onSearchChanged,
+                                controller: _searchController,
+                                leading: Padding(
+                                  padding: const EdgeInsets.only(left: 5),
+                                  child: state is SearchUsersLoadingState
+                                      ? const SizedBox(
+                                          height: 22,
+                                          width: 22,
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                            strokeWidth: 2,
+                                          ),
+                                        )
+                                      : const HugeIcon(
+                                          icon: HugeIcons.strokeRoundedSearch01,
+                                          size: 32,
                                           color: Colors.white,
-                                          strokeWidth: 2,
                                         ),
-                                      )
-                                    : const HugeIcon(
-                                        icon: HugeIcons.strokeRoundedSearch01,
-                                        size: 32,
-                                        color: Colors.white,
-                                      ),
+                                ),
                               ),
                             ),
                           ),
@@ -218,19 +222,24 @@ class _FeedsBodyState extends State<FeedsBody> {
                           // Main feed items (list of posts as a SliverList)
                           const SliverListfeedItems(),
 
-                          // Show a call to action message if there are no posts from friends (feed is empty)
+                          // If the feed is empty, check if we are still loading
                           if (socialCubit.friendsPostsModelList.isEmpty)
                             SliverToBoxAdapter(
                               child: Padding(
                                 padding: EdgeInsets.only(
                                     top: MediaQuery.sizeOf(context).height / 5),
-                                child: Align(
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    'Follow some friends or share your first post ✨',
-                                    textAlign: TextAlign.center,
-                                    style: FontsStyle.font20Poppins,
-                                  ),
+                                child: Center(
+                                  child: state is GetFeedsPostsLoadingState
+                                      ? const CircularProgressIndicator()
+                                      : FadeInUp(
+                                          duration:
+                                              const Duration(milliseconds: 500),
+                                          child: Text(
+                                            'Follow some friends or share your first post ✨',
+                                            textAlign: TextAlign.center,
+                                            style: FontsStyle.font20Poppins,
+                                          ),
+                                        ),
                                 ),
                               ),
                             ),

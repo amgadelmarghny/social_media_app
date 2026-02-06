@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:animate_do/animate_do.dart';
 import 'package:social_media_app/layout/home/home_view.dart';
 import 'package:social_media_app/modules/register/widgets/bloc_consumer_button.dart';
 import 'package:social_media_app/modules/register/widgets/register_text_fields.dart';
@@ -43,9 +44,12 @@ class RegisterViewBody extends StatelessWidget {
               child: CustomScrollView(
                 slivers: [
                   SliverToBoxAdapter(
-                    child: Text(
-                      'Sign up',
-                      style: FontsStyle.font32Bold,
+                    child: FadeInLeft(
+                      duration: const Duration(milliseconds: 500),
+                      child: Text(
+                        'Sign up',
+                        style: FontsStyle.font32Bold,
+                      ),
                     ),
                   ),
                   const SliverToBoxAdapter(
@@ -53,8 +57,11 @@ class RegisterViewBody extends StatelessWidget {
                       height: 30,
                     ),
                   ),
-                  const SliverToBoxAdapter(
-                    child: RegisterTextFields(),
+                  SliverToBoxAdapter(
+                    child: FadeInUp(
+                      duration: const Duration(milliseconds: 500),
+                      child: const RegisterTextFields(),
+                    ),
                   ),
                   const SliverToBoxAdapter(
                     child: SizedBox(
@@ -63,21 +70,26 @@ class RegisterViewBody extends StatelessWidget {
                   ),
                   SliverFillRemaining(
                     hasScrollBody: false,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        BlocConsumerButton(
-                          emailController: registerCubit.emailController,
-                          firstNameController:
-                              registerCubit.firstNameController,
-                          lastNameController: registerCubit.lastNameController,
-                          dateAndMonthController:
-                              registerCubit.dateAndMonthController,
-                          yearController: registerCubit.yearController,
-                          userNameController: registerCubit.userNameController,
-                        ),
-                        const SigninNavigaorRow(),
-                      ],
+                    child: FadeIn(
+                      duration: const Duration(seconds: 1),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          BlocConsumerButton(
+                            emailController: registerCubit.emailController,
+                            firstNameController:
+                                registerCubit.firstNameController,
+                            lastNameController:
+                                registerCubit.lastNameController,
+                            dateAndMonthController:
+                                registerCubit.dateAndMonthController,
+                            yearController: registerCubit.yearController,
+                            userNameController:
+                                registerCubit.userNameController,
+                          ),
+                          const SigninNavigaorRow(),
+                        ],
+                      ),
                     ),
                   )
                 ],

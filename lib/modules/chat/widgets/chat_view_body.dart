@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:animate_do/animate_do.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:social_media_app/models/message_model.dart';
 import 'package:social_media_app/modules/chat/widgets/chat_view_interactive.dart';
 import 'package:social_media_app/modules/chat/widgets/custom_picked_images_list_view.dart';
@@ -62,119 +64,93 @@ class _ChatViewBodyState extends State<ChatViewBody> {
                 // (e.g., during loading or as a fallback)
                 messages = chatCubit.messageList;
               }
-              return ListView.builder(
-                physics:
-                    const BouncingScrollPhysics(), // Enables iOS-style bounce
-                reverse:
-                    true, // Shows newest messages at the bottom, old at top
-                itemCount: messages.length,
-                itemBuilder: (context, index) {
-                  final message = messages[index];
+              return AnimationLimiter(
+                child: ListView.builder(
+                  physics:
+                      const BouncingScrollPhysics(), // Enables iOS-style bounce
+                  reverse:
+                      true, // Shows newest messages at the bottom, old at top
+                  itemCount: messages.length,
+                  itemBuilder: (context, index) {
+                    final message = messages[index];
 
-                  // Identify the current user id to distinguish own messages from friend's
-                  final currentUserId =
-                      BlocProvider.of<SocialCubit>(context).userModel!.uid;
-                  final bool isSelfChat = currentUserId == widget.friendUid;
+                    // Identify the current user id to distinguish own messages from friend's
+                    final currentUserId =
+                        BlocProvider.of<SocialCubit>(context).userModel!.uid;
+                    final bool isSelfChat = currentUserId == widget.friendUid;
 
-                  // Flag to determine whether to show a header label for message date
-                  bool showHeader = false;
+                    // Flag to determine whether to show a header label for message date
+                    bool showHeader = false;
 
-                  // If this is the oldest message (at the top), always show header
-                  if (index == messages.length - 1) {
-                    showHeader = true;
-                  } else {
-                    // Otherwise, compare to the previous (older) message and show
-                    // the header if the date changes.
-                    final prevMessage = messages[index + 1];
-                    if (message.dateTime.day != prevMessage.dateTime.day) {
+                    // If this is the oldest message (at the top), always show header
+                    if (index == messages.length - 1) {
                       showHeader = true;
+                    } else {
+                      // Otherwise, compare to the previous (older) message and show
+                      // the header if the date changes.
+                      final prevMessage = messages[index + 1];
+                      if (message.dateTime.day != prevMessage.dateTime.day) {
+                        showHeader = true;
+                      }
                     }
-                  }
-                  // Build the message bubble (with possible date header above)
-                  return Column(
-                    children: [
-                      // Show a date header label if it's the first message of a new day
-                      if (showHeader)
-                        Container(
-                          decoration: const BoxDecoration(
-                            color: defaultColorButton,
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(20),
-                            ),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 8.0, horizontal: 8),
-                          margin: const EdgeInsets.symmetric(
-                              vertical: 8.0, horizontal: 8),
-                          child: Text(
-                            // Utility method to get human-readable date label
-                            getMessageDateLabel(message.dateTime),
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white54,
-                            ),
+                    // Build the message bubble (with possible date header above)
+                    return AnimationConfiguration.staggeredList(
+                      position: index,
+                      duration: const Duration(milliseconds: 375),
+                      child: SlideAnimation(
+                        verticalOffset: 50.0,
+                        child: FadeInAnimation(
+                          child: Column(
+                            children: [
+                              // Show a date header label if it's the first message of a new day
+                              if (showHeader)
+                                FadeInDown(
+                                  duration: const Duration(milliseconds: 400),
+                                  child: Container(
+                                    decoration: const BoxDecoration(
+                                      color: defaultColorButton,
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(20),
+                                      ),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8.0, horizontal: 8),
+                                    margin: const EdgeInsets.symmetric(
+                                        vertical: 8.0, horizontal: 8),
+                                    child: Text(
+                                      // Utility method to get human-readable date label
+                                      getMessageDateLabel(message.dateTime),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white54,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+
+                              Builder(builder: (context) {
+                                // Display message bubble as "MyBubbleChat" if sent by user,
+                                // otherwise as friend bubble chat component.
+                                if (message.uid == currentUserId) {
+                                  return FadeInRight(
+                                    duration: const Duration(milliseconds: 300),
+                                    child: _buildMyMessage(
+                                        message, isSending, isSelfChat),
+                                  );
+                                } else {
+                                  return FadeInLeft(
+                                    duration: const Duration(milliseconds: 300),
+                                    child: _buildFriendMessage(message),
+                                  );
+                                }
+                              })
+                            ],
                           ),
                         ),
-
-                      Builder(builder: (context) {
-                        // Display message bubble as "MyBubbleChat" if sent by user,
-                        // otherwise as friend bubble chat component.
-                        if (message.uid == currentUserId) {
-                          if (message.images != null) {
-                            return MyPhotosWithTextMessageBubbleChat(
-                              message: message.textMessage,
-                              images: message.images!,
-                              dateTime: message.dateTime,
-                              isRead: message.isRead,
-                              isDelivered: message.isDelivered,
-                              isSending: isSending,
-                              isSelfChat: isSelfChat,
-                            );
-                          }
-                          if (message.textMessage != null) {
-                            return MyBubbleChat(
-                              message: message.textMessage!,
-                              dateTime: message.dateTime,
-                              isRead: message.isRead,
-                              isDelivered: message.isDelivered,
-                              isSending: isSending,
-                              isSelfChat: isSelfChat,
-                            );
-                          } else if (message.voiceRecord != null) {
-                            return MyVoiceMessageWidget(
-                              key: ValueKey(message.voiceRecord),
-                              audioUrl: message.voiceRecord!,
-                              dateTime: message.dateTime,
-                              isRead: message.isRead,
-                              isDelivered: message.isDelivered,
-                              isSending: isSending,
-                              isSelfChat: isSelfChat,
-                            );
-                          }
-                        } else {
-                          if (message.images != null) {
-                            return FriendPhotosWithText(
-                                message: message.textMessage,
-                                images: message.images!,
-                                dateTime: message.dateTime);
-                          }
-                          if (message.textMessage != null) {
-                            return FriendBubbleMessage(
-                                message: message.textMessage!,
-                                dateTime: message.dateTime);
-                          } else if (message.voiceRecord != null) {
-                            return FriendVoiceMessageWidget(
-                              key: ValueKey(message.voiceRecord),
-                              audioUrl: message.voiceRecord!,
-                              dateTime: message.dateTime,
-                            );
-                          }
-                        }
-                        return SizedBox();
-                      })
-                    ],
-                  );
-                },
+                      ),
+                    );
+                  },
+                ),
               );
             },
           ),
@@ -188,5 +164,61 @@ class _ChatViewBodyState extends State<ChatViewBody> {
         ),
       ],
     );
+  }
+
+  Widget _buildMyMessage(
+      MessageModel message, bool isSending, bool isSelfChat) {
+    if (message.images != null) {
+      return MyPhotosWithTextMessageBubbleChat(
+        message: message.textMessage,
+        images: message.images!,
+        dateTime: message.dateTime,
+        isRead: message.isRead,
+        isDelivered: message.isDelivered,
+        isSending: isSending,
+        isSelfChat: isSelfChat,
+      );
+    }
+    if (message.textMessage != null) {
+      return MyBubbleChat(
+        message: message.textMessage!,
+        dateTime: message.dateTime,
+        isRead: message.isRead,
+        isDelivered: message.isDelivered,
+        isSending: isSending,
+        isSelfChat: isSelfChat,
+      );
+    } else if (message.voiceRecord != null) {
+      return MyVoiceMessageWidget(
+        key: ValueKey(message.voiceRecord),
+        audioUrl: message.voiceRecord!,
+        dateTime: message.dateTime,
+        isRead: message.isRead,
+        isDelivered: message.isDelivered,
+        isSending: isSending,
+        isSelfChat: isSelfChat,
+      );
+    }
+    return const SizedBox();
+  }
+
+  Widget _buildFriendMessage(MessageModel message) {
+    if (message.images != null) {
+      return FriendPhotosWithText(
+          message: message.textMessage,
+          images: message.images!,
+          dateTime: message.dateTime);
+    }
+    if (message.textMessage != null) {
+      return FriendBubbleMessage(
+          message: message.textMessage!, dateTime: message.dateTime);
+    } else if (message.voiceRecord != null) {
+      return FriendVoiceMessageWidget(
+        key: ValueKey(message.voiceRecord),
+        audioUrl: message.voiceRecord!,
+        dateTime: message.dateTime,
+      );
+    }
+    return const SizedBox();
   }
 }

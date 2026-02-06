@@ -66,6 +66,8 @@ dependencies:
   url_launcher: ^6.3.2
   voice_message_package: ^2.0.0
   wechat_assets_picker: ^10.1.0
+  animate_do: ^3.3.4
+  flutter_staggered_animations: ^1.0.0
 
 dependency_overrides:
   record_platform_interface: 1.4.0

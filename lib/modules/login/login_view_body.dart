@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:animate_do/animate_do.dart';
 import 'package:social_media_app/modules/login/widgets/sign_up_navigator_row.dart';
 import 'package:social_media_app/shared/bloc/login_cubit/login_cubit.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
@@ -56,11 +57,14 @@ class LoginViewBody extends StatelessWidget {
                     height: 50,
                   ),
                 ),
-                const SliverToBoxAdapter(
-                  child: Image(
-                    height: 100,
-                    image: AssetImage(
-                      'lib/assets/images/launch_icon_wthout_bg.png',
+                SliverToBoxAdapter(
+                  child: FadeInDown(
+                    duration: const Duration(milliseconds: 600),
+                    child: const Image(
+                      height: 100,
+                      image: AssetImage(
+                        'lib/assets/images/launch_icon_wthout_bg.png',
+                      ),
                     ),
                   ),
                 ),
@@ -70,9 +74,12 @@ class LoginViewBody extends StatelessWidget {
                   ),
                 ),
                 SliverToBoxAdapter(
-                  child: Text(
-                    'Sign in',
-                    style: FontsStyle.font32Bold,
+                  child: FadeInLeft(
+                    duration: const Duration(milliseconds: 500),
+                    child: Text(
+                      'Sign in',
+                      style: FontsStyle.font32Bold,
+                    ),
                   ),
                 ),
                 const SliverToBoxAdapter(
@@ -80,7 +87,12 @@ class LoginViewBody extends StatelessWidget {
                     height: 20,
                   ),
                 ),
-                const SliverToBoxAdapter(child: LoginFieldsAndButton()),
+                SliverToBoxAdapter(
+                  child: FadeInUp(
+                    duration: const Duration(milliseconds: 500),
+                    child: const LoginFieldsAndButton(),
+                  ),
+                ),
                 const SliverToBoxAdapter(
                   child: SizedBox(
                     height: 15,
@@ -100,11 +112,14 @@ class LoginViewBody extends StatelessWidget {
                 //   ),
                 // ),
                 // const SliverToBoxAdapter(child: AuthIocnList()),
-                const SliverFillRemaining(
+                SliverFillRemaining(
                   hasScrollBody: false,
                   child: Align(
                       alignment: AlignmentGeometry.bottomCenter,
-                      child: SignUpNavigatorRow()),
+                      child: FadeIn(
+                        duration: const Duration(seconds: 1),
+                        child: const SignUpNavigatorRow(),
+                      )),
                 )
               ],
             ),

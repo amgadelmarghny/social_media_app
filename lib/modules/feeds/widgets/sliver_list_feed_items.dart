@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/components/post_item.dart';
 
@@ -14,17 +15,28 @@ class SliverListfeedItems extends StatelessWidget {
     return BlocBuilder<SocialCubit, SocialState>(
       builder: (context, state) {
         SocialCubit socialCubit = context.read<SocialCubit>();
-        return SliverList.builder(
-          itemBuilder: (context, index) {
-            return Skeletonizer(
-              enabled: state is GetFeedsPostsLoadingState,
-              child: PostItem(
-                postModel: socialCubit.friendsPostsModelList[index],
-                postId: socialCubit.friendsPostsIdList[index],
-              ),
-            );
-          },
-          itemCount: socialCubit.friendsPostsModelList.length,
+        return AnimationLimiter(
+          child: SliverList.builder(
+            itemBuilder: (context, index) {
+              return AnimationConfiguration.staggeredList(
+                position: index,
+                duration: const Duration(milliseconds: 500),
+                child: SlideAnimation(
+                  verticalOffset: 50.0,
+                  child: FadeInAnimation(
+                    child: Skeletonizer(
+                      enabled: state is GetFeedsPostsLoadingState,
+                      child: PostItem(
+                        postModel: socialCubit.friendsPostsModelList[index],
+                        postId: socialCubit.friendsPostsIdList[index],
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+            itemCount: socialCubit.friendsPostsModelList.length,
+          ),
         );
       },
     );

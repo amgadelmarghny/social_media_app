@@ -47,6 +47,12 @@ abstract class CustomThemeMode {
       shape: CircleBorder(),
       backgroundColor: defaultColorButton,
     ),
+    pageTransitionsTheme: const PageTransitionsTheme(
+      builders: {
+        TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
+        TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+      },
+    ),
   );
 
   static final darkTheme = ThemeData(
@@ -86,6 +92,12 @@ abstract class CustomThemeMode {
       shape: CircleBorder(),
       backgroundColor: defaultColorButton,
       iconSize: 35,
+    ),
+    pageTransitionsTheme: const PageTransitionsTheme(
+      builders: {
+        TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
+        TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+      },
     ),
   );
 }
