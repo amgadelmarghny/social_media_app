@@ -760,8 +760,58 @@ class SocialCubit extends Cubit<SocialState> {
 
   // Delete a post from Firestore, then refresh post lists
   Future<void> deletePost(String postId) async {
+    emit(RemovePostLoadingState());
     try {
-      await _postCollectionRef.doc(postId).delete();
+      // 1. Get post data to check for postImage and clean up sub-collections
+      DocumentSnapshot postDoc = await _postCollectionRef.doc(postId).get();
+
+      if (postDoc.exists) {
+        Map<String, dynamic> postData = postDoc.data() as Map<String, dynamic>;
+
+        // 2. Delete post image from Storage if it exists
+        if (postData['postImage'] != null) {
+          try {
+            await FirebaseStorage.instance
+                .refFromURL(postData['postImage'])
+                .delete();
+          } catch (e) {
+            debugPrint(
+                "Post image not found in storage or already deleted: $e");
+          }
+        }
+
+        // 3. Delete Likes sub-collection
+        var likesSnapshot = await _postCollectionRef
+            .doc(postId)
+            .collection(kLikesCollection)
+            .get();
+        for (var doc in likesSnapshot.docs) {
+          await doc.reference.delete();
+        }
+
+        // 4. Delete Comments sub-collection (and comment images if they exist)
+        var commentsSnapshot = await _postCollectionRef
+            .doc(postId)
+            .collection(kCommentsCollection)
+            .get();
+        for (var doc in commentsSnapshot.docs) {
+          if (doc.data()['image'] != null) {
+            try {
+              await FirebaseStorage.instance
+                  .refFromURL(doc.data()['image'])
+                  .delete();
+            } catch (e) {
+              debugPrint("Comment image not found in storage: $e");
+            }
+          }
+          await doc.reference.delete();
+        }
+
+        // 5. Finally, delete the post document itself
+        await _postCollectionRef.doc(postId).delete();
+      }
+
+      // Refresh post lists
       getMyUserPosts(userModel!.uid);
       await getTimelinePosts();
       emit(RemovePostState());

@@ -78,24 +78,38 @@ class ProfilePostRow extends StatelessWidget {
         ),
         if (BlocProvider.of<SocialCubit>(context).userModel != null &&
             timePosted != null)
-          IconButton(
-            onPressed: () {
-              showPopover(
-                direction: PopoverDirection.top,
-                context: context,
-                height: 50,
-                width: 250,
-                backgroundColor: const Color(0xff8862D9),
-                bodyBuilder: (context) => userUid ==
-                        BlocProvider.of<SocialCubit>(context).userModel!.uid
-                    ? DeletePostOption(
-                        postId: postId!,
-                        isItDeletedThroughPostView: isItDeletedThroughPostView,
-                      )
-                    : ReportPostOption(postId: postId! , isItDeletedThroughPostView: isItDeletedThroughPostView,),
+          BlocBuilder<SocialCubit, SocialState>(
+            builder: (context, state) {
+              return AbsorbPointer(
+                absorbing: state is RemovePostLoadingState,
+                child: IconButton(
+                  onPressed: () {
+                    showPopover(
+                      direction: PopoverDirection.top,
+                      context: context,
+                      height: 50,
+                      width: 250,
+                      backgroundColor: const Color(0xff8862D9),
+                      bodyBuilder: (context) => userUid ==
+                              BlocProvider.of<SocialCubit>(context)
+                                  .userModel!
+                                  .uid
+                          ? DeletePostOption(
+                              postId: postId!,
+                              isItDeletedThroughPostView:
+                                  isItDeletedThroughPostView,
+                            )
+                          : ReportPostOption(
+                              postId: postId!,
+                              isItDeletedThroughPostView:
+                                  isItDeletedThroughPostView,
+                            ),
+                    );
+                  },
+                  icon: const Icon(Icons.more_vert),
+                ),
               );
             },
-            icon: const Icon(Icons.more_vert),
           ),
       ],
     );

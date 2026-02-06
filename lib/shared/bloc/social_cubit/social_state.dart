@@ -105,6 +105,8 @@ final class SearchUsersFailureState extends SocialState {
 final class RemovePickedFile extends SocialState {}
 
 // cancel upload post
+final class RemovePostLoadingState extends SocialState {}
+
 final class RemovePostState extends SocialState {}
 
 final class RemovePostFailureState extends SocialState {
