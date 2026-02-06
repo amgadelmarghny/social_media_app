@@ -509,7 +509,6 @@ class ChatCubit extends Cubit<ChatState> {
 
     // Cancel old subscription if exists, to prevent leaks/multiple listeners
     _messagesSubscription?.cancel();
-
     // Listen for Firestore message updates for this conversation, sorted latest-to-oldest
     _messagesSubscription = FirebaseFirestore.instance
         .collection(kUsersCollection)
@@ -521,7 +520,7 @@ class ChatCubit extends Cubit<ChatState> {
         .snapshots()
         .listen(
       (event) {
-        // Clear current list and refill with updated documents
+        // Clear current list and refill with updated documents (entire snapshot)
         messageList.clear();
 
         for (var doc in event.docs) {
@@ -603,6 +602,20 @@ class ChatCubit extends Cubit<ChatState> {
         emit(GetChatsFailureState(errMessage: error.toString()));
       },
     );
+  }
+
+  /// Marks a specific chat as read by updating the 'isRead' status in the chat preview
+  Future<void> markChatAsRead({required String friendUid}) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection(kUsersCollection)
+          .doc(currentUserId)
+          .collection(kChatCollection)
+          .doc(friendUid)
+          .update({'isRead': true});
+    } catch (e) {
+      debugPrint('Error marking chat as read: $e');
+    }
   }
 
   /// Disposes of the Firestore listener to avoid leaks; always call when cubit is closed

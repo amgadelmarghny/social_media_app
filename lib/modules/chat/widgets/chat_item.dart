@@ -5,6 +5,7 @@ import 'package:skeletonizer/skeletonizer.dart';
 import 'package:social_media_app/models/chat_item_model.dart';
 import 'package:social_media_app/models/user_model.dart';
 import 'package:social_media_app/modules/chat/chat_view.dart';
+import 'package:social_media_app/shared/bloc/chat_cubit/chat_cubit.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/components/message_date_lable.dart';
 import 'package:social_media_app/shared/components/profile_picture_with_story.dart';
@@ -60,11 +61,18 @@ class _ChatItemState extends State<ChatItem> {
       // Show skeleton loading while the user model has not been fetched.
       enabled: userModel?.firstName.isEmpty ?? true,
       child: InkWell(
-          onTap: () => Navigator.pushNamed(
-                context,
-                ChatView.routeName, // Navigate to the chat view on tap.
-                arguments: userModel,
-              ),
+          onTap: () {
+            // Mark the chat as read when clicked
+            context
+                .read<ChatCubit>()
+                .markChatAsRead(friendUid: widget.chatItemModel.uid);
+
+            Navigator.pushNamed(
+              context,
+              ChatView.routeName, // Navigate to the chat view on tap.
+              arguments: userModel,
+            );
+          },
           child: Row(
             children: [
               ProfilePictureWithStory(

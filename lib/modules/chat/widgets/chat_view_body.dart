@@ -30,6 +30,10 @@ class ChatViewBody extends StatefulWidget {
 }
 
 class _ChatViewBodyState extends State<ChatViewBody> {
+  // Flag to track if the initial entrance animation has already been performed.
+  // This prevents the entire list from re-animating every time a new message is sent/received.
+  bool _isInitialAnimationDone = false;
+
   @override
   void initState() {
     super.initState();
@@ -46,10 +50,26 @@ class _ChatViewBodyState extends State<ChatViewBody> {
         // Expanded widget to allow the chat message list to take all available space,
         // while the input widget stays at the bottom.
         Expanded(
-          child: BlocBuilder<ChatCubit, ChatState>(
+          child: BlocConsumer<ChatCubit, ChatState>(
             // Re-build only when messages are loaded or loading anew.
             buildWhen: (previous, current) =>
                 current is GetMessagesSuccess || current is GetMessagesLoading,
+            listener: (context, state) {
+              // Once we get the first successful batch of messages that isn't empty,
+              // schedule the flag to be set to true AFTER this frame has rendered.
+              // This ensures the first load actually PERFORMS the animation.
+              if (state is GetMessagesSuccess &&
+                  state.messages.isNotEmpty &&
+                  !_isInitialAnimationDone) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (mounted) {
+                    setState(() {
+                      _isInitialAnimationDone = true;
+                    });
+                  }
+                });
+              }
+            },
             builder: (context, state) {
               final chatCubit = context.read<ChatCubit>();
               bool isSending =
@@ -64,94 +84,59 @@ class _ChatViewBodyState extends State<ChatViewBody> {
                 // (e.g., during loading or as a fallback)
                 messages = chatCubit.messageList;
               }
-              return AnimationLimiter(
-                child: ListView.builder(
-                  physics:
-                      const BouncingScrollPhysics(), // Enables iOS-style bounce
-                  reverse:
-                      true, // Shows newest messages at the bottom, old at top
-                  itemCount: messages.length,
-                  itemBuilder: (context, index) {
-                    final message = messages[index];
 
-                    // Identify the current user id to distinguish own messages from friend's
-                    final currentUserId =
-                        BlocProvider.of<SocialCubit>(context).userModel!.uid;
-                    final bool isSelfChat = currentUserId == widget.friendUid;
+              // We only wrap with AnimationLimiter if the initial animation isn't done.
+              Widget listView = ListView.builder(
+                physics: const BouncingScrollPhysics(),
+                reverse: true,
+                itemCount: messages.length,
+                itemBuilder: (context, index) {
+                  final message = messages[index];
+                  final currentUserId =
+                      BlocProvider.of<SocialCubit>(context).userModel!.uid;
+                  final bool isSelfChat = currentUserId == widget.friendUid;
 
-                    // Flag to determine whether to show a header label for message date
-                    bool showHeader = false;
-
-                    // If this is the oldest message (at the top), always show header
-                    if (index == messages.length - 1) {
+                  bool showHeader = false;
+                  if (index == messages.length - 1) {
+                    showHeader = true;
+                  } else {
+                    final prevMessage = messages[index + 1];
+                    if (message.dateTime.day != prevMessage.dateTime.day) {
                       showHeader = true;
-                    } else {
-                      // Otherwise, compare to the previous (older) message and show
-                      // the header if the date changes.
-                      final prevMessage = messages[index + 1];
-                      if (message.dateTime.day != prevMessage.dateTime.day) {
-                        showHeader = true;
-                      }
                     }
-                    // Build the message bubble (with possible date header above)
-                    return AnimationConfiguration.staggeredList(
-                      position: index,
-                      duration: const Duration(milliseconds: 375),
-                      child: SlideAnimation(
-                        verticalOffset: 50.0,
-                        child: FadeInAnimation(
-                          child: Column(
-                            children: [
-                              // Show a date header label if it's the first message of a new day
-                              if (showHeader)
-                                FadeInDown(
-                                  duration: const Duration(milliseconds: 400),
-                                  child: Container(
-                                    decoration: const BoxDecoration(
-                                      color: defaultColorButton,
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(20),
-                                      ),
-                                    ),
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 8.0, horizontal: 8),
-                                    margin: const EdgeInsets.symmetric(
-                                        vertical: 8.0, horizontal: 8),
-                                    child: Text(
-                                      // Utility method to get human-readable date label
-                                      getMessageDateLabel(message.dateTime),
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white54,
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                  }
 
-                              Builder(builder: (context) {
-                                // Display message bubble as "MyBubbleChat" if sent by user,
-                                // otherwise as friend bubble chat component.
-                                if (message.uid == currentUserId) {
-                                  return FadeInRight(
-                                    duration: const Duration(milliseconds: 300),
-                                    child: _buildMyMessage(
-                                        message, isSending, isSelfChat),
-                                  );
-                                } else {
-                                  return FadeInLeft(
-                                    duration: const Duration(milliseconds: 300),
-                                    child: _buildFriendMessage(message),
-                                  );
-                                }
-                              })
-                            ],
-                          ),
-                        ),
+                  // The actual message content widget
+                  Widget messageWidget = Column(
+                    children: [
+                      if (showHeader) _buildDateHeader(message.dateTime),
+                      _buildMessageBubble(
+                          message, currentUserId, isSending, isSelfChat),
+                    ],
+                  );
+
+                  // If initial animation is done, return widget directly without animation wrappers
+                  if (_isInitialAnimationDone) {
+                    return messageWidget;
+                  }
+
+                  // Otherwise, wrap with staggered and entrance animations
+                  return AnimationConfiguration.staggeredList(
+                    position: index,
+                    duration: const Duration(milliseconds: 375),
+                    child: SlideAnimation(
+                      verticalOffset: 50.0,
+                      child: FadeInAnimation(
+                        child: messageWidget,
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  );
+                },
               );
+
+              return _isInitialAnimationDone
+                  ? listView
+                  : AnimationLimiter(child: listView);
             },
           ),
         ),
@@ -164,6 +149,54 @@ class _ChatViewBodyState extends State<ChatViewBody> {
         ),
       ],
     );
+  }
+
+  Widget _buildDateHeader(DateTime dateTime) {
+    Widget header = Container(
+      decoration: const BoxDecoration(
+        color: defaultColorButton,
+        borderRadius: BorderRadius.all(
+          Radius.circular(20),
+        ),
+      ),
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8),
+      margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8),
+      child: Text(
+        getMessageDateLabel(dateTime),
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          color: Colors.white54,
+        ),
+      ),
+    );
+
+    if (_isInitialAnimationDone) {
+      return header;
+    }
+    return FadeInDown(
+      duration: const Duration(milliseconds: 400),
+      child: header,
+    );
+  }
+
+  Widget _buildMessageBubble(MessageModel message, String currentUserId,
+      bool isSending, bool isSelfChat) {
+    Widget bubble;
+    if (message.uid == currentUserId) {
+      bubble = _buildMyMessage(message, isSending, isSelfChat);
+      if (_isInitialAnimationDone) return bubble;
+      return FadeInRight(
+        duration: const Duration(milliseconds: 300),
+        child: bubble,
+      );
+    } else {
+      bubble = _buildFriendMessage(message);
+      if (_isInitialAnimationDone) return bubble;
+      return FadeInLeft(
+        duration: const Duration(milliseconds: 300),
+        child: bubble,
+      );
+    }
   }
 
   Widget _buildMyMessage(
