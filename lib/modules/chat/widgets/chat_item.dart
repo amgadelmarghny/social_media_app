@@ -44,6 +44,17 @@ class _ChatItemState extends State<ChatItem> {
   }
 
   @override
+  void didUpdateWidget(covariant ChatItem oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // If the UID has changed (due to list reordering and widget reuse),
+    // refresh the user data.
+    if (oldWidget.chatItemModel.uid != widget.chatItemModel.uid) {
+      userModel = null;
+      getChatUserModel();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Skeletonizer(
       // Show skeleton loading while the user model has not been fetched.

@@ -38,6 +38,7 @@ class _CustomChatTextFieldState extends State<CustomChatTextField> {
                 ? widget.controller.text
                 : null,
           );
+          
         } else {
           if (widget.controller.text.isNotEmpty) {
             widget.controller.clear();

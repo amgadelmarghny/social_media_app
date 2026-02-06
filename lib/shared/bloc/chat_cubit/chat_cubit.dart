@@ -136,7 +136,7 @@ class ChatCubit extends Cubit<ChatState> {
           messageModel.textMessage!.isNotEmpty) {
         notificationContent = messageModel.textMessage!;
       } else {
-      notificationContent = 'Sent an image';
+        notificationContent = 'Sent an image';
       }
     } else {
       notificationContent = messageModel.textMessage ?? '';
@@ -580,7 +580,7 @@ class ChatCubit extends Cubit<ChatState> {
         .snapshots()
         .listen(
       (event) {
-        chatItemsList.clear();
+        List<ChatItemModel> updatedChatItemsList = [];
         for (var chatItem in event.docs) {
           ChatItemModel chatItemModel = ChatItemModel(
             uid: chatItem.id,
@@ -590,8 +590,9 @@ class ChatCubit extends Cubit<ChatState> {
             dateTime: (chatItem.data()[kCreatedAt] as Timestamp).toDate(),
             isRead: chatItem.data()['isRead'] ?? true,
           );
-          chatItemsList.add(chatItemModel);
+          updatedChatItemsList.add(chatItemModel);
         }
+        chatItemsList = updatedChatItemsList;
         emit(GetChatsSuccessState());
       },
       onError: (error) {
