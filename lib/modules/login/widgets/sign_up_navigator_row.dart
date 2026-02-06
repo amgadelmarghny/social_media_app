@@ -16,7 +16,9 @@ class SignUpNavigatorRow extends StatelessWidget {
       children: [
         Text(
           'Don\'t have an account?',
-          style: FontsStyle.font18PopinWithShadowOption(),
+          style: FontsStyle.font18PopinWithShadowOption(
+            isShadow: true,
+          ),
         ),
         const Spacer(),
         TextButton(

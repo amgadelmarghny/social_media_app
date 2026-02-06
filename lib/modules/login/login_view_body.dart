@@ -98,7 +98,7 @@ class LoginViewBody extends StatelessWidget {
                     height: 15,
                   ),
                 ),
-                //TODO: Applay sign in with facebock and google.
+                // TODO: Applay sign in with facebock and google.
                 // SliverToBoxAdapter(
                 //   child: Text(
                 //     'Or sign in with',
