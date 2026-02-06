@@ -1,0 +1,5 @@
+Analyzing social_media_app...                                   
+
+warning - This 'onError' handler must return a value assignable to 'FileSystemEntity', but ends without returning a value - lib\shared\bloc\chat_cubit\chat_cubit.dart:324:57 - body_might_complete_normally_catch_error
+
+1 issue found. (ran in 5.9s)

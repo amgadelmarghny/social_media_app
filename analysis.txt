@@ -1,0 +1,10 @@
+Analyzing social_media_app...                                   
+
+warning - This 'onError' handler must return a value assignable to 'FileSystemEntity', but ends without returning a value - lib\shared\bloc\chat_cubit\chat_cubit.dart:324:57 - body_might_complete_normally_catch_error
+   info - The import of 'package:googleapis_auth/googleapis_auth.dart' is unnecessary because all of the used elements are also provided by the import of 'package:googleapis_auth/auth_io.dart' - lib\shared\services\notification_service.dart:8:8 - unnecessary_import
+  error - The named parameter 'settings' is required, but there's no corresponding argument - lib\shared\services\notification_service.dart:189:44 - missing_required_argument
+  error - Too many positional arguments: 0 expected, but 1 found - lib\shared\services\notification_service.dart:190:7 - extra_positional_arguments_could_be_named
+  error - The named parameter 'id' is required, but there's no corresponding argument - lib\shared\services\notification_service.dart:395:44 - missing_required_argument
+  error - Too many positional arguments: 0 expected, but 4 found - lib\shared\services\notification_service.dart:396:7 - extra_positional_arguments_could_be_named
+
+6 issues found. (ran in 8.2s)
