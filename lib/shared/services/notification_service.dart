@@ -75,7 +75,13 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   if (message.data.containsKey('title')) {
     try {
       final notificationService = NotificationService();
-      await notificationService.initialize();
+      // Only show local notification if it's NOT a standard notification that the system already showed
+      // Or if we want to override with our rich style.
+      // To prevent double notification, we can check if it has data but we'll keep it for now as the system one is basic.
+      // Initialize only once if not already initialized
+      if (!notificationService.isInitialized) {
+        await notificationService.initialize();
+      }
       await notificationService.showLocalNotification(
         title: message.data['title'] ?? 'New Notification',
         body: message.data['body'] ?? '',
@@ -95,6 +101,8 @@ class NotificationService {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
+  bool isInitialized = false;
+  static String? openedChatId;
 
   factory NotificationService() => _instance;
   NotificationService._internal();
@@ -132,6 +140,10 @@ class NotificationService {
       body: jsonEncode({
         'message': {
           'token': receiverToken,
+          'notification': {
+            'title': title,
+            'body': body,
+          },
           'data': {
             'title': title,
             'body': body,
@@ -143,13 +155,29 @@ class NotificationService {
           },
           'android': {
             'priority': 'high',
+            'notification': {
+              'channel_id': 'high_importance_channel',
+              'notification_priority': 'PRIORITY_HIGH',
+              'default_sound': true,
+              'default_vibrate_timings': true,
+              if (messageImage != null && messageImage.isNotEmpty)
+                'image': messageImage,
+            },
           },
           'apns': {
             'payload': {
               'aps': {
                 'content-available': 1,
                 'sound': 'default',
+                'alert': {
+                  'title': title,
+                  'body': body,
+                },
               },
+            },
+            'fcm_options': {
+              if (messageImage != null && messageImage.isNotEmpty)
+                'image': messageImage,
             },
           },
         },
@@ -192,6 +220,8 @@ class NotificationService {
 
     // Create Android notification channel for high importance
     await _createNotificationChannel();
+
+    isInitialized = true;
   }
 
   /// Create Android notification channel with high importance
@@ -288,6 +318,13 @@ class NotificationService {
   /// Handle foreground messages by showing local notification
   Future<void> _handleForegroundMessage(RemoteMessage message) async {
     debugPrint('Foreground message received: ${message.messageId}');
+
+    // Don't show notification if user is already in this chat
+    if (message.data['type'] == 'message' &&
+        message.data['uid'] == openedChatId) {
+      debugPrint('User is already in this chat, skipping notification');
+      return;
+    }
 
     // Show local notification from data even if notification block is missing
     if (message.data.containsKey('title')) {

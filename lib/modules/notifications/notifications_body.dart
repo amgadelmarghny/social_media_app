@@ -79,7 +79,7 @@ class _NotificationsBodyState extends State<NotificationsBody> {
           return true;
         },
         child: Padding(
-          padding: EdgeInsets.only(top: 10, bottom: _bodiesBottomPadding),
+          padding: EdgeInsets.only(top: 10, bottom: _bodiesBottomPadding + 10),
           child: StreamBuilder<QuerySnapshot>(
             stream: _notificationsStream,
             builder: (context, snapshot) {
@@ -119,7 +119,7 @@ class _NotificationsBodyState extends State<NotificationsBody> {
                 itemBuilder: (context, index) {
                   final model = notifications[index];
                   return FadeInRight(
-                    duration: Duration(milliseconds: 100 * index),
+                    duration: Duration(milliseconds: 150 * index),
                     child: NotificationItem(
                       model: model,
                       onTap: () =>
