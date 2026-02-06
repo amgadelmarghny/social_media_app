@@ -27,10 +27,10 @@ class CustomPickedImagesListView extends StatelessWidget {
           height: cubit.pickedImages.isNotEmpty
               ? 110
               : 0, // Fixed height for the preview images bar.
-          padding: const EdgeInsets.all(8.0), // Spacing around the images.
+          padding: const EdgeInsets.only(
+              left: 8, right: 8, top: 8), // Spacing around the images.
           decoration: BoxDecoration(
-            color:
-                defaultColorButton, // Slightly colored background for contrast.
+            color: defaultColor, // Slightly colored background for contrast.
             border: const Border(
                 top:
                     BorderSide(color: Colors.black12)), // Top border separator.

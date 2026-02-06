@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:social_media_app/models/notification_model.dart';
 import 'package:social_media_app/shared/components/profile_picture_with_story.dart';
+import 'package:social_media_app/shared/components/date_utils.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
-import 'package:intl/intl.dart';
 import 'package:social_media_app/shared/style/theme/constant.dart';
 
 class NotificationItem extends StatelessWidget {
@@ -18,65 +18,58 @@ class NotificationItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
       color: model.isRead
           ? Colors.transparent
           : Colors.grey.withValues(alpha: 0.6),
       child: InkWell(
         onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-          child: Row(
-            children: [
-              if (model.senderPhoto != null) ...[
-                ProfilePictureWithStory(
-                  image: model.senderPhoto,
-                  isWithoutStory: true,
-                  size: 45,
-                ),
-                const SizedBox(width: 10),
-              ],
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    RichText(
-                      text: TextSpan(
-                        children: [
-                          TextSpan(
-                              text: '${model.senderName} ',
-                              style: FontsStyle.font18PopinMedium()),
-                          TextSpan(
-                            text: _getNotificationText(),
-                            style: FontsStyle.font16RegularForNotification(),
-                          ),
-                        ],
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+        child: Row(
+          children: [
+            ProfilePictureWithStory(
+              image: model.senderPhoto,
+              isWithoutStory: true,
+              size: 60,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                            text: '${model.senderName} ',
+                            style: FontsStyle.font18PopinMedium()),
+                        TextSpan(
+                          text: _getNotificationText(),
+                          style: FontsStyle.font16RegularForNotification(),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 5),
-                    Text(
-                      DateFormat.yMMMd().add_jm().format(model.dateTime),
-                      style: FontsStyle.font12Popin(),
-                    ),
-                  ],
-                ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    getFriendlyTimeLabel(model.dateTime),
+                    style: FontsStyle.font12Popin(),
+                  ),
+                ],
               ),
-              if (model.type == 'like' || model.type == 'comment')
-                // Optionally show a small icon indicating type
-                Icon(
-                  model.type == 'like'
-                      ? Icons.favorite
-                      : Icons.comment_outlined,
-                  size: 30,
-                  color: model.type == 'like'
-                      ? defaultColorButton
-                      : Colors.white54,
-                ),
-              if (model.type == 'follow')
-                const Icon(Icons.person_add, size: 30, color: Colors.white54),
-            ],
-          ),
+            ),
+            if (model.type == 'like' || model.type == 'comment')
+              // Optionally show a small icon indicating type
+              Icon(
+                model.type == 'like' ? Icons.favorite : Icons.comment_outlined,
+                size: 30,
+                color:
+                    model.type == 'like' ? defaultColorButton : Colors.white54,
+              ),
+            if (model.type == 'follow')
+              const Icon(Icons.person_add, size: 30, color: Colors.white54),
+          ],
         ),
       ),
     );

@@ -13,7 +13,7 @@ import 'package:social_media_app/modules/chat/widgets/my_photos_with_text_messag
 import 'package:social_media_app/modules/chat/widgets/my_voice_message_widget.dart';
 import 'package:social_media_app/shared/bloc/chat_cubit/chat_cubit.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
-import 'package:social_media_app/shared/components/message_date_lable.dart';
+import 'package:social_media_app/shared/components/date_utils.dart';
 import 'package:social_media_app/shared/style/theme/constant.dart';
 
 /// The main body widget for the chat view.
@@ -140,7 +140,7 @@ class _ChatViewBodyState extends State<ChatViewBody> {
             },
           ),
         ),
-        CustomPickedImagesListView(),
+        const CustomPickedImagesListView(),
         // Widget for the chat input area (sending messages, etc.)
         // Always stays fixed to the bottom of the screen under the message list.
         ChatViewInteracrive(

@@ -7,7 +7,7 @@ import 'package:social_media_app/models/user_model.dart';
 import 'package:social_media_app/modules/chat/chat_view.dart';
 import 'package:social_media_app/shared/bloc/chat_cubit/chat_cubit.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
-import 'package:social_media_app/shared/components/message_date_lable.dart';
+import 'package:social_media_app/shared/components/date_utils.dart';
 import 'package:social_media_app/shared/components/profile_picture_with_story.dart';
 import 'package:social_media_app/shared/style/fonts/font_style.dart';
 
@@ -167,7 +167,7 @@ class _ChatItemState extends State<ChatItem> {
                           ),
                         // Display the label for date/time of the last message.
                         Text(
-                          getMessageDateLabel(widget.chatItemModel.dateTime),
+                          getFriendlyTimeLabel(widget.chatItemModel.dateTime),
                           style: FontsStyle.font18PopinWithShadowOption(
                               color: Colors.white60),
                         ),

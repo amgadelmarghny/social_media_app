@@ -1,3 +1,4 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -21,10 +22,23 @@ class NotificationsBody extends StatefulWidget {
 class _NotificationsBodyState extends State<NotificationsBody> {
   final ScrollController _scrollController = ScrollController();
   double _bodiesBottomPadding = 36;
+  late final Stream<QuerySnapshot> _notificationsStream;
 
   @override
   void initState() {
     super.initState();
+
+    // Initialize the stream once in initState to prevent resets during build/setState
+    final cubit = BlocProvider.of<SocialCubit>(context);
+    final myUid = cubit.userModel?.uid ?? cubit.currentUserUid;
+
+    _notificationsStream = FirebaseFirestore.instance
+        .collection(kUsersCollection)
+        .doc(myUid)
+        .collection('notifications')
+        .orderBy('dateTime', descending: true)
+        .snapshots();
+
     _scrollController.addListener(() {
       if (_scrollController.position.atEdge) {
         bool isTop = _scrollController.position.pixels == 0;
@@ -65,15 +79,9 @@ class _NotificationsBodyState extends State<NotificationsBody> {
           return true;
         },
         child: Padding(
-          padding: EdgeInsets.only(
-              top: 10, left: 10, right: 10, bottom: _bodiesBottomPadding),
+          padding: EdgeInsets.only(top: 10, bottom: _bodiesBottomPadding),
           child: StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance
-                .collection(kUsersCollection)
-                .doc(myUid)
-                .collection('notifications')
-                .orderBy('dateTime', descending: true)
-                .snapshots(),
+            stream: _notificationsStream,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(
@@ -105,19 +113,18 @@ class _NotificationsBodyState extends State<NotificationsBody> {
                   .where((notification) => notification.type != 'message')
                   .toList();
 
-              return ListView.separated(
+              return ListView.builder(
                 controller: _scrollController,
                 itemCount: notifications.length,
-                separatorBuilder: (context, index) => const Divider(
-                  color: Colors.grey,
-                  thickness: 0.2,
-                ),
                 itemBuilder: (context, index) {
                   final model = notifications[index];
-                  return NotificationItem(
-                    model: model,
-                    onTap: () =>
-                        _handleNotificationTap(context, model, socialCubit),
+                  return FadeInRight(
+                    duration: Duration(milliseconds: 100 * index),
+                    child: NotificationItem(
+                      model: model,
+                      onTap: () =>
+                          _handleNotificationTap(context, model, socialCubit),
+                    ),
                   );
                 },
               );
@@ -188,8 +195,6 @@ class _NotificationsBodyState extends State<NotificationsBody> {
         if (context.mounted) Navigator.pop(context); // Close loading
         if (userModel != null && context.mounted) {
           Navigator.pushNamed(context, UserView.routName, arguments: userModel);
-        } else {
-          // debugPrint("User not found");
         }
       } else {
         if (context.mounted) Navigator.pop(context); // Close loading

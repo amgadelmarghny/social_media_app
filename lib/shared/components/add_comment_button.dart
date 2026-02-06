@@ -54,31 +54,37 @@ class AddCommentButton extends StatelessWidget {
         // Suffix icon for sending the comment
         suffixIcon: BlocBuilder<CommentsCubit, CommentsState>(
           builder: (context, state) {
-            return IconButton(
-              onPressed: () async {
-                SocialCubit socialCubit = BlocProvider.of<SocialCubit>(context);
-                UserModel myUserModel = socialCubit.userModel!;
-                // Send the comment when the send button is pressed
-                await _sendCommentMethod(
-                  commentsCubit: commentsCubit,
-                  postId: postId,
-                  myUserModel: myUserModel,
-                  socialCubit: socialCubit,
-                  commentsNum: commentsNum,
-                );
-              },
-              // Show a loading indicator if a comment is being sent or image is uploading
-              icon: state is AddCommentLoading ||
-                      state is UploadCommentImageLoadingState ||
-                      state is GetCommentsLoading
-                  ? const CircleAvatar(
-                      radius: 10,
-                      child: CircularProgressIndicator(
-                        color: defaultTextColor,
-                        strokeWidth: 2.5,
-                      ),
-                    )
-                  : const Icon(Icons.send_outlined),
+            return AbsorbPointer(
+              absorbing: state is AddCommentLoading ||
+                  state is UploadCommentImageLoadingState ||
+                  state is GetCommentsLoading,
+              child: IconButton(
+                onPressed: () async {
+                  SocialCubit socialCubit =
+                      BlocProvider.of<SocialCubit>(context);
+                  UserModel myUserModel = socialCubit.userModel!;
+                  // Send the comment when the send button is pressed
+                  await _sendCommentMethod(
+                    commentsCubit: commentsCubit,
+                    postId: postId,
+                    myUserModel: myUserModel,
+                    socialCubit: socialCubit,
+                    commentsNum: commentsNum,
+                  );
+                },
+                // Show a loading indicator if a comment is being sent or image is uploading
+                icon: state is AddCommentLoading ||
+                        state is UploadCommentImageLoadingState ||
+                        state is GetCommentsLoading
+                    ? const CircleAvatar(
+                        radius: 10,
+                        child: CircularProgressIndicator(
+                          color: defaultTextColor,
+                          strokeWidth: 2.5,
+                        ),
+                      )
+                    : const Icon(Icons.send_outlined),
+              ),
             );
           },
         ),

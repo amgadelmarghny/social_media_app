@@ -2,13 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 import 'package:social_media_app/models/post_model.dart';
 import 'package:social_media_app/modules/post/post_view.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/components/custom_read_more_text.dart';
 import 'package:social_media_app/shared/components/image_viewer_screen.dart';
 import 'package:social_media_app/shared/components/post_item_image.dart';
+import 'package:social_media_app/shared/components/date_utils.dart';
 import '../../modules/feeds/widgets/interactive_row.dart';
 import '../../modules/feeds/widgets/profile_post_row.dart';
 import 'constants.dart';
@@ -97,9 +97,7 @@ class _PostItemState extends State<PostItem> {
                 ProfilePostRow(
                   image: widget.postModel.profilePhoto,
                   userName: widget.postModel.userName,
-                  timePosted: DateFormat.yMMMd()
-                      .add_jm()
-                      .format(widget.postModel.dateTime),
+                  timePosted: getFriendlyTimeLabel(widget.postModel.dateTime),
                   userUid: widget.postModel.creatorUid,
                   postId: widget.postId,
                 ),

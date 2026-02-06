@@ -38,7 +38,7 @@ abstract class FontsStyle {
     return TextStyle(
       fontFamily: 'Poppins',
       color: color,
-      fontSize: getResponsiveFontSize(fontSize: 1),
+      fontSize: getResponsiveFontSize(fontSize: 12),
       fontWeight: FontWeight.normal,
     );
   }

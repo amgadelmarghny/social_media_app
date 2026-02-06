@@ -88,12 +88,9 @@ class _ChatsBodyState extends State<ChatsBody> {
                 // Each row is wrapped in two Skeletonizer widgets to emulate loading states
                 itemBuilder: (context, index) => Skeletonizer(
                   enabled: state is GetChatsLoadingState,
-                  child: Skeletonizer(
-                    enabled: state is GetChatsLoadingState,
-                    child: ChatItem(
-                      chatItemModel: BlocProvider.of<ChatCubit>(context)
-                          .chatItemsList[index],
-                    ),
+                  child: ChatItem(
+                    chatItemModel: BlocProvider.of<ChatCubit>(context)
+                        .chatItemsList[index],
                   ),
                 ),
                 // Add a gap between chat preview items

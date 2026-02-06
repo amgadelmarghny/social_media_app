@@ -8,8 +8,8 @@ import 'package:social_media_app/modules/user/user_view.dart';
 import 'package:social_media_app/shared/bloc/social_cubit/social_cubit.dart';
 import 'package:social_media_app/shared/components/image_viewer_screen.dart';
 import 'package:social_media_app/shared/components/profile_picture_with_story.dart';
+import 'package:social_media_app/shared/components/date_utils.dart';
 import '../style/fonts/font_style.dart';
-import 'custom_time_ago.dart';
 
 class CommentItem extends StatelessWidget {
   const CommentItem({
@@ -63,7 +63,7 @@ class CommentItem extends StatelessWidget {
                     children: [
                       GestureDetector(
                         onTap: () async {
-                         final UserModel? userModel =
+                          final UserModel? userModel =
                               await BlocProvider.of<SocialCubit>(context)
                                   .getUserData(userUid: commentModel.userUid);
                           if (context.mounted && userModel != null) {
@@ -143,7 +143,7 @@ class CommentItem extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      timeAgo(commentModel.dateTime),
+                      getFriendlyTimeLabel(commentModel.dateTime),
                       style: FontsStyle.font18PopinWithShadowOption(
                           isShadow: true),
                     ),
