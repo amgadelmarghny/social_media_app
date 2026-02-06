@@ -691,6 +691,7 @@ class SocialCubit extends Cubit<SocialState> {
                 title: '${userModel!.firstName} ${userModel!.lastName}',
                 body: 'published a new post',
                 senderPhoto: userModel!.photo,
+                messageImage: postModel.postImage,
                 data: {
                   'type': 'post',
                   'postId': postDocId,

@@ -72,6 +72,22 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
       }
     }
   }
+  // Always show local notification for rich style (if it has data)
+  if (message.data.containsKey('title')) {
+    try {
+      final notificationService = NotificationService();
+      await notificationService.initialize();
+      await notificationService.showLocalNotification(
+        title: message.data['title'] ?? 'New Notification',
+        body: message.data['body'] ?? '',
+        payload: jsonEncode(message.data),
+        senderPhoto: message.data['senderPhoto'],
+        messageImage: message.data['messageImage'],
+      );
+    } catch (e) {
+      debugPrint("Error showing local notification in background: $e");
+    }
+  }
 }
 
 /// Service class to manage all notification-related functionality
@@ -101,6 +117,7 @@ class NotificationService {
     required String title,
     required String body,
     String? senderPhoto,
+    String? messageImage,
     Map<String, dynamic>? data,
   }) async {
     final credentials = await _getAccessToken();
@@ -116,28 +133,22 @@ class NotificationService {
       body: jsonEncode({
         'message': {
           'token': receiverToken,
-          'notification': {
+          'data': {
             'title': title,
             'body': body,
-            if (senderPhoto != null && senderPhoto.isNotEmpty)
-              'image': senderPhoto,
-          },
-          'data': {
             ...?data?.map((key, value) => MapEntry(key, value.toString())),
             if (senderPhoto != null && senderPhoto.isNotEmpty)
               'senderPhoto': senderPhoto,
+            if (messageImage != null && messageImage.isNotEmpty)
+              'messageImage': messageImage,
           },
           'android': {
             'priority': 'high',
-            'notification': {
-              'sound': 'default',
-              'channel_id': 'high_importance_channel',
-              'click_action': 'FLUTTER_NOTIFICATION_CLICK',
-            },
           },
           'apns': {
             'payload': {
               'aps': {
+                'content-available': 1,
                 'sound': 'default',
               },
             },
@@ -278,50 +289,77 @@ class NotificationService {
   /// Handle foreground messages by showing local notification
   Future<void> _handleForegroundMessage(RemoteMessage message) async {
     debugPrint('Foreground message received: ${message.messageId}');
-    debugPrint('Title: ${message.notification?.title}');
-    debugPrint('Body: ${message.notification?.body}');
 
-    // Show local notification when app is in foreground
-    if (message.notification != null) {
-      await _showLocalNotification(
+    // Show local notification from data even if notification block is missing
+    if (message.data.containsKey('title')) {
+      await showLocalNotification(
+        title: message.data['title'] ?? 'New Notification',
+        body: message.data['body'] ?? '',
+        payload: jsonEncode(message.data),
+        senderPhoto: message.data['senderPhoto'],
+        messageImage: message.data['messageImage'],
+      );
+    } else if (message.notification != null) {
+      // Fallback for standard notifications
+      await showLocalNotification(
         title: message.notification!.title ?? 'New Notification',
         body: message.notification!.body ?? '',
-        payload: message.data.toString(),
-        imageUrl: message.data['senderPhoto'] ??
-            message.notification!.android?.imageUrl,
+        payload: jsonEncode(message.data),
+        senderPhoto: message.data['senderPhoto'],
+        messageImage: message.data['messageImage'],
       );
     }
   }
 
   /// Download and save image to local storage for local notifications
   Future<String?> _downloadAndSaveFile(String url, String fileName) async {
-    final Directory directory = await getApplicationDocumentsDirectory();
-    final String filePath = '${directory.path}/$fileName';
-    final http.Response response = await http.get(Uri.parse(url));
-    final File file = File(filePath);
-    await file.writeAsBytes(response.bodyBytes);
-    return filePath;
+    try {
+      final Directory directory = await getTemporaryDirectory();
+      final String filePath =
+          '${directory.path}/${DateTime.now().millisecondsSinceEpoch}_$fileName';
+      final http.Response response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final File file = File(filePath);
+        await file.writeAsBytes(response.bodyBytes);
+        debugPrint('File downloaded successfully to $filePath');
+        return filePath;
+      }
+    } catch (e) {
+      debugPrint('Error downloading file from $url: $e');
+    }
+    return null;
   }
 
   /// Show local notification
-  Future<void> _showLocalNotification({
+  Future<void> showLocalNotification({
     required String title,
     required String body,
     String? payload,
-    String? imageUrl,
+    String? senderPhoto,
+    String? messageImage,
   }) async {
     String? largeIconPath;
-    if (imageUrl != null && imageUrl.isNotEmpty) {
+    if (senderPhoto != null && senderPhoto.isNotEmpty) {
       try {
         largeIconPath =
-            await _downloadAndSaveFile(imageUrl, 'notification_icon.jpg');
+            await _downloadAndSaveFile(senderPhoto, 'sender_photo.jpg');
       } catch (e) {
-        debugPrint('Error downloading notification icon: $e');
+        debugPrint('Error downloading sender photo: $e');
+      }
+    }
+
+    String? bigPicturePath;
+    if (messageImage != null && messageImage.isNotEmpty) {
+      try {
+        bigPicturePath =
+            await _downloadAndSaveFile(messageImage, 'message_image.jpg');
+      } catch (e) {
+        debugPrint('Error downloading message image: $e');
       }
     }
 
     AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-      'high_importance_channel', // Must match the channel ID created
+      'high_importance_channel',
       'High Importance Notifications',
       channelDescription: 'This channel is used for important notifications',
       importance: Importance.high,
@@ -331,10 +369,16 @@ class NotificationService {
       playSound: true,
       largeIcon:
           largeIconPath != null ? FilePathAndroidBitmap(largeIconPath) : null,
-      styleInformation: (imageUrl != null && imageUrl.isNotEmpty)
-          ? const BigTextStyleInformation(
-              '') // Needed to show large icon properly sometimes, or just use default
-          : null,
+      styleInformation: bigPicturePath != null
+          ? BigPictureStyleInformation(
+              FilePathAndroidBitmap(bigPicturePath),
+              largeIcon: largeIconPath != null
+                  ? FilePathAndroidBitmap(largeIconPath)
+                  : null,
+              contentTitle: title,
+              summaryText: body,
+            )
+          : BigTextStyleInformation(body),
     );
 
     DarwinNotificationDetails iosDetails = const DarwinNotificationDetails(
@@ -349,7 +393,7 @@ class NotificationService {
     );
 
     await _flutterLocalNotificationsPlugin.show(
-      DateTime.now().millisecond, // Unique notification ID
+      DateTime.now().millisecondsSinceEpoch % 100000,
       title,
       body,
       notificationDetails,

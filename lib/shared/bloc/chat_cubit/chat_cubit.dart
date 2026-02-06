@@ -129,14 +129,14 @@ class ChatCubit extends Cubit<ChatState> {
 
     if (messageModel.voiceRecord != null &&
         messageModel.voiceRecord!.isNotEmpty) {
-      notificationContent = 'Voice recording';
+      notificationContent = '🎤 Voice recording';
     } else if (messageModel.images != null && messageModel.images!.isNotEmpty) {
       // If image matches with text
       if (messageModel.textMessage != null &&
           messageModel.textMessage!.isNotEmpty) {
         notificationContent = messageModel.textMessage!;
       } else {
-        notificationContent = 'Sent an image';
+        notificationContent = '📷 Image';
       }
     } else {
       notificationContent = messageModel.textMessage ?? '';
@@ -175,6 +175,10 @@ class ChatCubit extends Cubit<ChatState> {
                   title: senderName,
                   body: notificationContent,
                   senderPhoto: senderData['photo'],
+                  messageImage: (messageModel.images != null &&
+                          messageModel.images!.isNotEmpty)
+                      ? messageModel.images!.first
+                      : null,
                   data: {
                     'type': 'message',
                     'uid': messageModel.uid,
